@@ -15,14 +15,14 @@ import (
 
 type runner struct {
 	bin         string
-	listenAddr  string
+	listenPort  uint16
 	etcdCluster []string
 }
 
-func New(bin string, listenAddr string, etcdCluster []string) ifrit.Runner {
+func New(bin string, listenPort uint16, etcdCluster []string) ifrit.Runner {
 	return &runner{
 		bin:         bin,
-		listenAddr:  listenAddr,
+		listenPort:  listenPort,
 		etcdCluster: etcdCluster,
 	}
 }
@@ -32,7 +32,7 @@ func (r *runner) Run(signals <-chan os.Signal, ready chan<- struct{}) error {
 		exec.Command(
 			r.bin,
 			"-etcdCluster", strings.Join(r.etcdCluster, ","),
-			"-listenAddr", r.listenAddr,
+			"-listenAddr", fmt.Sprintf("0.0.0.0:%d", r.listenPort),
 		),
 		ginkgo.GinkgoWriter,
 		ginkgo.GinkgoWriter,

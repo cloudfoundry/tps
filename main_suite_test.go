@@ -18,7 +18,7 @@ import (
 )
 
 var runner ifrit.Runner
-var tpsAddr string
+var tpsPort uint16
 
 var etcdRunner *etcdstorerunner.ETCDClusterRunner
 var store storeadapter.StoreAdapter
@@ -43,11 +43,11 @@ var _ = BeforeEach(func() {
 
 	bbs = Bbs.NewBBS(store, timeprovider.NewTimeProvider(), logger)
 
-	tpsAddr = fmt.Sprintf("127.0.0.1:%d", 1518+GinkgoParallelNode())
+	tpsPort = uint16(1518 + GinkgoParallelNode())
 
 	runner = tpsrunner.New(
 		tpsPath,
-		tpsAddr,
+		tpsPort,
 		[]string{fmt.Sprintf("http://127.0.0.1:%d", etcdPort)},
 	)
 })

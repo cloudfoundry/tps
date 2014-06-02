@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"syscall"
 
@@ -27,7 +28,7 @@ var _ = Describe("TPS", func() {
 			Transport: &http.Transport{},
 		}
 
-		requestGenerator = router.NewRequestGenerator("http://"+tpsAddr, api.Routes)
+		requestGenerator = router.NewRequestGenerator(fmt.Sprintf("http://127.0.0.1:%d", tpsPort), api.Routes)
 	})
 
 	AfterEach(func() {
