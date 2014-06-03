@@ -37,6 +37,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			InstanceGuid: instance.InstanceGuid,
 			Index:        uint(instance.Index),
 			State:        handler.stateFor(instance.State),
+			Since:        instance.Since,
 		}
 
 	}

@@ -106,6 +106,7 @@ var _ = Describe("TPS", func() {
 					InstanceGuid: "some-instance-guid-1",
 
 					Index: 0,
+					Since: timeProvider.Time().UnixNano(),
 
 					State: "starting",
 				}))
@@ -115,6 +116,7 @@ var _ = Describe("TPS", func() {
 					InstanceGuid: "some-instance-guid-2",
 
 					Index: 1,
+					Since: timeProvider.Time().UnixNano(),
 
 					State: "running",
 				}))
@@ -124,6 +126,7 @@ var _ = Describe("TPS", func() {
 					InstanceGuid: "some-instance-guid-3",
 
 					Index: 2,
+					Since: timeProvider.Time().UnixNano(),
 
 					State: "running",
 				}))
