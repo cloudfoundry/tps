@@ -54,7 +54,7 @@ var _ = Describe("TPS", func() {
 					Index: 0,
 
 					State: models.ActualLRPStateStarting,
-				})
+				}, "executor-id")
 
 				bbs.ReportActualLRPAsRunning(models.ActualLRP{
 					ProcessGuid:  "some-process-guid",
@@ -63,7 +63,7 @@ var _ = Describe("TPS", func() {
 					Index: 1,
 
 					State: models.ActualLRPStateRunning,
-				})
+				}, "executor-id")
 
 				bbs.ReportActualLRPAsRunning(models.ActualLRP{
 					ProcessGuid:  "some-process-guid",
@@ -72,7 +72,7 @@ var _ = Describe("TPS", func() {
 					Index: 2,
 
 					State: models.ActualLRPStateRunning,
-				})
+				}, "executor-id")
 
 				bbs.ReportActualLRPAsRunning(models.ActualLRP{
 					ProcessGuid:  "some-other-process-guid",
@@ -81,7 +81,7 @@ var _ = Describe("TPS", func() {
 					Index: 0,
 
 					State: models.ActualLRPStateRunning,
-				})
+				}, "executor-id")
 			})
 
 			It("reports the state of the given process guid's instances", func() {
