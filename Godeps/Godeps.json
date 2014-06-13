@@ -36,7 +36,7 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/storeadapter",
-			"Rev": "65a22cbed10ebcd7708870001cbc6f2d3f5263ae"
+			"Rev": "302ed5235641e156e4d443fe31fb3f8a813a1318"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/yagnats",
