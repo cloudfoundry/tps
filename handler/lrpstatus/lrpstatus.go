@@ -2,6 +2,7 @@ package lrpstatus
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
@@ -24,11 +25,20 @@ func NewHandler(bbs Bbs.TPSBBS, logger *gosteno.Logger) http.Handler {
 }
 
 func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	actual, err := handler.bbs.GetActualLRPsByProcessGuid(r.FormValue(":guid"))
+	guid := r.FormValue(":guid")
+
+	handler.logger.Infof("request for lrp %s received", guid)
+
+	actual, err := handler.bbs.GetActualLRPsByProcessGuid(guid)
 	if err != nil {
+		handler.logger.Errord(map[string]interface{}{
+			"error": err.Error(),
+		}, "tps.lrps")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	handler.logger.Infof("retrieved lrp information for %s from bbs", guid)
 
 	instances := make([]api.LRPInstance, len(actual))
 	for i, instance := range actual {
@@ -42,7 +52,15 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	json.NewEncoder(w).Encode(instances)
+	err = json.NewEncoder(w).Encode(instances)
+
+	handler.logger.Infof("responding with lrp information for %s: %#v", guid, instances)
+
+	if err != nil {
+		handler.logger.Errord(map[string]interface{}{
+			"error": fmt.Sprintf("failed to stream response for %s: %s", guid, err),
+		}, "tps.lrps")
+	}
 }
 
 func (handler *handler) stateFor(state models.ActualLRPState) string {
