@@ -49,9 +49,11 @@ func (hr *HeartbeatRunner) Run(signals <-chan os.Signal, ready chan<- struct{}) 
 
 	ticker := time.NewTicker(hr.heartbeatInterval)
 	heartbeatChan := make(chan error)
-	inflight := false
 
 	close(ready)
+
+	inflight := true
+	go hr.heartbeat(natsClient, heartbeatChan)
 
 	for {
 		select {
