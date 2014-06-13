@@ -4,48 +4,37 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"syscall"
+	"time"
 
 	"github.com/cloudfoundry-incubator/runtime-schema/models"
+	"github.com/cloudfoundry/yagnats"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/router"
 
 	"github.com/cloudfoundry-incubator/tps/api"
+	"github.com/cloudfoundry-incubator/tps/heartbeat"
 )
 
 var _ = Describe("TPS", func() {
-	var tps ifrit.Process
 
 	var httpClient *http.Client
 	var requestGenerator *router.RequestGenerator
+	var natsClient yagnats.NATSClient
 
 	BeforeEach(func() {
-		tps = ifrit.Envoke(runner)
-
+		natsClient = natsRunner.MessageBus
+		requestGenerator = router.NewRequestGenerator(fmt.Sprintf("http://%s", tpsAddr), api.Routes)
 		httpClient = &http.Client{
 			Transport: &http.Transport{},
 		}
-
-		requestGenerator = router.NewRequestGenerator(fmt.Sprintf("http://127.0.0.1:%d", tpsPort), api.Routes)
-	})
-
-	AfterEach(func() {
-		tps.Signal(syscall.SIGTERM)
-		Eventually(tps.Wait(), 5).Should(Receive(BeNil()))
 	})
 
 	Describe("GET /lrps/:guid", func() {
 		Context("when etcd is running", func() {
-			BeforeEach(func() {
-				etcdRunner.Start()
-			})
-
-			AfterEach(func() {
-				etcdRunner.Stop()
-			})
-
 			BeforeEach(func() {
 				bbs.ReportActualLRPAsStarting(models.ActualLRP{
 					ProcessGuid:  "some-process-guid",
@@ -134,6 +123,10 @@ var _ = Describe("TPS", func() {
 		})
 
 		Context("when etcd is not running", func() {
+			BeforeEach(func() {
+				etcdRunner.Stop()
+			})
+
 			It("returns 500", func() {
 				getLRPs, err := requestGenerator.RequestForHandler(
 					api.LRPStatus,
@@ -147,6 +140,78 @@ var _ = Describe("TPS", func() {
 
 				Ω(response.StatusCode).Should(Equal(http.StatusInternalServerError))
 			})
+		})
+	})
+
+	Context("when the NATS server is running", func() {
+		var tpsNatsSubject = "service.announce.tps"
+		var announceMsg chan *yagnats.Message
+
+		BeforeEach(func() {
+			announceMsg = make(chan *yagnats.Message)
+			natsClient.Subscribe(tpsNatsSubject, func(msg *yagnats.Message) {
+				announceMsg <- msg
+			})
+		})
+
+		AfterEach(func() {
+			natsClient.UnsubscribeAll(tpsNatsSubject)
+		})
+
+		It("heartbeats announcement messages at the predefined interval", func() {
+			Eventually(announceMsg, heartbeatInterval+time.Second).Should(Receive())
+			Eventually(announceMsg, heartbeatInterval+time.Second).Should(Receive())
+		})
+
+		Describe("published HeartbeatMessage", func() {
+			var heartbeatMsg heartbeat.HeartbeatMessage
+
+			BeforeEach(func(done Done) {
+				heartbeatMsg = heartbeat.HeartbeatMessage{}
+				msg := <-announceMsg
+				err := json.Unmarshal(msg.Payload, &heartbeatMsg)
+				Ω(err).ShouldNot(HaveOccurred())
+				close(done)
+			})
+
+			It("contains the correct tps address", func() {
+				Ω(heartbeatMsg.Addr).Should(Equal(fmt.Sprintf("http://%s", tpsAddr)))
+			})
+
+			It("a ttl 3 times longer than the heartbeatInterval, in seconds", func() {
+				Ω(heartbeatMsg.TTL).Should(Equal(uint(3)))
+			})
+		})
+	})
+
+	Context("when the NATS server is down while starting up", func() {
+		BeforeEach(func() {
+			tps.Signal(os.Kill)
+			Eventually(tps.Wait()).Should(Receive(nil))
+
+			natsRunner.KillWithFire()
+
+			tps = ifrit.Envoke(runner)
+		})
+
+		It("exits imediately", func() {
+			Eventually(tps.Wait()).Should(Receive())
+		})
+	})
+
+	Context("when the NATS server goes down after startup", func() {
+		BeforeEach(func() {
+			natsRunner.KillWithFire()
+			time.Sleep(50 * time.Millisecond)
+		})
+
+		It("does not exit", func() {
+			Consistently(tps.Wait()).ShouldNot(Receive())
+		})
+
+		It("exits when we send a signal", func() {
+			tps.Signal(syscall.SIGINT)
+			Eventually(tps.Wait()).Should(Receive())
 		})
 	})
 })

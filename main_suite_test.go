@@ -2,10 +2,12 @@ package main_test
 
 import (
 	"fmt"
+	"os"
 
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
 	"github.com/cloudfoundry-incubator/tps/integration/tpsrunner"
 	"github.com/cloudfoundry/gosteno"
+	"github.com/cloudfoundry/gunk/natsrunner"
 	"github.com/cloudfoundry/gunk/timeprovider/faketimeprovider"
 	"github.com/cloudfoundry/storeadapter"
 	"github.com/cloudfoundry/storeadapter/storerunner/etcdstorerunner"
@@ -18,23 +20,23 @@ import (
 	"time"
 )
 
-var runner ifrit.Runner
-var tpsPort uint16
-
-var etcdRunner *etcdstorerunner.ETCDClusterRunner
 var store storeadapter.StoreAdapter
 var bbs *Bbs.BBS
 var timeProvider *faketimeprovider.FakeTimeProvider
 
+var tpsAddr string
+var tps ifrit.Process
+var runner ifrit.Runner
+
+var etcdRunner *etcdstorerunner.ETCDClusterRunner
+var natsRunner *natsrunner.NATSRunner
+
+var heartbeatInterval = 50 * time.Millisecond
+
 var _ = BeforeEach(func() {
-	tpsPath, err := gexec.Build("github.com/cloudfoundry-incubator/tps", "-race")
-	Ω(err).ShouldNot(HaveOccurred())
-
+	tpsAddr = fmt.Sprintf("127.0.0.1:%d", uint16(1518+GinkgoParallelNode()))
 	etcdPort := 5001 + GinkgoParallelNode()
-
-	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1)
-
-	store = etcdRunner.Adapter()
+	natsPort := 4001 + GinkgoParallelNode()
 
 	logSink := gosteno.NewTestingSink()
 	gosteno.Init(&gosteno.Config{
@@ -43,19 +45,57 @@ var _ = BeforeEach(func() {
 	logger := gosteno.NewLogger("the-logger")
 	gosteno.EnterTestMode()
 
+	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1)
+
+	store = etcdRunner.Adapter()
 	timeProvider = faketimeprovider.New(time.Unix(0, 1138))
 	bbs = Bbs.NewBBS(store, timeProvider, logger)
 
-	tpsPort = uint16(1518 + GinkgoParallelNode())
+	natsRunner = natsrunner.NewNATSRunner(natsPort)
+
+	tpsPath, err := gexec.Build("github.com/cloudfoundry-incubator/tps", "-race")
+	Ω(err).ShouldNot(HaveOccurred())
 
 	runner = tpsrunner.New(
 		tpsPath,
-		tpsPort,
+		tpsAddr,
 		[]string{fmt.Sprintf("http://127.0.0.1:%d", etcdPort)},
+		[]string{fmt.Sprintf("127.0.0.1:%d", natsPort)},
+		heartbeatInterval,
 	)
+
+	startAll()
 })
 
 func TestTPS(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "TPS Suite")
+}
+
+var _ = AfterEach(func() {
+	stopAll()
+})
+
+var _ = AfterSuite(func() {
+	gexec.CleanupBuildArtifacts()
+	stopAll()
+})
+
+func startAll() {
+	etcdRunner.Start()
+	natsRunner.Start()
+	tps = ifrit.Envoke(runner)
+}
+
+func stopAll() {
+	if etcdRunner != nil {
+		etcdRunner.Stop()
+	}
+	if natsRunner != nil {
+		natsRunner.Stop()
+	}
+	if tps != nil {
+		tps.Signal(os.Kill)
+		Eventually(tps.Wait()).Should(Receive())
+	}
 }
