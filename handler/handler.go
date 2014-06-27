@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry-incubator/tps/api"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
 	"github.com/cloudfoundry/gosteno"
-	"github.com/tedsuo/router"
+	"github.com/tedsuo/rata"
 )
 
 func New(bbs Bbs.TPSBBS, logger *gosteno.Logger) (http.Handler, error) {
@@ -15,5 +15,5 @@ func New(bbs Bbs.TPSBBS, logger *gosteno.Logger) (http.Handler, error) {
 		api.LRPStatus: lrpstatus.NewHandler(bbs, logger),
 	}
 
-	return router.NewRouter(api.Routes, handlers)
+	return rata.NewRouter(api.Routes, handlers)
 }

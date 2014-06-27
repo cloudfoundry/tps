@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/tedsuo/ifrit"
-	"github.com/tedsuo/router"
+	"github.com/tedsuo/rata"
 
 	"github.com/cloudfoundry-incubator/tps/api"
 	"github.com/cloudfoundry-incubator/tps/heartbeat"
@@ -22,12 +22,12 @@ import (
 var _ = Describe("TPS", func() {
 
 	var httpClient *http.Client
-	var requestGenerator *router.RequestGenerator
+	var requestGenerator *rata.RequestGenerator
 	var natsClient yagnats.NATSClient
 
 	BeforeEach(func() {
 		natsClient = natsRunner.MessageBus
-		requestGenerator = router.NewRequestGenerator(fmt.Sprintf("http://%s", tpsAddr), api.Routes)
+		requestGenerator = rata.NewRequestGenerator(fmt.Sprintf("http://%s", tpsAddr), api.Routes)
 		httpClient = &http.Client{
 			Transport: &http.Transport{},
 		}
@@ -74,9 +74,9 @@ var _ = Describe("TPS", func() {
 			})
 
 			It("reports the state of the given process guid's instances", func() {
-				getLRPs, err := requestGenerator.RequestForHandler(
+				getLRPs, err := requestGenerator.CreateRequest(
 					api.LRPStatus,
-					router.Params{"guid": "some-process-guid"},
+					rata.Params{"guid": "some-process-guid"},
 					nil,
 				)
 				Ω(err).ShouldNot(HaveOccurred())
@@ -128,9 +128,9 @@ var _ = Describe("TPS", func() {
 			})
 
 			It("returns 500", func() {
-				getLRPs, err := requestGenerator.RequestForHandler(
+				getLRPs, err := requestGenerator.CreateRequest(
 					api.LRPStatus,
-					router.Params{"guid": "some-process-guid"},
+					rata.Params{"guid": "some-process-guid"},
 					nil,
 				)
 				Ω(err).ShouldNot(HaveOccurred())
