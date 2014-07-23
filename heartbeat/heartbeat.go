@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cloudfoundry/gosteno"
 	"github.com/cloudfoundry/yagnats"
+	"github.com/pivotal-golang/lager"
 )
 
 const HeatbeatSubject = "service.announce.tps"
@@ -24,26 +24,25 @@ type HeartbeatRunner struct {
 	natsPassword      string
 	heartbeatInterval time.Duration
 	serviceAddress    string
-	logger            *gosteno.Logger
+	logger            lager.Logger
 }
 
-func New(natsAddresses, natsUsername, natsPassword string, heartbeatInterval time.Duration, serviceAddress string, logger *gosteno.Logger) *HeartbeatRunner {
+func New(natsAddresses, natsUsername, natsPassword string, heartbeatInterval time.Duration, serviceAddress string, logger lager.Logger) *HeartbeatRunner {
+	heartbeatLogger := logger.Session("heartbeater")
 	return &HeartbeatRunner{
 		natsAddresses:     natsAddresses,
 		natsUsername:      natsUsername,
 		natsPassword:      natsPassword,
 		heartbeatInterval: heartbeatInterval,
 		serviceAddress:    serviceAddress,
-		logger:            logger,
+		logger:            heartbeatLogger,
 	}
 }
 
 func (hr *HeartbeatRunner) Run(signals <-chan os.Signal, ready chan<- struct{}) error {
 	natsClient, err := initializeNatsClient(hr.natsAddresses, hr.natsUsername, hr.natsPassword)
 	if err != nil {
-		hr.logger.Errord(map[string]interface{}{
-			"error": fmt.Sprintf("Error connecting to NATS: %s\n", err),
-		}, "tps.hearbeater-init.failed")
+		hr.logger.Error("init-failure-connecting-to-nats", err)
 		return err
 	}
 
@@ -63,9 +62,7 @@ func (hr *HeartbeatRunner) Run(signals <-chan os.Signal, ready chan<- struct{}) 
 		case err := <-heartbeatChan:
 			inflight = false
 			if err != nil {
-				hr.logger.Errord(map[string]interface{}{
-					"error": fmt.Sprintf("Error sending heartbeat: %s\n", err),
-				}, "tps.hearbeater.failed")
+				hr.logger.Error("failed", err)
 				return err
 			}
 
@@ -91,14 +88,14 @@ func (hr *HeartbeatRunner) heartbeat(natsClient yagnats.NATSClient, heartbeatCha
 		return
 	}
 
-	hr.logger.Info("tps.hearbeater.will-heartbeat")
+	hr.logger.Info("will-heartbeat")
 	err = natsClient.Publish(HeatbeatSubject, payload)
 	if err != nil {
 		heartbeatChan <- err
 		return
 	}
 
-	hr.logger.Info("tps.hearbeater.heartbeat")
+	hr.logger.Info("heartbeat")
 
 	heartbeatChan <- nil
 }

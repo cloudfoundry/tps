@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cloudfoundry-incubator/cf-lager"
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
 	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry-incubator/tps/heartbeat"
@@ -16,6 +17,7 @@ import (
 	"github.com/cloudfoundry/gunk/timeprovider"
 	"github.com/cloudfoundry/storeadapter/etcdstoreadapter"
 	"github.com/cloudfoundry/storeadapter/workerpool"
+	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/grouper"
 	"github.com/tedsuo/ifrit/http_server"
@@ -67,8 +69,9 @@ var syslogName = flag.String(
 func main() {
 	flag.Parse()
 
-	logger := initializeLogger()
-	bbs := initializeBbs(logger)
+	logger := cf_lager.New("tps")
+	stenoLogger := initializeStenoLogger()
+	bbs := initializeBbs(stenoLogger)
 	apiHandler := initializeHandler(logger, bbs)
 
 	group := grouper.EnvokeGroup(grouper.RunGroup{
@@ -84,7 +87,7 @@ func main() {
 
 	monitor := ifrit.Envoke(sigmon.New(group))
 
-	logger.Infof("tps.started")
+	logger.Info("started")
 
 	waitChan := monitor.Wait()
 	exitChan := group.Exits()
@@ -93,28 +96,23 @@ func main() {
 		select {
 		case member := <-exitChan:
 			if member.Error != nil {
-				logger.Errord(map[string]interface{}{
-					"error": member.Error.Error(),
-				}, fmt.Sprintf("tps.%s.exited", member.Name))
-
+				logger.Error(fmt.Sprintf("%s.exited", member.Name), member.Error)
 				monitor.Signal(syscall.SIGTERM)
 			}
 
 		case err := <-waitChan:
 			if err != nil {
-				logger.Errord(map[string]interface{}{
-					"error": err.Error(),
-				}, "tps.exited")
+				logger.Error("exited", err)
 				os.Exit(1)
 			}
 
-			logger.Info("tps.exited")
+			logger.Info("exited")
 			os.Exit(0)
 		}
 	}
 }
 
-func initializeLogger() *gosteno.Logger {
+func initializeStenoLogger() *gosteno.Logger {
 	stenoConfig := &gosteno.Config{
 		Sinks: []gosteno.Sink{
 			gosteno.NewIOSink(os.Stdout),
@@ -144,12 +142,10 @@ func initializeBbs(logger *gosteno.Logger) Bbs.TPSBBS {
 	return Bbs.NewTPSBBS(etcdAdapter, timeprovider.NewTimeProvider(), logger)
 }
 
-func initializeHandler(logger *gosteno.Logger, bbs Bbs.TPSBBS) http.Handler {
+func initializeHandler(logger lager.Logger, bbs Bbs.TPSBBS) http.Handler {
 	apiHandler, err := handler.New(bbs, logger)
 	if err != nil {
-		logger.Fatald(map[string]interface{}{
-			"error": err.Error(),
-		}, "tps.initialize-handler.failed")
+		logger.Fatal("initialize-handler.failed", err)
 	}
 
 	return apiHandler

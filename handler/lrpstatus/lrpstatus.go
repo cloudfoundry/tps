@@ -2,22 +2,21 @@ package lrpstatus
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
 	"github.com/cloudfoundry-incubator/runtime-schema/models"
-	"github.com/cloudfoundry/gosteno"
+	"github.com/pivotal-golang/lager"
 
 	"github.com/cloudfoundry-incubator/tps/api"
 )
 
 type handler struct {
 	bbs    Bbs.TPSBBS
-	logger *gosteno.Logger
+	logger lager.Logger
 }
 
-func NewHandler(bbs Bbs.TPSBBS, logger *gosteno.Logger) http.Handler {
+func NewHandler(bbs Bbs.TPSBBS, logger lager.Logger) http.Handler {
 	return &handler{
 		bbs:    bbs,
 		logger: logger,
@@ -25,20 +24,20 @@ func NewHandler(bbs Bbs.TPSBBS, logger *gosteno.Logger) http.Handler {
 }
 
 func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	lrpLogger := handler.logger.Session("lrp-handler")
+
 	guid := r.FormValue(":guid")
 
-	handler.logger.Infof("request for lrp %s received", guid)
+	lrpLogger.Info("request-received", lager.Data{"guid": guid})
 
 	actual, err := handler.bbs.GetActualLRPsByProcessGuid(guid)
 	if err != nil {
-		handler.logger.Errord(map[string]interface{}{
-			"error": err.Error(),
-		}, "tps.lrps")
+		lrpLogger.Error("failed-retrieving-bbs-info", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	handler.logger.Infof("retrieved lrp information for %s from bbs", guid)
+	lrpLogger.Info("retrieved-bbs-info", lager.Data{"guid": guid})
 
 	instances := make([]api.LRPInstance, len(actual))
 	for i, instance := range actual {
@@ -46,7 +45,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			ProcessGuid:  instance.ProcessGuid,
 			InstanceGuid: instance.InstanceGuid,
 			Index:        uint(instance.Index),
-			State:        handler.stateFor(instance.State),
+			State:        stateFor(instance.State, lrpLogger),
 			Since:        instance.Since,
 		}
 
@@ -54,26 +53,24 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(instances)
 
-	handler.logger.Infof("responding with lrp information for %s: %#v", guid, instances)
+	lrpLogger.Info("responding", map[string]interface{}{
+		"guid":      guid,
+		"instances": instances,
+	})
 
 	if err != nil {
-		handler.logger.Errord(map[string]interface{}{
-			"error": fmt.Sprintf("failed to stream response for %s: %s", guid, err),
-		}, "tps.lrps")
+		lrpLogger.Error("stream-response-failed", err, lager.Data{"guid": guid})
 	}
 }
 
-func (handler *handler) stateFor(state models.ActualLRPState) string {
+func stateFor(state models.ActualLRPState, logger lager.Logger) string {
 	switch state {
 	case models.ActualLRPStateStarting:
 		return "starting"
 	case models.ActualLRPStateRunning:
 		return "running"
 	default:
-		handler.logger.Errord(map[string]interface{}{
-			"state": state,
-		}, "tps.unknown-state")
-
+		logger.Error("unknown-state", nil, lager.Data{"state": state})
 		return "unknown"
 	}
 }
