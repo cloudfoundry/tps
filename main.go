@@ -59,12 +59,6 @@ var heartbeatInterval = flag.Duration(
 	"the interval, in seconds, between heartbeats for maintaining presence",
 )
 
-var syslogName = flag.String(
-	"syslogName",
-	"",
-	"syslog name",
-)
-
 func main() {
 	flag.Parse()
 
