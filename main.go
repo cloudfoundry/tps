@@ -13,7 +13,6 @@ import (
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
 	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry-incubator/tps/heartbeat"
-	"github.com/cloudfoundry/gosteno"
 	"github.com/cloudfoundry/gunk/timeprovider"
 	"github.com/cloudfoundry/storeadapter/etcdstoreadapter"
 	"github.com/cloudfoundry/storeadapter/workerpool"
@@ -70,8 +69,7 @@ func main() {
 	flag.Parse()
 
 	logger := cf_lager.New("tps")
-	stenoLogger := initializeStenoLogger()
-	bbs := initializeBbs(stenoLogger)
+	bbs := initializeBbs(logger)
 	apiHandler := initializeHandler(logger, bbs)
 
 	group := grouper.EnvokeGroup(grouper.RunGroup{
@@ -112,23 +110,7 @@ func main() {
 	}
 }
 
-func initializeStenoLogger() *gosteno.Logger {
-	stenoConfig := &gosteno.Config{
-		Sinks: []gosteno.Sink{
-			gosteno.NewIOSink(os.Stdout),
-		},
-	}
-
-	if *syslogName != "" {
-		stenoConfig.Sinks = append(stenoConfig.Sinks, gosteno.NewSyslogSink(*syslogName))
-	}
-
-	gosteno.Init(stenoConfig)
-
-	return gosteno.NewLogger("TPS")
-}
-
-func initializeBbs(logger *gosteno.Logger) Bbs.TPSBBS {
+func initializeBbs(logger lager.Logger) Bbs.TPSBBS {
 	etcdAdapter := etcdstoreadapter.NewETCDStoreAdapter(
 		strings.Split(*etcdCluster, ","),
 		workerpool.NewWorkerPool(10),
@@ -136,7 +118,7 @@ func initializeBbs(logger *gosteno.Logger) Bbs.TPSBBS {
 
 	err := etcdAdapter.Connect()
 	if err != nil {
-		logger.Fatalf("Error connecting to etcd: %s\n", err)
+		logger.Fatal("failed-to-connect-to-etcd", err)
 	}
 
 	return Bbs.NewTPSBBS(etcdAdapter, timeprovider.NewTimeProvider(), logger)

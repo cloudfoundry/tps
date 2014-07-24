@@ -6,7 +6,6 @@ import (
 
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
 	"github.com/cloudfoundry-incubator/tps/integration/tpsrunner"
-	"github.com/cloudfoundry/gosteno"
 	"github.com/cloudfoundry/gunk/natsrunner"
 	"github.com/cloudfoundry/gunk/timeprovider/faketimeprovider"
 	"github.com/cloudfoundry/storeadapter"
@@ -14,6 +13,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
+	"github.com/pivotal-golang/lager/lagertest"
 	"github.com/tedsuo/ifrit"
 
 	"testing"
@@ -38,18 +38,11 @@ var _ = BeforeEach(func() {
 	etcdPort := 5001 + GinkgoParallelNode()
 	natsPort := 4001 + GinkgoParallelNode()
 
-	logSink := gosteno.NewTestingSink()
-	gosteno.Init(&gosteno.Config{
-		Sinks: []gosteno.Sink{logSink},
-	})
-	logger := gosteno.NewLogger("the-logger")
-	gosteno.EnterTestMode()
-
 	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1)
 
 	store = etcdRunner.Adapter()
 	timeProvider = faketimeprovider.New(time.Unix(0, 1138))
-	bbs = Bbs.NewBBS(store, timeProvider, logger)
+	bbs = Bbs.NewBBS(store, timeProvider, lagertest.NewTestLogger("test"))
 
 	natsRunner = natsrunner.NewNATSRunner(natsPort)
 
