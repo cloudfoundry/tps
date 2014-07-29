@@ -28,16 +28,12 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	guid := r.FormValue(":guid")
 
-	lrpLogger.Info("request-received", lager.Data{"guid": guid})
-
 	actual, err := handler.bbs.GetActualLRPsByProcessGuid(guid)
 	if err != nil {
 		lrpLogger.Error("failed-retrieving-bbs-info", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	lrpLogger.Info("retrieved-bbs-info", lager.Data{"guid": guid})
 
 	instances := make([]api.LRPInstance, len(actual))
 	for i, instance := range actual {
@@ -52,11 +48,6 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = json.NewEncoder(w).Encode(instances)
-
-	lrpLogger.Info("responding", map[string]interface{}{
-		"guid":      guid,
-		"instances": instances,
-	})
 
 	if err != nil {
 		lrpLogger.Error("stream-response-failed", err, lager.Data{"guid": guid})
