@@ -48,7 +48,7 @@ func (r *runner) Run(signals <-chan os.Signal, ready chan<- struct{}) error {
 		return err
 	}
 
-	gomega.Eventually(session).Should(gbytes.Say("tps.started"))
+	gomega.Eventually(session, 5).Should(gbytes.Say("tps.started"))
 
 	close(ready)
 
