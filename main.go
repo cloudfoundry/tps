@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cloudfoundry-incubator/cf-debug-server"
 	"github.com/cloudfoundry-incubator/cf-lager"
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
 	"github.com/cloudfoundry-incubator/tps/handler"
@@ -65,6 +66,8 @@ func main() {
 	logger := cf_lager.New("tps")
 	bbs := initializeBbs(logger)
 	apiHandler := initializeHandler(logger, bbs)
+
+	cf_debug_server.Run()
 
 	group := grouper.EnvokeGroup(grouper.RunGroup{
 		"api": http_server.New(*listenAddr, apiHandler),
