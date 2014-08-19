@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/cloudfoundry-incubator/tps",
-	"GoVersion": "go1.3",
+	"GoVersion": "go1.3.1",
 	"Packages": [
 		"./..."
 	],
@@ -28,6 +28,10 @@
 		{
 			"ImportPath": "github.com/cloudfoundry-incubator/runtime-schema/models",
 			"Rev": "538875d73b153d53c129dbc7085206853785fdf9"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/gunk/group_runner",
+			"Rev": "d3d2d94e738fb19b5ae6504be161fd0eacc3f22d"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/gunk/natsrunner",
