@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/cloudfoundry-incubator/cf-debug-server"
@@ -14,12 +13,12 @@ import (
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
 	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry-incubator/tps/heartbeat"
+	"github.com/cloudfoundry/gunk/group_runner"
 	"github.com/cloudfoundry/gunk/timeprovider"
 	"github.com/cloudfoundry/storeadapter/etcdstoreadapter"
 	"github.com/cloudfoundry/storeadapter/workerpool"
 	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/ifrit"
-	"github.com/tedsuo/ifrit/grouper"
 	"github.com/tedsuo/ifrit/http_server"
 	"github.com/tedsuo/ifrit/sigmon"
 )
@@ -69,42 +68,29 @@ func main() {
 
 	cf_debug_server.Run()
 
-	group := grouper.EnvokeGroup(grouper.RunGroup{
-		"api": http_server.New(*listenAddr, apiHandler),
-		"heartbeat": heartbeat.New(
+	group := group_runner.New([]group_runner.Member{
+		{"heartbeat", heartbeat.New(
 			*natsAddresses,
 			*natsUsername,
 			*natsPassword,
 			*heartbeatInterval,
 			fmt.Sprintf("http://%s", *listenAddr),
-			logger),
+			logger)},
+		{"api", http_server.New(*listenAddr, apiHandler)},
 	})
 
 	monitor := ifrit.Envoke(sigmon.New(group))
 
 	logger.Info("started")
 
-	waitChan := monitor.Wait()
-	exitChan := group.Exits()
-
-	for {
-		select {
-		case member := <-exitChan:
-			if member.Error != nil {
-				logger.Error(fmt.Sprintf("%s.exited", member.Name), member.Error)
-				monitor.Signal(syscall.SIGTERM)
-			}
-
-		case err := <-waitChan:
-			if err != nil {
-				logger.Error("exited", err)
-				os.Exit(1)
-			}
-
-			logger.Info("exited")
-			os.Exit(0)
-		}
+	err := <-monitor.Wait()
+	if err != nil {
+		logger.Error("exited", err)
+		os.Exit(1)
 	}
+
+	logger.Info("exited")
+	os.Exit(0)
 }
 
 func initializeBbs(logger lager.Logger) Bbs.TPSBBS {
