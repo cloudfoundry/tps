@@ -33,7 +33,11 @@ var natsRunner *natsrunner.NATSRunner
 
 var heartbeatInterval = 50 * time.Millisecond
 
-var _ = BeforeEach(func() {
+var _ = SynchronizedBeforeSuite(func() []byte {
+	tpsPath, err := gexec.Build("github.com/cloudfoundry-incubator/tps", "-race")
+	Ω(err).ShouldNot(HaveOccurred())
+	return []byte(tpsPath)
+}, func(tpsPath []byte) {
 	tpsAddr = fmt.Sprintf("127.0.0.1:%d", uint16(1518+GinkgoParallelNode()))
 	etcdPort := 5001 + GinkgoParallelNode()
 	natsPort := 4001 + GinkgoParallelNode()
@@ -46,18 +50,13 @@ var _ = BeforeEach(func() {
 
 	natsRunner = natsrunner.NewNATSRunner(natsPort)
 
-	tpsPath, err := gexec.Build("github.com/cloudfoundry-incubator/tps", "-race")
-	Ω(err).ShouldNot(HaveOccurred())
-
 	runner = tpsrunner.New(
-		tpsPath,
+		string(tpsPath),
 		tpsAddr,
 		[]string{fmt.Sprintf("http://127.0.0.1:%d", etcdPort)},
 		[]string{fmt.Sprintf("127.0.0.1:%d", natsPort)},
 		heartbeatInterval,
 	)
-
-	startAll()
 })
 
 func TestTPS(t *testing.T) {
@@ -65,13 +64,18 @@ func TestTPS(t *testing.T) {
 	RunSpecs(t, "TPS Suite")
 }
 
+var _ = BeforeEach(func() {
+	startAll()
+})
+
 var _ = AfterEach(func() {
 	stopAll()
 })
 
-var _ = AfterSuite(func() {
-	gexec.CleanupBuildArtifacts()
+var _ = SynchronizedAfterSuite(func() {
 	stopAll()
+}, func() {
+	gexec.CleanupBuildArtifacts()
 })
 
 func startAll() {
