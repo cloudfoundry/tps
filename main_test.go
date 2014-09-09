@@ -36,14 +36,7 @@ var _ = Describe("TPS", func() {
 	Describe("GET /lrps/:guid", func() {
 		Context("when etcd is running", func() {
 			BeforeEach(func() {
-				bbs.ReportActualLRPAsStarting(models.ActualLRP{
-					ProcessGuid:  "some-process-guid",
-					InstanceGuid: "some-instance-guid-1",
-
-					Index: 0,
-
-					State: models.ActualLRPStateStarting,
-				}, "executor-id")
+				bbs.ReportActualLRPAsStarting("some-process-guid", "some-instance-guid-1", "executor-id", 0)
 
 				bbs.ReportActualLRPAsRunning(models.ActualLRP{
 					ProcessGuid:  "some-process-guid",
