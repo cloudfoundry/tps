@@ -10,6 +10,7 @@ import (
 
 	"github.com/cloudfoundry-incubator/runtime-schema/models"
 	"github.com/cloudfoundry/yagnats"
+	"github.com/apcera/nats"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/tedsuo/ifrit"
@@ -23,7 +24,7 @@ var _ = Describe("TPS", func() {
 
 	var httpClient *http.Client
 	var requestGenerator *rata.RequestGenerator
-	var natsClient yagnats.NATSClient
+	var natsClient yagnats.ApceraWrapperNATSClient
 
 	BeforeEach(func() {
 		natsClient = natsRunner.MessageBus
@@ -138,17 +139,21 @@ var _ = Describe("TPS", func() {
 
 	Context("when the NATS server is running", func() {
 		var tpsNatsSubject = "service.announce.tps"
-		var announceMsg chan *yagnats.Message
+		var announceMsg chan *nats.Msg
+		var subscription *nats.Subscription
 
 		BeforeEach(func() {
-			announceMsg = make(chan *yagnats.Message)
-			natsClient.Subscribe(tpsNatsSubject, func(msg *yagnats.Message) {
+			announceMsg = make(chan *nats.Msg)
+			var err error
+			subscription, err = natsClient.Subscribe(tpsNatsSubject, func(msg *nats.Msg) {
 				announceMsg <- msg
 			})
+			Ω(err).ShouldNot(HaveOccurred())
 		})
 
 		AfterEach(func() {
-			natsClient.UnsubscribeAll(tpsNatsSubject)
+			err := natsClient.Unsubscribe(subscription)
+			Ω(err).ShouldNot(HaveOccurred())
 		})
 
 		It("heartbeats announcement messages at the predefined interval", func() {
@@ -162,7 +167,7 @@ var _ = Describe("TPS", func() {
 			BeforeEach(func(done Done) {
 				heartbeatMsg = heartbeat.HeartbeatMessage{}
 				msg := <-announceMsg
-				err := json.Unmarshal(msg.Payload, &heartbeatMsg)
+				err := json.Unmarshal(msg.Data, &heartbeatMsg)
 				Ω(err).ShouldNot(HaveOccurred())
 				close(done)
 			})
