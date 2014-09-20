@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
+	"github.com/cloudfoundry/gunk/natsclientrunner"
 	"github.com/cloudfoundry/yagnats"
 	"github.com/pivotal-golang/lager"
 )
@@ -40,7 +40,8 @@ func New(natsAddresses, natsUsername, natsPassword string, heartbeatInterval tim
 }
 
 func (hr *HeartbeatRunner) Run(signals <-chan os.Signal, ready chan<- struct{}) error {
-	natsClient, err := initializeNatsClient(hr.natsAddresses, hr.natsUsername, hr.natsPassword)
+	natsClient := natsclientrunner.NewClient(hr.natsAddresses, hr.natsUsername, hr.natsPassword)
+	err := natsClient.Connect()
 	if err != nil {
 		hr.logger.Error("init-failure-connecting-to-nats", err)
 		return err
@@ -76,7 +77,7 @@ func (hr *HeartbeatRunner) Run(signals <-chan os.Signal, ready chan<- struct{}) 
 	}
 }
 
-func (hr *HeartbeatRunner) heartbeat(natsClient yagnats.NATSClient, heartbeatChan chan<- error) {
+func (hr *HeartbeatRunner) heartbeat(natsClient yagnats.ApceraWrapperNATSClient, heartbeatChan chan<- error) {
 	msg := HeartbeatMessage{
 		Addr: hr.serviceAddress,
 		TTL:  ttlFromHeartbeatInterval(hr.heartbeatInterval),
@@ -106,26 +107,4 @@ func ttlFromHeartbeatInterval(heartbeatInterval time.Duration) uint {
 		heartbeatSecs = 1
 	}
 	return heartbeatSecs * 3
-}
-
-func initializeNatsClient(natsAddresses, natsUsername, natsPassword string) (yagnats.NATSClient, error) {
-	natsClient := yagnats.NewClient()
-
-	natsMembers := []yagnats.ConnectionProvider{}
-	for _, addr := range strings.Split(natsAddresses, ",") {
-		natsMembers = append(
-			natsMembers,
-			&yagnats.ConnectionInfo{
-				Addr:     addr,
-				Username: natsUsername,
-				Password: natsPassword,
-			},
-		)
-	}
-
-	err := natsClient.Connect(&yagnats.ConnectionCluster{
-		Members: natsMembers,
-	})
-
-	return natsClient, err
 }
