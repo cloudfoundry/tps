@@ -8,9 +8,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/apcera/nats"
 	"github.com/cloudfoundry-incubator/runtime-schema/models"
 	"github.com/cloudfoundry/yagnats"
-	"github.com/apcera/nats"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/tedsuo/ifrit"
@@ -34,6 +34,16 @@ var _ = Describe("TPS", func() {
 		}
 	})
 
+	JustBeforeEach(func() {
+		tps = ifrit.Envoke(runner)
+	})
+
+	AfterEach(func() {
+		if tps != nil {
+			tps.Signal(os.Kill)
+			Eventually(tps.Wait()).Should(Receive())
+		}
+	})
 	Describe("GET /lrps/:guid", func() {
 		Context("when etcd is running", func() {
 			BeforeEach(func() {
@@ -164,7 +174,7 @@ var _ = Describe("TPS", func() {
 		Describe("published HeartbeatMessage", func() {
 			var heartbeatMsg heartbeat.HeartbeatMessage
 
-			BeforeEach(func(done Done) {
+			JustBeforeEach(func(done Done) {
 				heartbeatMsg = heartbeat.HeartbeatMessage{}
 				msg := <-announceMsg
 				err := json.Unmarshal(msg.Data, &heartbeatMsg)
@@ -184,12 +194,7 @@ var _ = Describe("TPS", func() {
 
 	Context("when the NATS server is down while starting up", func() {
 		BeforeEach(func() {
-			tps.Signal(os.Kill)
-			Eventually(tps.Wait()).Should(Receive(nil))
-
 			natsRunner.KillWithFire()
-
-			tps = ifrit.Envoke(runner)
 		})
 
 		It("exits imediately", func() {
@@ -198,7 +203,7 @@ var _ = Describe("TPS", func() {
 	})
 
 	Context("when the NATS server goes down after startup", func() {
-		BeforeEach(func() {
+		JustBeforeEach(func() {
 			natsRunner.KillWithFire()
 			time.Sleep(50 * time.Millisecond)
 		})

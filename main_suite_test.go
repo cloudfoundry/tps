@@ -2,7 +2,6 @@ package main_test
 
 import (
 	"fmt"
-	"os"
 
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
 	"github.com/cloudfoundry-incubator/tps/integration/tpsrunner"
@@ -32,12 +31,22 @@ var etcdRunner *etcdstorerunner.ETCDClusterRunner
 var natsRunner *natsrunner.NATSRunner
 
 var heartbeatInterval = 50 * time.Millisecond
+var tpsBinPath string
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	tpsPath, err := gexec.Build("github.com/cloudfoundry-incubator/tps", "-race")
+	synchronizedTpsBinPath, err := gexec.Build("github.com/cloudfoundry-incubator/tps", "-race")
 	Ω(err).ShouldNot(HaveOccurred())
-	return []byte(tpsPath)
-}, func(tpsPath []byte) {
+	return []byte(synchronizedTpsBinPath)
+}, func(synchronizedTpsBinPath []byte) {
+	tpsBinPath = string(synchronizedTpsBinPath)
+})
+
+func TestTPS(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "TPS Suite")
+}
+
+var _ = BeforeEach(func() {
 	tpsAddr = fmt.Sprintf("127.0.0.1:%d", uint16(1518+GinkgoParallelNode()))
 	etcdPort := 5001 + GinkgoParallelNode()
 	natsPort := 4001 + GinkgoParallelNode()
@@ -49,22 +58,14 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	bbs = Bbs.NewBBS(store, timeProvider, lagertest.NewTestLogger("test"))
 
 	natsRunner = natsrunner.NewNATSRunner(natsPort)
-
 	runner = tpsrunner.New(
-		string(tpsPath),
+		string(tpsBinPath),
 		tpsAddr,
 		[]string{fmt.Sprintf("http://127.0.0.1:%d", etcdPort)},
 		[]string{fmt.Sprintf("127.0.0.1:%d", natsPort)},
 		heartbeatInterval,
 	)
-})
 
-func TestTPS(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "TPS Suite")
-}
-
-var _ = BeforeEach(func() {
 	startAll()
 })
 
@@ -81,7 +82,6 @@ var _ = SynchronizedAfterSuite(func() {
 func startAll() {
 	etcdRunner.Start()
 	natsRunner.Start()
-	tps = ifrit.Envoke(runner)
 }
 
 func stopAll() {
@@ -90,9 +90,5 @@ func stopAll() {
 	}
 	if natsRunner != nil {
 		natsRunner.Stop()
-	}
-	if tps != nil {
-		tps.Signal(os.Kill)
-		Eventually(tps.Wait()).Should(Receive())
 	}
 }
