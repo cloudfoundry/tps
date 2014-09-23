@@ -14,6 +14,7 @@ import (
 	"github.com/onsi/gomega/gexec"
 	"github.com/pivotal-golang/lager/lagertest"
 	"github.com/tedsuo/ifrit"
+	"github.com/tedsuo/ifrit/ginkgomon"
 
 	"testing"
 	"time"
@@ -25,7 +26,7 @@ var timeProvider *faketimeprovider.FakeTimeProvider
 
 var tpsAddr string
 var tps ifrit.Process
-var runner ifrit.Runner
+var runner *ginkgomon.Runner
 
 var etcdRunner *etcdstorerunner.ETCDClusterRunner
 var natsRunner *natsrunner.NATSRunner
