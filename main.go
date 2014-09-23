@@ -15,6 +15,7 @@ import (
 	"github.com/cloudfoundry-incubator/tps/heartbeat"
 	"github.com/cloudfoundry/dropsonde/autowire"
 	"github.com/cloudfoundry/gunk/group_runner"
+	"github.com/cloudfoundry/gunk/natsclientrunner"
 	"github.com/cloudfoundry/gunk/timeprovider"
 	"github.com/cloudfoundry/storeadapter/etcdstoreadapter"
 	"github.com/cloudfoundry/storeadapter/workerpool"
@@ -67,13 +68,13 @@ func main() {
 	bbs := initializeBbs(logger)
 	apiHandler := initializeHandler(logger, bbs)
 
+	natsClient := natsclientrunner.NewClient(*natsAddresses, *natsUsername, *natsPassword)
 	cf_debug_server.Run()
 
 	group := group_runner.New([]group_runner.Member{
+		{"natsClient", natsclientrunner.New(natsClient, logger)},
 		{"heartbeat", heartbeat.New(
-			*natsAddresses,
-			*natsUsername,
-			*natsPassword,
+			natsClient,
 			*heartbeatInterval,
 			fmt.Sprintf("http://%s", *listenAddr),
 			logger)},

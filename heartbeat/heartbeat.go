@@ -6,7 +6,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/cloudfoundry/gunk/natsclientrunner"
 	"github.com/cloudfoundry/yagnats"
 	"github.com/pivotal-golang/lager"
 )
@@ -19,6 +18,7 @@ type HeartbeatMessage struct {
 }
 
 type HeartbeatRunner struct {
+	natsClient        yagnats.ApceraWrapperNATSClient
 	natsAddresses     string
 	natsUsername      string
 	natsPassword      string
@@ -27,12 +27,10 @@ type HeartbeatRunner struct {
 	logger            lager.Logger
 }
 
-func New(natsAddresses, natsUsername, natsPassword string, heartbeatInterval time.Duration, serviceAddress string, logger lager.Logger) *HeartbeatRunner {
+func New(natsClient yagnats.ApceraWrapperNATSClient, heartbeatInterval time.Duration, serviceAddress string, logger lager.Logger) *HeartbeatRunner {
 	heartbeatLogger := logger.Session("heartbeater")
 	return &HeartbeatRunner{
-		natsAddresses:     natsAddresses,
-		natsUsername:      natsUsername,
-		natsPassword:      natsPassword,
+		natsClient:        natsClient,
 		heartbeatInterval: heartbeatInterval,
 		serviceAddress:    serviceAddress,
 		logger:            heartbeatLogger,
@@ -40,20 +38,13 @@ func New(natsAddresses, natsUsername, natsPassword string, heartbeatInterval tim
 }
 
 func (hr *HeartbeatRunner) Run(signals <-chan os.Signal, ready chan<- struct{}) error {
-	natsClient := natsclientrunner.NewClient(hr.natsAddresses, hr.natsUsername, hr.natsPassword)
-	err := natsClient.Connect()
-	if err != nil {
-		hr.logger.Error("init-failure-connecting-to-nats", err)
-		return err
-	}
-
 	ticker := time.NewTicker(hr.heartbeatInterval)
 	heartbeatChan := make(chan error)
 
 	close(ready)
 
 	inflight := true
-	go hr.heartbeat(natsClient, heartbeatChan)
+	go hr.heartbeat(heartbeatChan)
 
 	for {
 		select {
@@ -72,12 +63,12 @@ func (hr *HeartbeatRunner) Run(signals <-chan os.Signal, ready chan<- struct{}) 
 				continue
 			}
 			inflight = true
-			go hr.heartbeat(natsClient, heartbeatChan)
+			go hr.heartbeat(heartbeatChan)
 		}
 	}
 }
 
-func (hr *HeartbeatRunner) heartbeat(natsClient yagnats.ApceraWrapperNATSClient, heartbeatChan chan<- error) {
+func (hr *HeartbeatRunner) heartbeat(heartbeatChan chan<- error) {
 	msg := HeartbeatMessage{
 		Addr: hr.serviceAddress,
 		TTL:  ttlFromHeartbeatInterval(hr.heartbeatInterval),
@@ -90,7 +81,7 @@ func (hr *HeartbeatRunner) heartbeat(natsClient yagnats.ApceraWrapperNATSClient,
 	}
 
 	hr.logger.Info("will-heartbeat")
-	err = natsClient.Publish(HeatbeatSubject, payload)
+	err = hr.natsClient.Publish(HeatbeatSubject, payload)
 	if err != nil {
 		heartbeatChan <- err
 		return

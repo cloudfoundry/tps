@@ -194,12 +194,19 @@ var _ = Describe("TPS", func() {
 
 	Context("when the NATS server is down while starting up", func() {
 		BeforeEach(func() {
+			runner.StartCheck = ""
 			natsRunner.KillWithFire()
 		})
 
-		It("exits imediately", func() {
+		It("does not exit", func() {
+			Consistently(tps.Wait()).ShouldNot(Receive())
+		})
+
+		It("exits when we send a signal", func() {
+			tps.Signal(syscall.SIGINT)
 			Eventually(tps.Wait()).Should(Receive())
 		})
+
 	})
 
 	Context("when the NATS server goes down after startup", func() {
