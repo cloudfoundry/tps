@@ -24,7 +24,7 @@ var _ = Describe("TPS", func() {
 
 	var httpClient *http.Client
 	var requestGenerator *rata.RequestGenerator
-	var natsClient yagnats.ApceraWrapperNATSClient
+	var natsClient yagnats.NATSConn
 
 	BeforeEach(func() {
 		natsClient = natsRunner.MessageBus

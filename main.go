@@ -19,6 +19,7 @@ import (
 	"github.com/cloudfoundry/gunk/timeprovider"
 	"github.com/cloudfoundry/storeadapter/etcdstoreadapter"
 	"github.com/cloudfoundry/storeadapter/workerpool"
+	"github.com/cloudfoundry/yagnats"
 	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/http_server"
@@ -68,16 +69,21 @@ func main() {
 	bbs := initializeBbs(logger)
 	apiHandler := initializeHandler(logger, bbs)
 
-	natsClient := natsclientrunner.NewClient(*natsAddresses, *natsUsername, *natsPassword)
+	var natsClient yagnats.NATSConn
 	cf_debug_server.Run()
 
-	group := group_runner.New([]group_runner.Member{
-		{"natsClient", natsclientrunner.New(natsClient, logger)},
-		{"heartbeat", heartbeat.New(
+	heartbeatRunner := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
+		actual := heartbeat.New(
 			natsClient,
 			*heartbeatInterval,
 			fmt.Sprintf("http://%s", *listenAddr),
-			logger)},
+			logger)
+		return actual.Run(signals, ready)
+	})
+
+	group := group_runner.New([]group_runner.Member{
+		{"natsClient", natsclientrunner.New(*natsAddresses, *natsUsername, *natsPassword, logger, &natsClient)},
+		{"heartbeat", heartbeatRunner},
 		{"api", http_server.New(*listenAddr, apiHandler)},
 	})
 

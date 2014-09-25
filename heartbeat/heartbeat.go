@@ -18,7 +18,7 @@ type HeartbeatMessage struct {
 }
 
 type HeartbeatRunner struct {
-	natsClient        yagnats.ApceraWrapperNATSClient
+	natsClient        yagnats.NATSConn
 	natsAddresses     string
 	natsUsername      string
 	natsPassword      string
@@ -27,7 +27,7 @@ type HeartbeatRunner struct {
 	logger            lager.Logger
 }
 
-func New(natsClient yagnats.ApceraWrapperNATSClient, heartbeatInterval time.Duration, serviceAddress string, logger lager.Logger) *HeartbeatRunner {
+func New(natsClient yagnats.NATSConn, heartbeatInterval time.Duration, serviceAddress string, logger lager.Logger) *HeartbeatRunner {
 	heartbeatLogger := logger.Session("heartbeater")
 	return &HeartbeatRunner{
 		natsClient:        natsClient,
