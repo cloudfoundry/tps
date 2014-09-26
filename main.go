@@ -14,7 +14,6 @@ import (
 	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry-incubator/tps/heartbeat"
 	"github.com/cloudfoundry/dropsonde/autowire"
-	"github.com/cloudfoundry/gunk/group_runner"
 	"github.com/cloudfoundry/gunk/natsclientrunner"
 	"github.com/cloudfoundry/gunk/timeprovider"
 	"github.com/cloudfoundry/storeadapter/etcdstoreadapter"
@@ -22,6 +21,7 @@ import (
 	"github.com/cloudfoundry/yagnats"
 	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/ifrit"
+	"github.com/tedsuo/ifrit/grouper"
 	"github.com/tedsuo/ifrit/http_server"
 	"github.com/tedsuo/ifrit/sigmon"
 )
@@ -81,7 +81,7 @@ func main() {
 		return actual.Run(signals, ready)
 	})
 
-	group := group_runner.New([]group_runner.Member{
+	group := grouper.NewOrdered(os.Interrupt, grouper.Members{
 		{"natsClient", natsclientrunner.New(*natsAddresses, *natsUsername, *natsPassword, logger, &natsClient)},
 		{"heartbeat", heartbeatRunner},
 		{"api", http_server.New(*listenAddr, apiHandler)},
