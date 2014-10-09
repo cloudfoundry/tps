@@ -13,7 +13,7 @@ import (
 	"github.com/cloudfoundry/yagnats"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/tedsuo/ifrit"
+	"github.com/tedsuo/ifrit/ginkgomon"
 	"github.com/tedsuo/rata"
 
 	"github.com/cloudfoundry-incubator/tps/api"
@@ -35,7 +35,7 @@ var _ = Describe("TPS", func() {
 	})
 
 	JustBeforeEach(func() {
-		tps = ifrit.Envoke(runner)
+		tps = ginkgomon.Invoke(runner)
 	})
 
 	AfterEach(func() {
