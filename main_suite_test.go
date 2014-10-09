@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
-	"github.com/cloudfoundry-incubator/tps/integration/tpsrunner"
+	"github.com/cloudfoundry-incubator/tps/testrunner"
 	"github.com/cloudfoundry/gunk/natsrunner"
 	"github.com/cloudfoundry/gunk/timeprovider/faketimeprovider"
 	"github.com/cloudfoundry/storeadapter"
@@ -59,7 +59,7 @@ var _ = BeforeEach(func() {
 	bbs = Bbs.NewBBS(store, timeProvider, lagertest.NewTestLogger("test"))
 
 	natsRunner = natsrunner.NewNATSRunner(natsPort)
-	runner = tpsrunner.New(
+	runner = testrunner.New(
 		string(tpsBinPath),
 		tpsAddr,
 		[]string{fmt.Sprintf("http://127.0.0.1:%d", etcdPort)},

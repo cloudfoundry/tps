@@ -1,4 +1,4 @@
-package tpsrunner
+package testrunner
 
 import (
 	"fmt"
