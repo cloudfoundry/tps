@@ -62,12 +62,18 @@ var heartbeatInterval = flag.Duration(
 	"the interval, in seconds, between heartbeats for maintaining presence",
 )
 
+var maxInFlightRequests = flag.Int(
+	"maxInFlightRequests",
+	200,
+	"number of requests to handle at a time; any more will receive 503",
+)
+
 func main() {
 	flag.Parse()
 
 	logger := cf_lager.New("tps")
 	bbs := initializeBbs(logger)
-	apiHandler := initializeHandler(logger, bbs)
+	apiHandler := initializeHandler(logger, *maxInFlightRequests, bbs)
 
 	var natsClient yagnats.NATSConn
 	cf_debug_server.Run()
@@ -115,8 +121,8 @@ func initializeBbs(logger lager.Logger) Bbs.TPSBBS {
 	return Bbs.NewTPSBBS(etcdAdapter, timeprovider.NewTimeProvider(), logger)
 }
 
-func initializeHandler(logger lager.Logger, bbs Bbs.TPSBBS) http.Handler {
-	apiHandler, err := handler.New(bbs, logger)
+func initializeHandler(logger lager.Logger, maxInFlight int, bbs Bbs.TPSBBS) http.Handler {
+	apiHandler, err := handler.New(bbs, maxInFlight, logger)
 	if err != nil {
 		logger.Fatal("initialize-handler.failed", err)
 	}

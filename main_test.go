@@ -206,7 +206,6 @@ var _ = Describe("TPS", func() {
 			tps.Signal(syscall.SIGINT)
 			Eventually(tps.Wait()).Should(Receive())
 		})
-
 	})
 
 	Context("when the NATS server goes down after startup", func() {

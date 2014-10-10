@@ -10,9 +10,9 @@ import (
 	"github.com/tedsuo/rata"
 )
 
-func New(bbs Bbs.TPSBBS, logger lager.Logger) (http.Handler, error) {
+func New(bbs Bbs.TPSBBS, maxInFlight int, logger lager.Logger) (http.Handler, error) {
 	handlers := map[string]http.Handler{
-		api.LRPStatus: lrpstatus.NewHandler(bbs, logger),
+		api.LRPStatus: lrpstatus.NewHandler(bbs, maxInFlight, logger),
 	}
 
 	return rata.NewRouter(api.Routes, handlers)
