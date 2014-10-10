@@ -5,7 +5,7 @@ import (
 
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
 	"github.com/cloudfoundry-incubator/tps/testrunner"
-	"github.com/cloudfoundry/gunk/natsrunner"
+	"github.com/cloudfoundry/gunk/diegonats"
 	"github.com/cloudfoundry/gunk/timeprovider/faketimeprovider"
 	"github.com/cloudfoundry/storeadapter"
 	"github.com/cloudfoundry/storeadapter/storerunner/etcdstorerunner"
@@ -29,7 +29,7 @@ var tps ifrit.Process
 var runner *ginkgomon.Runner
 
 var etcdRunner *etcdstorerunner.ETCDClusterRunner
-var natsRunner *natsrunner.NATSRunner
+var natsRunner *diegonats.NATSRunner
 
 var heartbeatInterval = 50 * time.Millisecond
 var tpsBinPath string
@@ -58,7 +58,7 @@ var _ = BeforeEach(func() {
 	timeProvider = faketimeprovider.New(time.Unix(0, 1138))
 	bbs = Bbs.NewBBS(store, timeProvider, lagertest.NewTestLogger("test"))
 
-	natsRunner = natsrunner.NewNATSRunner(natsPort)
+	natsRunner = diegonats.NewRunner(natsPort)
 	runner = testrunner.New(
 		string(tpsBinPath),
 		tpsAddr,

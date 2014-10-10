@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/cloudfoundry/yagnats"
+	"github.com/cloudfoundry/gunk/diegonats"
 	"github.com/pivotal-golang/lager"
 )
 
@@ -18,7 +18,7 @@ type HeartbeatMessage struct {
 }
 
 type HeartbeatRunner struct {
-	natsClient        yagnats.NATSConn
+	natsClient        diegonats.NATSClient
 	natsAddresses     string
 	natsUsername      string
 	natsPassword      string
@@ -27,7 +27,7 @@ type HeartbeatRunner struct {
 	logger            lager.Logger
 }
 
-func New(natsClient yagnats.NATSConn, heartbeatInterval time.Duration, serviceAddress string, logger lager.Logger) *HeartbeatRunner {
+func New(natsClient diegonats.NATSClient, heartbeatInterval time.Duration, serviceAddress string, logger lager.Logger) *HeartbeatRunner {
 	heartbeatLogger := logger.Session("heartbeater")
 	return &HeartbeatRunner{
 		natsClient:        natsClient,

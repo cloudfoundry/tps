@@ -14,11 +14,10 @@ import (
 	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry-incubator/tps/heartbeat"
 	"github.com/cloudfoundry/dropsonde/autowire"
-	"github.com/cloudfoundry/gunk/natsclientrunner"
+	"github.com/cloudfoundry/gunk/diegonats"
 	"github.com/cloudfoundry/gunk/timeprovider"
 	"github.com/cloudfoundry/storeadapter/etcdstoreadapter"
 	"github.com/cloudfoundry/storeadapter/workerpool"
-	"github.com/cloudfoundry/yagnats"
 	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/grouper"
@@ -75,7 +74,7 @@ func main() {
 	bbs := initializeBbs(logger)
 	apiHandler := initializeHandler(logger, *maxInFlightRequests, bbs)
 
-	var natsClient yagnats.NATSConn
+	natsClient := diegonats.NewClient()
 	cf_debug_server.Run()
 
 	heartbeatRunner := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
@@ -88,7 +87,7 @@ func main() {
 	})
 
 	group := grouper.NewOrdered(os.Interrupt, grouper.Members{
-		{"natsClient", natsclientrunner.New(*natsAddresses, *natsUsername, *natsPassword, logger, &natsClient)},
+		{"natsClient", diegonats.NewClientRunner(*natsAddresses, *natsUsername, *natsPassword, logger, natsClient)},
 		{"heartbeat", heartbeatRunner},
 		{"api", http_server.New(*listenAddr, apiHandler)},
 	})

@@ -10,7 +10,7 @@ import (
 
 	"github.com/apcera/nats"
 	"github.com/cloudfoundry-incubator/runtime-schema/models"
-	"github.com/cloudfoundry/yagnats"
+	"github.com/cloudfoundry/gunk/diegonats"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/tedsuo/ifrit/ginkgomon"
@@ -24,10 +24,10 @@ var _ = Describe("TPS", func() {
 
 	var httpClient *http.Client
 	var requestGenerator *rata.RequestGenerator
-	var natsClient yagnats.NATSConn
+	var natsClient diegonats.NATSClient
 
 	BeforeEach(func() {
-		natsClient = natsRunner.MessageBus
+		natsClient = natsRunner.Client
 		requestGenerator = rata.NewRequestGenerator(fmt.Sprintf("http://%s", tpsAddr), api.Routes)
 		httpClient = &http.Client{
 			Transport: &http.Transport{},
