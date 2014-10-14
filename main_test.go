@@ -10,7 +10,6 @@ import (
 
 	"github.com/apcera/nats"
 	"github.com/cloudfoundry-incubator/runtime-schema/models"
-	"github.com/cloudfoundry/gunk/diegonats"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/tedsuo/ifrit/ginkgomon"
@@ -24,10 +23,8 @@ var _ = Describe("TPS", func() {
 
 	var httpClient *http.Client
 	var requestGenerator *rata.RequestGenerator
-	var natsClient diegonats.NATSClient
 
 	BeforeEach(func() {
-		natsClient = natsRunner.Client
 		requestGenerator = rata.NewRequestGenerator(fmt.Sprintf("http://%s", tpsAddr), api.Routes)
 		httpClient = &http.Client{
 			Transport: &http.Transport{},
@@ -195,7 +192,7 @@ var _ = Describe("TPS", func() {
 	Context("when the NATS server is down while starting up", func() {
 		BeforeEach(func() {
 			runner.StartCheck = ""
-			natsRunner.KillWithFire()
+			ginkgomon.Kill(gnatsdRunner)
 		})
 
 		It("does not exit", func() {
@@ -210,7 +207,7 @@ var _ = Describe("TPS", func() {
 
 	Context("when the NATS server goes down after startup", func() {
 		JustBeforeEach(func() {
-			natsRunner.KillWithFire()
+			ginkgomon.Kill(gnatsdRunner)
 			time.Sleep(50 * time.Millisecond)
 		})
 

@@ -29,7 +29,9 @@ var tps ifrit.Process
 var runner *ginkgomon.Runner
 
 var etcdRunner *etcdstorerunner.ETCDClusterRunner
-var natsRunner *diegonats.NATSRunner
+var natsPort int
+var gnatsdRunner ifrit.Process
+var natsClient diegonats.NATSClient
 
 var heartbeatInterval = 50 * time.Millisecond
 var tpsBinPath string
@@ -50,7 +52,7 @@ func TestTPS(t *testing.T) {
 var _ = BeforeEach(func() {
 	tpsAddr = fmt.Sprintf("127.0.0.1:%d", uint16(1518+GinkgoParallelNode()))
 	etcdPort := 5001 + GinkgoParallelNode()
-	natsPort := 4001 + GinkgoParallelNode()
+	natsPort = 4001 + GinkgoParallelNode()
 
 	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1)
 
@@ -58,7 +60,6 @@ var _ = BeforeEach(func() {
 	timeProvider = faketimeprovider.New(time.Unix(0, 1138))
 	bbs = Bbs.NewBBS(store, timeProvider, lagertest.NewTestLogger("test"))
 
-	natsRunner = diegonats.NewRunner(natsPort)
 	runner = testrunner.New(
 		string(tpsBinPath),
 		tpsAddr,
@@ -82,14 +83,12 @@ var _ = SynchronizedAfterSuite(func() {
 
 func startAll() {
 	etcdRunner.Start()
-	natsRunner.Start()
+	gnatsdRunner, natsClient = diegonats.StartGnatsd(natsPort)
 }
 
 func stopAll() {
 	if etcdRunner != nil {
 		etcdRunner.Stop()
 	}
-	if natsRunner != nil {
-		natsRunner.Stop()
-	}
+	ginkgomon.Kill(gnatsdRunner)
 }
