@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
-	"github.com/cloudfoundry-incubator/tps/testrunner"
+	"github.com/cloudfoundry-incubator/tps/cmd/tps/testrunner"
 	"github.com/cloudfoundry/gunk/diegonats"
 	"github.com/cloudfoundry/gunk/timeprovider/faketimeprovider"
 	"github.com/cloudfoundry/storeadapter"
@@ -37,7 +37,7 @@ var heartbeatInterval = 50 * time.Millisecond
 var tpsBinPath string
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	synchronizedTpsBinPath, err := gexec.Build("github.com/cloudfoundry-incubator/tps", "-race")
+	synchronizedTpsBinPath, err := gexec.Build("github.com/cloudfoundry-incubator/tps/cmd/tps", "-race")
 	Ω(err).ShouldNot(HaveOccurred())
 	return []byte(synchronizedTpsBinPath)
 }, func(synchronizedTpsBinPath []byte) {
