@@ -13,7 +13,7 @@ import (
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
 	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry-incubator/tps/heartbeat"
-	"github.com/cloudfoundry/dropsonde/autowire"
+	"github.com/cloudfoundry/dropsonde"
 	"github.com/cloudfoundry/gunk/diegonats"
 	"github.com/cloudfoundry/gunk/timeprovider"
 	"github.com/cloudfoundry/gunk/workpool"
@@ -67,10 +67,23 @@ var maxInFlightRequests = flag.Int(
 	"number of requests to handle at a time; any more will receive 503",
 )
 
+var dropsondeOrigin = flag.String(
+	"dropsondeOrigin",
+	"tps",
+	"Origin identifier for dropsonde-emitted metrics.",
+)
+
+var dropsondeDestination = flag.String(
+	"dropsondeDestination",
+	"localhost:3457",
+	"Destination for dropsonde-emitted metrics.",
+)
+
 func main() {
 	flag.Parse()
 
 	logger := cf_lager.New("tps")
+	initializeDropsonde(logger)
 	bbs := initializeBbs(logger)
 	apiHandler := initializeHandler(logger, *maxInFlightRequests, bbs)
 
@@ -106,6 +119,13 @@ func main() {
 	os.Exit(0)
 }
 
+func initializeDropsonde(logger lager.Logger) {
+	err := dropsonde.Initialize(*dropsondeOrigin, *dropsondeDestination)
+	if err != nil {
+		logger.Error("failed to initialize dropsonde: %v", err)
+	}
+}
+
 func initializeBbs(logger lager.Logger) Bbs.TPSBBS {
 	etcdAdapter := etcdstoreadapter.NewETCDStoreAdapter(
 		strings.Split(*etcdCluster, ","),
@@ -126,5 +146,5 @@ func initializeHandler(logger lager.Logger, maxInFlight int, bbs Bbs.TPSBBS) htt
 		logger.Fatal("initialize-handler.failed", err)
 	}
 
-	return autowire.InstrumentedHandler(apiHandler)
+	return dropsonde.InstrumentedHandler(apiHandler)
 }
