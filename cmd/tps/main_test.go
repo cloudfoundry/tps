@@ -44,34 +44,41 @@ var _ = Describe("TPS", func() {
 	Describe("GET /lrps/:guid", func() {
 		Context("when etcd is running", func() {
 			BeforeEach(func() {
-				bbs.ReportActualLRPAsStarting("some-process-guid", "some-instance-guid-1", "executor-id", 0)
+				_, err := bbs.ReportActualLRPAsStarting("some-process-guid", "some-instance-guid-1", "executor-id", "some-domain", 0)
+				Ω(err).ShouldNot(HaveOccurred())
 
-				bbs.ReportActualLRPAsRunning(models.ActualLRP{
+				err = bbs.ReportActualLRPAsRunning(models.ActualLRP{
 					ProcessGuid:  "some-process-guid",
 					InstanceGuid: "some-instance-guid-2",
+					Domain:       "some-domain",
 
 					Index: 1,
 
 					State: models.ActualLRPStateRunning,
 				}, "executor-id")
+				Ω(err).ShouldNot(HaveOccurred())
 
-				bbs.ReportActualLRPAsRunning(models.ActualLRP{
+				err = bbs.ReportActualLRPAsRunning(models.ActualLRP{
 					ProcessGuid:  "some-process-guid",
 					InstanceGuid: "some-instance-guid-3",
+					Domain:       "some-domain",
 
 					Index: 2,
 
 					State: models.ActualLRPStateRunning,
 				}, "executor-id")
+				Ω(err).ShouldNot(HaveOccurred())
 
-				bbs.ReportActualLRPAsRunning(models.ActualLRP{
+				err = bbs.ReportActualLRPAsRunning(models.ActualLRP{
 					ProcessGuid:  "some-other-process-guid",
 					InstanceGuid: "some-instance-guid-3",
+					Domain:       "some-domain",
 
 					Index: 0,
 
 					State: models.ActualLRPStateRunning,
 				}, "executor-id")
+				Ω(err).ShouldNot(HaveOccurred())
 			})
 
 			It("reports the state of the given process guid's instances", func() {
