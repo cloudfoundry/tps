@@ -44,7 +44,7 @@ var _ = Describe("TPS", func() {
 	Describe("GET /lrps/:guid", func() {
 		Context("when etcd is running", func() {
 			BeforeEach(func() {
-				_, err := bbs.ReportActualLRPAsStarting("some-process-guid", "some-instance-guid-1", "executor-id", "some-domain", 0)
+				_, err := bbs.ReportActualLRPAsStarting("some-process-guid", "some-instance-guid-1", "cell-id", "some-domain", 0)
 				Ω(err).ShouldNot(HaveOccurred())
 
 				err = bbs.ReportActualLRPAsRunning(models.ActualLRP{
@@ -55,7 +55,7 @@ var _ = Describe("TPS", func() {
 					Index: 1,
 
 					State: models.ActualLRPStateRunning,
-				}, "executor-id")
+				}, "cell-id")
 				Ω(err).ShouldNot(HaveOccurred())
 
 				err = bbs.ReportActualLRPAsRunning(models.ActualLRP{
@@ -66,7 +66,7 @@ var _ = Describe("TPS", func() {
 					Index: 2,
 
 					State: models.ActualLRPStateRunning,
-				}, "executor-id")
+				}, "cell-id")
 				Ω(err).ShouldNot(HaveOccurred())
 
 				err = bbs.ReportActualLRPAsRunning(models.ActualLRP{
@@ -77,7 +77,7 @@ var _ = Describe("TPS", func() {
 					Index: 0,
 
 					State: models.ActualLRPStateRunning,
-				}, "executor-id")
+				}, "cell-id")
 				Ω(err).ShouldNot(HaveOccurred())
 			})
 
