@@ -27,7 +27,7 @@ var _ = Describe("LRPStatus", func() {
 		server = httptest.NewServer(handler)
 		fakeResponses = make(chan chan []models.ActualLRP, 2)
 
-		fakeBBS.GetActualLRPsByProcessGuidStub = func(string) ([]models.ActualLRP, error) {
+		fakeBBS.ActualLRPsByProcessGuidStub = func(string) ([]models.ActualLRP, error) {
 			return <-<-fakeResponses, nil
 		}
 	})
@@ -59,7 +59,7 @@ var _ = Describe("LRPStatus", func() {
 				firstResponseCh <- res
 			}()
 
-			Eventually(fakeBBS.GetActualLRPsByProcessGuidCallCount).Should(Equal(1))
+			Eventually(fakeBBS.ActualLRPsByProcessGuidCallCount).Should(Equal(1))
 
 			// hit it again, assert we get a 503
 			resp, err := http.Get(server.URL)

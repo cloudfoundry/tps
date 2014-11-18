@@ -43,7 +43,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	guid := r.FormValue(":guid")
 
-	actual, err := handler.bbs.GetActualLRPsByProcessGuid(guid)
+	actual, err := handler.bbs.ActualLRPsByProcessGuid(guid)
 	if err != nil {
 		lrpLogger.Error("failed-retrieving-bbs-info", err)
 		w.WriteHeader(http.StatusInternalServerError)
