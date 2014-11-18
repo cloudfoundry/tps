@@ -15,7 +15,7 @@ import (
 	"github.com/tedsuo/ifrit/ginkgomon"
 	"github.com/tedsuo/rata"
 
-	"github.com/cloudfoundry-incubator/tps/api"
+	api "github.com/cloudfoundry-incubator/tps"
 	"github.com/cloudfoundry-incubator/tps/heartbeat"
 )
 

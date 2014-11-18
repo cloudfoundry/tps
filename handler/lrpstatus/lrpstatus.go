@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry-incubator/runtime-schema/models"
 	"github.com/pivotal-golang/lager"
 
-	"github.com/cloudfoundry-incubator/tps/api"
+	"github.com/cloudfoundry-incubator/tps"
 )
 
 type handler struct {
@@ -50,9 +50,9 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	instances := make([]api.LRPInstance, len(actual))
+	instances := make([]tps.LRPInstance, len(actual))
 	for i, instance := range actual {
-		instances[i] = api.LRPInstance{
+		instances[i] = tps.LRPInstance{
 			ProcessGuid:  instance.ProcessGuid,
 			InstanceGuid: instance.InstanceGuid,
 			Index:        uint(instance.Index),

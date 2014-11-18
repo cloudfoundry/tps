@@ -1,4 +1,4 @@
-package api
+package tps
 
 import "github.com/tedsuo/rata"
 

@@ -1,4 +1,4 @@
-package api
+package tps
 
 type LRPInstance struct {
 	ProcessGuid  string `json:"process_guid"`
