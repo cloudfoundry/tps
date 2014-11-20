@@ -5,19 +5,15 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/cloudfoundry-incubator/cf-debug-server"
 	"github.com/cloudfoundry-incubator/cf-lager"
-	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
+	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry-incubator/tps/heartbeat"
 	"github.com/cloudfoundry/dropsonde"
 	"github.com/cloudfoundry/gunk/diegonats"
-	"github.com/cloudfoundry/gunk/timeprovider"
-	"github.com/cloudfoundry/gunk/workpool"
-	"github.com/cloudfoundry/storeadapter/etcdstoreadapter"
 	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/grouper"
@@ -31,10 +27,10 @@ var listenAddr = flag.String(
 	"listening address of api server",
 )
 
-var etcdCluster = flag.String(
-	"etcdCluster",
-	"http://127.0.0.1:4001",
-	"comma-separated list of etcd addresses (http://ip:port)",
+var diegoAPIURL = flag.String(
+	"diegoAPIURL",
+	"",
+	"URL of diego API",
 )
 
 var natsAddresses = flag.String(
@@ -84,8 +80,8 @@ func main() {
 
 	logger := cf_lager.New("tps")
 	initializeDropsonde(logger)
-	bbs := initializeBbs(logger)
-	apiHandler := initializeHandler(logger, *maxInFlightRequests, bbs)
+	diegoAPIClient := receptor.NewClient(*diegoAPIURL)
+	apiHandler := initializeHandler(logger, *maxInFlightRequests, diegoAPIClient)
 
 	natsClient := diegonats.NewClient()
 	cf_debug_server.Run()
@@ -126,22 +122,8 @@ func initializeDropsonde(logger lager.Logger) {
 	}
 }
 
-func initializeBbs(logger lager.Logger) Bbs.TPSBBS {
-	etcdAdapter := etcdstoreadapter.NewETCDStoreAdapter(
-		strings.Split(*etcdCluster, ","),
-		workpool.NewWorkPool(10),
-	)
-
-	err := etcdAdapter.Connect()
-	if err != nil {
-		logger.Fatal("failed-to-connect-to-etcd", err)
-	}
-
-	return Bbs.NewTPSBBS(etcdAdapter, timeprovider.NewTimeProvider(), logger)
-}
-
-func initializeHandler(logger lager.Logger, maxInFlight int, bbs Bbs.TPSBBS) http.Handler {
-	apiHandler, err := handler.New(bbs, maxInFlight, logger)
+func initializeHandler(logger lager.Logger, maxInFlight int, apiClient receptor.Client) http.Handler {
+	apiHandler, err := handler.New(apiClient, maxInFlight, logger)
 	if err != nil {
 		logger.Fatal("initialize-handler.failed", err)
 	}

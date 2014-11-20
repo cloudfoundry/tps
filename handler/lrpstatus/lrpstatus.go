@@ -4,24 +4,23 @@ import (
 	"encoding/json"
 	"net/http"
 
-	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
-	"github.com/cloudfoundry-incubator/runtime-schema/models"
+	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/pivotal-golang/lager"
 
 	"github.com/cloudfoundry-incubator/tps"
 )
 
 type handler struct {
-	bbs    Bbs.TPSBBS
-	logger lager.Logger
+	apiClient receptor.Client
+	logger    lager.Logger
 
 	semaphore chan struct{}
 }
 
-func NewHandler(bbs Bbs.TPSBBS, maxInFlight int, logger lager.Logger) http.Handler {
+func NewHandler(apiClient receptor.Client, maxInFlight int, logger lager.Logger) http.Handler {
 	return &handler{
-		bbs:    bbs,
-		logger: logger,
+		apiClient: apiClient,
+		logger:    logger,
 
 		semaphore: make(chan struct{}, maxInFlight),
 	}
@@ -43,9 +42,9 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	guid := r.FormValue(":guid")
 
-	actual, err := handler.bbs.ActualLRPsByProcessGuid(guid)
+	actual, err := handler.apiClient.ActualLRPsByProcessGuid(guid)
 	if err != nil {
-		lrpLogger.Error("failed-retrieving-bbs-info", err)
+		lrpLogger.Error("failed-retrieving-lrp-info", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -67,11 +66,11 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func stateFor(state models.ActualLRPState, logger lager.Logger) string {
+func stateFor(state string, logger lager.Logger) string {
 	switch state {
-	case models.ActualLRPStateStarting:
+	case receptor.ActualLRPStateStarting:
 		return "starting"
-	case models.ActualLRPStateRunning:
+	case receptor.ActualLRPStateRunning:
 		return "running"
 	default:
 		logger.Error("unknown-state", nil, lager.Data{"state": state})

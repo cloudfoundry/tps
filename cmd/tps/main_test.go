@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/apcera/nats"
-	"github.com/cloudfoundry-incubator/runtime-schema/models"
+	"github.com/cloudfoundry-incubator/receptor"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/tedsuo/ifrit/ginkgomon"
@@ -41,44 +41,42 @@ var _ = Describe("TPS", func() {
 			Eventually(tps.Wait()).Should(Receive())
 		}
 	})
+
 	Describe("GET /lrps/:guid", func() {
-		Context("when etcd is running", func() {
+		Context("when the receptor is running", func() {
 			BeforeEach(func() {
-				_, err := bbs.ReportActualLRPAsStarting("some-process-guid", "some-instance-guid-1", "cell-id", "some-domain", 0)
-				Ω(err).ShouldNot(HaveOccurred())
+				receptorServer.RouteToHandler("GET", "/v1/desired_lrps/some-process-guid/actual_lrps", func(w http.ResponseWriter, req *http.Request) {
+					json.NewEncoder(w).Encode([]receptor.ActualLRPResponse{
+						{
+							ProcessGuid:  "some-process-guid",
+							InstanceGuid: "some-instance-guid-1",
+							Domain:       "some-domain",
+							Index:        0,
+							Since:        1,
+							State:        receptor.ActualLRPStateStarting,
+						},
+						{
+							ProcessGuid:  "some-process-guid",
+							InstanceGuid: "some-instance-guid-2",
+							Domain:       "some-domain",
+							Index:        1,
+							Since:        2,
+							State:        receptor.ActualLRPStateRunning,
+						},
+						{
+							ProcessGuid:  "some-process-guid",
+							InstanceGuid: "some-instance-guid-3",
+							Domain:       "some-domain",
+							Index:        2,
+							Since:        3,
+							State:        receptor.ActualLRPStateRunning,
+						},
+					})
+				})
+			})
 
-				err = bbs.ReportActualLRPAsRunning(models.ActualLRP{
-					ProcessGuid:  "some-process-guid",
-					InstanceGuid: "some-instance-guid-2",
-					Domain:       "some-domain",
-
-					Index: 1,
-
-					State: models.ActualLRPStateRunning,
-				}, "cell-id")
-				Ω(err).ShouldNot(HaveOccurred())
-
-				err = bbs.ReportActualLRPAsRunning(models.ActualLRP{
-					ProcessGuid:  "some-process-guid",
-					InstanceGuid: "some-instance-guid-3",
-					Domain:       "some-domain",
-
-					Index: 2,
-
-					State: models.ActualLRPStateRunning,
-				}, "cell-id")
-				Ω(err).ShouldNot(HaveOccurred())
-
-				err = bbs.ReportActualLRPAsRunning(models.ActualLRP{
-					ProcessGuid:  "some-other-process-guid",
-					InstanceGuid: "some-instance-guid-3",
-					Domain:       "some-domain",
-
-					Index: 0,
-
-					State: models.ActualLRPStateRunning,
-				}, "cell-id")
-				Ω(err).ShouldNot(HaveOccurred())
+			AfterEach(func() {
+				receptorServer.Close()
 			})
 
 			It("reports the state of the given process guid's instances", func() {
@@ -101,38 +99,32 @@ var _ = Describe("TPS", func() {
 				Ω(lrpInstances).Should(ContainElement(api.LRPInstance{
 					ProcessGuid:  "some-process-guid",
 					InstanceGuid: "some-instance-guid-1",
-
-					Index: 0,
-					Since: timeProvider.Time().UnixNano(),
-
-					State: "starting",
+					Index:        0,
+					Since:        1,
+					State:        "starting",
 				}))
 
 				Ω(lrpInstances).Should(ContainElement(api.LRPInstance{
 					ProcessGuid:  "some-process-guid",
 					InstanceGuid: "some-instance-guid-2",
-
-					Index: 1,
-					Since: timeProvider.Time().UnixNano(),
-
-					State: "running",
+					Index:        1,
+					Since:        2,
+					State:        "running",
 				}))
 
 				Ω(lrpInstances).Should(ContainElement(api.LRPInstance{
 					ProcessGuid:  "some-process-guid",
 					InstanceGuid: "some-instance-guid-3",
-
-					Index: 2,
-					Since: timeProvider.Time().UnixNano(),
-
-					State: "running",
+					Index:        2,
+					Since:        3,
+					State:        "running",
 				}))
 			})
 		})
 
-		Context("when etcd is not running", func() {
+		Context("when the receptor is not running", func() {
 			BeforeEach(func() {
-				etcdRunner.Stop()
+				receptorServer.Close()
 			})
 
 			It("returns 500", func() {

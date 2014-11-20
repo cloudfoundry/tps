@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/cloudfoundry-incubator/runtime-schema/bbs/fake_bbs"
-	"github.com/cloudfoundry-incubator/runtime-schema/models"
+	"github.com/cloudfoundry-incubator/receptor"
+	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
 	. "github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,20 +14,20 @@ import (
 
 var _ = Describe("LRPStatus", func() {
 	var (
-		fakeBBS *fake_bbs.FakeTPSBBS
+		fakeClient *fake_receptor.FakeClient
 
 		server        *httptest.Server
-		fakeResponses chan chan []models.ActualLRP
+		fakeResponses chan chan []receptor.ActualLRPResponse
 	)
 
 	BeforeEach(func() {
-		fakeBBS = new(fake_bbs.FakeTPSBBS)
+		fakeClient = new(fake_receptor.FakeClient)
 
-		handler := NewHandler(fakeBBS, 1, lagertest.NewTestLogger("test"))
+		handler := NewHandler(fakeClient, 1, lagertest.NewTestLogger("test"))
 		server = httptest.NewServer(handler)
-		fakeResponses = make(chan chan []models.ActualLRP, 2)
+		fakeResponses = make(chan chan []receptor.ActualLRPResponse, 2)
 
-		fakeBBS.ActualLRPsByProcessGuidStub = func(string) ([]models.ActualLRP, error) {
+		fakeClient.ActualLRPsByProcessGuidStub = func(string) ([]receptor.ActualLRPResponse, error) {
 			return <-<-fakeResponses, nil
 		}
 	})
@@ -38,10 +38,10 @@ var _ = Describe("LRPStatus", func() {
 
 	Describe("rate limiting", func() {
 		It("returns 503 if the limit is exceeded", func() {
-			// hit it once, make fake BBS hang
-			hangingResponse := make(chan []models.ActualLRP, 1)
-			immediateResponse := make(chan []models.ActualLRP, 1)
-			immediateResponse <- []models.ActualLRP{}
+			// hit it once, make fake receptor hang
+			hangingResponse := make(chan []receptor.ActualLRPResponse, 1)
+			immediateResponse := make(chan []receptor.ActualLRPResponse, 1)
+			immediateResponse <- []receptor.ActualLRPResponse{}
 
 			// ensure we stop hanging so server can close
 			defer close(hangingResponse)
@@ -59,15 +59,15 @@ var _ = Describe("LRPStatus", func() {
 				firstResponseCh <- res
 			}()
 
-			Eventually(fakeBBS.ActualLRPsByProcessGuidCallCount).Should(Equal(1))
+			Eventually(fakeClient.ActualLRPsByProcessGuidCallCount).Should(Equal(1))
 
 			// hit it again, assert we get a 503
 			resp, err := http.Get(server.URL)
 			Ω(err).ShouldNot(HaveOccurred())
 			Expect(resp.StatusCode).To(Equal(http.StatusServiceUnavailable))
 
-			// un-hang the fake BBS
-			hangingResponse <- []models.ActualLRP{}
+			// un-hang the fake client
+			hangingResponse <- []receptor.ActualLRPResponse{}
 
 			var firstResponse *http.Response
 			Eventually(firstResponseCh).Should(Receive(&firstResponse))
