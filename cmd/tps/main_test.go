@@ -53,7 +53,7 @@ var _ = Describe("TPS", func() {
 							Domain:       "some-domain",
 							Index:        0,
 							Since:        1,
-							State:        receptor.ActualLRPStateStarting,
+							State:        receptor.ActualLRPStateClaimed,
 						},
 						{
 							ProcessGuid:  "some-process-guid",
@@ -101,7 +101,7 @@ var _ = Describe("TPS", func() {
 					InstanceGuid: "some-instance-guid-1",
 					Index:        0,
 					Since:        1,
-					State:        "starting",
+					State:        "claimed",
 				}))
 
 				Ω(lrpInstances).Should(ContainElement(api.LRPInstance{
