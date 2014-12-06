@@ -45,7 +45,7 @@ var _ = Describe("TPS", func() {
 	Describe("GET /lrps/:guid", func() {
 		Context("when the receptor is running", func() {
 			BeforeEach(func() {
-				receptorServer.RouteToHandler("GET", "/v1/desired_lrps/some-process-guid/actual_lrps", func(w http.ResponseWriter, req *http.Request) {
+				receptorServer.RouteToHandler("GET", "/v1/actual_lrps/some-process-guid", func(w http.ResponseWriter, req *http.Request) {
 					json.NewEncoder(w).Encode([]receptor.ActualLRPResponse{
 						{
 							ProcessGuid:  "some-process-guid",

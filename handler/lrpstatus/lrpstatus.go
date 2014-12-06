@@ -66,8 +66,10 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func stateFor(state string, logger lager.Logger) string {
+func stateFor(state receptor.ActualLRPState, logger lager.Logger) string {
 	switch state {
+	case receptor.ActualLRPStateUnclaimed:
+		return "unclaimed"
 	case receptor.ActualLRPStateClaimed:
 		return "claimed"
 	case receptor.ActualLRPStateRunning:
