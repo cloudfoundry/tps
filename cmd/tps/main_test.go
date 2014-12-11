@@ -15,6 +15,7 @@ import (
 	"github.com/tedsuo/ifrit/ginkgomon"
 	"github.com/tedsuo/rata"
 
+	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	api "github.com/cloudfoundry-incubator/tps"
 	"github.com/cloudfoundry-incubator/tps/heartbeat"
 )
@@ -69,7 +70,15 @@ var _ = Describe("TPS", func() {
 							Domain:       "some-domain",
 							Index:        2,
 							Since:        3,
-							State:        receptor.ActualLRPStateRunning,
+							State:        receptor.ActualLRPStateUnclaimed,
+						},
+						{
+							ProcessGuid:  "some-process-guid",
+							InstanceGuid: "some-instance-guid-4",
+							Domain:       "some-domain",
+							Index:        3,
+							Since:        4,
+							State:        "",
 						},
 					})
 				})
@@ -90,34 +99,42 @@ var _ = Describe("TPS", func() {
 				response, err := httpClient.Do(getLRPs)
 				Ω(err).ShouldNot(HaveOccurred())
 
-				var lrpInstances []api.LRPInstance
+				var lrpInstances []cc_messages.LRPInstance
 				err = json.NewDecoder(response.Body).Decode(&lrpInstances)
 				Ω(err).ShouldNot(HaveOccurred())
 
-				Ω(lrpInstances).Should(HaveLen(3))
+				Ω(lrpInstances).Should(HaveLen(4))
 
-				Ω(lrpInstances).Should(ContainElement(api.LRPInstance{
+				Ω(lrpInstances).Should(ContainElement(cc_messages.LRPInstance{
 					ProcessGuid:  "some-process-guid",
 					InstanceGuid: "some-instance-guid-1",
 					Index:        0,
 					Since:        1,
-					State:        "claimed",
+					State:        cc_messages.LRPInstanceStateStarting,
 				}))
 
-				Ω(lrpInstances).Should(ContainElement(api.LRPInstance{
+				Ω(lrpInstances).Should(ContainElement(cc_messages.LRPInstance{
 					ProcessGuid:  "some-process-guid",
 					InstanceGuid: "some-instance-guid-2",
 					Index:        1,
 					Since:        2,
-					State:        "running",
+					State:        cc_messages.LRPInstanceStateRunning,
 				}))
 
-				Ω(lrpInstances).Should(ContainElement(api.LRPInstance{
+				Ω(lrpInstances).Should(ContainElement(cc_messages.LRPInstance{
 					ProcessGuid:  "some-process-guid",
 					InstanceGuid: "some-instance-guid-3",
 					Index:        2,
 					Since:        3,
-					State:        "running",
+					State:        cc_messages.LRPInstanceStateUnknown,
+				}))
+
+				Ω(lrpInstances).Should(ContainElement(cc_messages.LRPInstance{
+					ProcessGuid:  "some-process-guid",
+					InstanceGuid: "some-instance-guid-4",
+					Index:        3,
+					Since:        4,
+					State:        cc_messages.LRPInstanceStateUnknown,
 				}))
 			})
 		})

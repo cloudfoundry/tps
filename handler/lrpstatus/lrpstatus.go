@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/pivotal-golang/lager"
 
-	"github.com/cloudfoundry-incubator/tps"
+	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 )
 
 type handler struct {
@@ -49,9 +49,9 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	instances := make([]tps.LRPInstance, len(actual))
+	instances := make([]cc_messages.LRPInstance, len(actual))
 	for i, instance := range actual {
-		instances[i] = tps.LRPInstance{
+		instances[i] = cc_messages.LRPInstance{
 			ProcessGuid:  instance.ProcessGuid,
 			InstanceGuid: instance.InstanceGuid,
 			Index:        uint(instance.Index),
@@ -66,16 +66,14 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func stateFor(state receptor.ActualLRPState, logger lager.Logger) string {
+func stateFor(state receptor.ActualLRPState, logger lager.Logger) cc_messages.LRPInstanceState {
 	switch state {
-	case receptor.ActualLRPStateUnclaimed:
-		return "unclaimed"
 	case receptor.ActualLRPStateClaimed:
-		return "claimed"
+		return cc_messages.LRPInstanceStateStarting
 	case receptor.ActualLRPStateRunning:
-		return "running"
+		return cc_messages.LRPInstanceStateRunning
 	default:
 		logger.Error("unknown-state", nil, lager.Data{"state": state})
-		return "unknown"
+		return cc_messages.LRPInstanceStateUnknown
 	}
 }
