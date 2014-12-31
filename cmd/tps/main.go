@@ -63,16 +63,9 @@ var maxInFlightRequests = flag.Int(
 	"number of requests to handle at a time; any more will receive 503",
 )
 
-var dropsondeOrigin = flag.String(
-	"dropsondeOrigin",
-	"tps",
-	"Origin identifier for dropsonde-emitted metrics.",
-)
-
-var dropsondeDestination = flag.String(
-	"dropsondeDestination",
-	"localhost:3457",
-	"Destination for dropsonde-emitted metrics.",
+const (
+	dropsondeDestination = "localhost:3457"
+	dropsondeOrigin      = "tps"
 )
 
 func main() {
@@ -116,7 +109,7 @@ func main() {
 }
 
 func initializeDropsonde(logger lager.Logger) {
-	err := dropsonde.Initialize(*dropsondeDestination, *dropsondeOrigin)
+	err := dropsonde.Initialize(dropsondeDestination, dropsondeOrigin)
 	if err != nil {
 		logger.Error("failed to initialize dropsonde: %v", err)
 	}
