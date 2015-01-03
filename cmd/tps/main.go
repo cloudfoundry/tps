@@ -53,7 +53,7 @@ var natsPassword = flag.String(
 
 var heartbeatInterval = flag.Duration(
 	"heartbeatInterval",
-	60*time.Second,
+	30*time.Second,
 	"the interval, in seconds, between heartbeats for maintaining presence",
 )
 
