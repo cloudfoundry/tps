@@ -69,6 +69,7 @@ const (
 )
 
 func main() {
+	cf_debug_server.AddFlags(flag.CommandLine)
 	flag.Parse()
 
 	logger := cf_lager.New("tps")
@@ -77,7 +78,6 @@ func main() {
 	apiHandler := initializeHandler(logger, *maxInFlightRequests, diegoAPIClient)
 
 	natsClient := diegonats.NewClient()
-	cf_debug_server.Run()
 
 	heartbeatRunner := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
 		actual := heartbeat.New(
@@ -88,11 +88,19 @@ func main() {
 		return actual.Run(signals, ready)
 	})
 
-	group := grouper.NewOrdered(os.Interrupt, grouper.Members{
+	members := grouper.Members{
 		{"natsClient", diegonats.NewClientRunner(*natsAddresses, *natsUsername, *natsPassword, logger, natsClient)},
 		{"heartbeat", heartbeatRunner},
 		{"api", http_server.New(*listenAddr, apiHandler)},
-	})
+	}
+
+	if dbgAddr := cf_debug_server.DebugAddress(flag.CommandLine); dbgAddr != "" {
+		members = append(grouper.Members{
+			{"debug-server", cf_debug_server.Runner(dbgAddr)},
+		}, members...)
+	}
+
+	group := grouper.NewOrdered(os.Interrupt, members)
 
 	monitor := ifrit.Envoke(sigmon.New(group))
 
