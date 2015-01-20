@@ -233,7 +233,7 @@ var _ = Describe("TPS", func() {
 
 		It("exits when we send a signal", func() {
 			tps.Signal(syscall.SIGINT)
-			Eventually(tps.Wait()).Should(Receive())
+			Eventually(tps.Wait(), 2*time.Second).Should(Receive())
 		})
 	})
 })
