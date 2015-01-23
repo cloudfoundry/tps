@@ -1,11 +1,13 @@
 package lrpstatus_test
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
+	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	. "github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -77,6 +79,35 @@ var _ = Describe("LRPStatus", func() {
 			resp, err = http.Get(server.URL)
 			Ω(err).ShouldNot(HaveOccurred())
 			Expect(resp.StatusCode).To(Equal(http.StatusOK))
+		})
+	})
+
+	Describe("Instance state", func() {
+		BeforeEach(func() {
+			fakeClient.ActualLRPsByProcessGuidStub = func(string) ([]receptor.ActualLRPResponse, error) {
+				return []receptor.ActualLRPResponse{
+					{Index: 0, State: receptor.ActualLRPStateUnclaimed},
+					{Index: 1, State: receptor.ActualLRPStateClaimed},
+					{Index: 2, State: receptor.ActualLRPStateRunning},
+					{Index: 3, State: receptor.ActualLRPStateCrashed},
+				}, nil
+			}
+		})
+
+		It("returns instance state", func() {
+			res, err := http.Get(server.URL)
+			Ω(err).ShouldNot(HaveOccurred())
+
+			response := []cc_messages.LRPInstance{}
+			err = json.NewDecoder(res.Body).Decode(&response)
+			res.Body.Close()
+			Ω(err).ShouldNot(HaveOccurred())
+
+			Ω(response).Should(HaveLen(4))
+			Ω(response[0].State).Should(Equal(cc_messages.LRPInstanceStateUnknown))
+			Ω(response[1].State).Should(Equal(cc_messages.LRPInstanceStateStarting))
+			Ω(response[2].State).Should(Equal(cc_messages.LRPInstanceStateRunning))
+			Ω(response[3].State).Should(Equal(cc_messages.LRPInstanceStateFlapping))
 		})
 	})
 })
