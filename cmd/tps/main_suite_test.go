@@ -5,11 +5,11 @@ import (
 
 	"github.com/cloudfoundry-incubator/tps/cmd/tps/testrunner"
 	"github.com/cloudfoundry/gunk/diegonats"
-	"github.com/cloudfoundry/gunk/timeprovider/faketimeprovider"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 	"github.com/onsi/gomega/ghttp"
+	"github.com/pivotal-golang/clock/fakeclock"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/ginkgomon"
 
@@ -17,7 +17,7 @@ import (
 	"time"
 )
 
-var timeProvider *faketimeprovider.FakeTimeProvider
+var clock *fakeclock.FakeClock
 
 var tpsAddr string
 var tps ifrit.Process
@@ -48,7 +48,7 @@ var _ = BeforeEach(func() {
 	tpsAddr = fmt.Sprintf("127.0.0.1:%d", uint16(1518+GinkgoParallelNode()))
 	natsPort = 4001 + GinkgoParallelNode()
 
-	timeProvider = faketimeprovider.New(time.Unix(0, 1138))
+	clock = fakeclock.NewFakeClock(time.Unix(0, 1138))
 	receptorServer = ghttp.NewServer()
 
 	runner = testrunner.New(
