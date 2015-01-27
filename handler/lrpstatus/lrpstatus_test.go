@@ -104,7 +104,7 @@ var _ = Describe("LRPStatus", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 
 			Ω(response).Should(HaveLen(4))
-			Ω(response[0].State).Should(Equal(cc_messages.LRPInstanceStateUnknown))
+			Ω(response[0].State).Should(Equal(cc_messages.LRPInstanceStateStarting))
 			Ω(response[1].State).Should(Equal(cc_messages.LRPInstanceStateStarting))
 			Ω(response[2].State).Should(Equal(cc_messages.LRPInstanceStateRunning))
 			Ω(response[3].State).Should(Equal(cc_messages.LRPInstanceStateFlapping))

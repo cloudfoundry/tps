@@ -68,6 +68,8 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func stateFor(state receptor.ActualLRPState, logger lager.Logger) cc_messages.LRPInstanceState {
 	switch state {
+	case receptor.ActualLRPStateUnclaimed:
+		return cc_messages.LRPInstanceStateStarting
 	case receptor.ActualLRPStateClaimed:
 		return cc_messages.LRPInstanceStateStarting
 	case receptor.ActualLRPStateRunning:

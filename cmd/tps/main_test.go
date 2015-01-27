@@ -126,7 +126,7 @@ var _ = Describe("TPS", func() {
 					InstanceGuid: "some-instance-guid-3",
 					Index:        2,
 					Since:        3,
-					State:        cc_messages.LRPInstanceStateUnknown,
+					State:        cc_messages.LRPInstanceStateStarting,
 				}))
 
 				Ω(lrpInstances).Should(ContainElement(cc_messages.LRPInstance{
