@@ -56,6 +56,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			InstanceGuid: instance.InstanceGuid,
 			Index:        uint(instance.Index),
 			State:        stateFor(instance.State, lrpLogger),
+			Details:      instance.PlacementError,
 			Since:        instance.Since,
 		}
 	}

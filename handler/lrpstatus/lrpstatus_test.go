@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
+	"github.com/cloudfoundry-incubator/runtime-schema/diego_errors"
 	. "github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -89,7 +90,7 @@ var _ = Describe("LRPStatus", func() {
 					{Index: 0, State: receptor.ActualLRPStateUnclaimed},
 					{Index: 1, State: receptor.ActualLRPStateClaimed},
 					{Index: 2, State: receptor.ActualLRPStateRunning},
-					{Index: 3, State: receptor.ActualLRPStateCrashed},
+					{Index: 3, State: receptor.ActualLRPStateCrashed, PlacementError: diego_errors.CELL_MISMATCH_MESSAGE},
 				}, nil
 			}
 		})
@@ -108,6 +109,7 @@ var _ = Describe("LRPStatus", func() {
 			Ω(response[1].State).Should(Equal(cc_messages.LRPInstanceStateStarting))
 			Ω(response[2].State).Should(Equal(cc_messages.LRPInstanceStateRunning))
 			Ω(response[3].State).Should(Equal(cc_messages.LRPInstanceStateFlapping))
+			Ω(response[3].Details).Should(Equal(diego_errors.CELL_MISMATCH_MESSAGE))
 		})
 	})
 })
