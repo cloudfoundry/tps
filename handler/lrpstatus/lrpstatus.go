@@ -76,7 +76,7 @@ func stateFor(state receptor.ActualLRPState, logger lager.Logger) cc_messages.LR
 	case receptor.ActualLRPStateRunning:
 		return cc_messages.LRPInstanceStateRunning
 	case receptor.ActualLRPStateCrashed:
-		return cc_messages.LRPInstanceStateFlapping
+		return cc_messages.LRPInstanceStateCrashed
 	default:
 		logger.Error("unknown-state", nil, lager.Data{"state": state})
 		return cc_messages.LRPInstanceStateUnknown

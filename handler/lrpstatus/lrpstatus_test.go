@@ -108,7 +108,7 @@ var _ = Describe("LRPStatus", func() {
 			Ω(response[0].State).Should(Equal(cc_messages.LRPInstanceStateStarting))
 			Ω(response[1].State).Should(Equal(cc_messages.LRPInstanceStateStarting))
 			Ω(response[2].State).Should(Equal(cc_messages.LRPInstanceStateRunning))
-			Ω(response[3].State).Should(Equal(cc_messages.LRPInstanceStateFlapping))
+			Ω(response[3].State).Should(Equal(cc_messages.LRPInstanceStateCrashed))
 			Ω(response[3].Details).Should(Equal(diego_errors.CELL_MISMATCH_MESSAGE))
 		})
 	})
