@@ -73,7 +73,7 @@ func main() {
 	cf_lager.AddFlags(flag.CommandLine)
 	flag.Parse()
 
-	logger := cf_lager.New("tps")
+	logger, reconfigurableSink := cf_lager.New("tps")
 	initializeDropsonde(logger)
 	diegoAPIClient := receptor.NewClient(*diegoAPIURL)
 	apiHandler := initializeHandler(logger, *maxInFlightRequests, diegoAPIClient)
@@ -97,7 +97,7 @@ func main() {
 
 	if dbgAddr := cf_debug_server.DebugAddress(flag.CommandLine); dbgAddr != "" {
 		members = append(grouper.Members{
-			{"debug-server", cf_debug_server.Runner(dbgAddr)},
+			{"debug-server", cf_debug_server.Runner(dbgAddr, reconfigurableSink)},
 		}, members...)
 	}
 
