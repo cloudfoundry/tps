@@ -2,18 +2,16 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/cloudfoundry-incubator/cf-debug-server"
 	"github.com/cloudfoundry-incubator/cf-lager"
 	"github.com/cloudfoundry-incubator/receptor"
+	"github.com/cloudfoundry-incubator/tps/cc_client"
 	"github.com/cloudfoundry-incubator/tps/handler"
-	"github.com/cloudfoundry-incubator/tps/heartbeat"
+	"github.com/cloudfoundry-incubator/tps/watcher"
 	"github.com/cloudfoundry/dropsonde"
-	"github.com/cloudfoundry/gunk/diegonats"
 	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/grouper"
@@ -33,34 +31,34 @@ var diegoAPIURL = flag.String(
 	"URL of diego API",
 )
 
-var natsAddresses = flag.String(
-	"natsAddresses",
-	"127.0.0.1:4222",
-	"comma-separated list of NATS addresses (ip:port)",
-)
-
-var natsUsername = flag.String(
-	"natsUsername",
-	"nats",
-	"Username to connect to nats",
-)
-
-var natsPassword = flag.String(
-	"natsPassword",
-	"nats",
-	"Password for nats user",
-)
-
-var heartbeatInterval = flag.Duration(
-	"heartbeatInterval",
-	30*time.Second,
-	"the interval, in seconds, between heartbeats for maintaining presence",
-)
-
 var maxInFlightRequests = flag.Int(
 	"maxInFlightRequests",
 	200,
 	"number of requests to handle at a time; any more will receive 503",
+)
+
+var ccBaseURL = flag.String(
+	"ccBaseURL",
+	"",
+	"URI to acccess the Cloud Controller",
+)
+
+var ccUsername = flag.String(
+	"ccUsername",
+	"",
+	"Basic auth username for CC internal API",
+)
+
+var ccPassword = flag.String(
+	"ccPassword",
+	"",
+	"Basic auth password for CC internal API",
+)
+
+var skipCertVerify = flag.Bool(
+	"skipCertVerify",
+	false,
+	"skip SSL certificate verification",
 )
 
 const (
@@ -75,23 +73,16 @@ func main() {
 
 	logger, reconfigurableSink := cf_lager.New("tps")
 	initializeDropsonde(logger)
-	diegoAPIClient := receptor.NewClient(*diegoAPIURL)
-	apiHandler := initializeHandler(logger, *maxInFlightRequests, diegoAPIClient)
+	receptorClient := receptor.NewClient(*diegoAPIURL)
+	apiHandler := initializeHandler(logger, *maxInFlightRequests, receptorClient)
+	ccClient := cc_client.NewCcClient(*ccBaseURL, *ccUsername, *ccPassword, *skipCertVerify)
 
-	natsClient := diegonats.NewClient()
-
-	heartbeatRunner := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
-		actual := heartbeat.New(
-			natsClient,
-			*heartbeatInterval,
-			fmt.Sprintf("http://%s", *listenAddr),
-			logger)
-		return actual.Run(signals, ready)
+	watcher := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
+		return watcher.NewWatcher(logger, receptorClient, ccClient).Run(signals, ready)
 	})
 
 	members := grouper.Members{
-		{"natsClient", diegonats.NewClientRunner(*natsAddresses, *natsUsername, *natsPassword, logger, natsClient)},
-		{"heartbeat", heartbeatRunner},
+		{"watcher", watcher},
 		{"api", http_server.New(*listenAddr, apiHandler)},
 	}
 
@@ -103,7 +94,7 @@ func main() {
 
 	group := grouper.NewOrdered(os.Interrupt, members)
 
-	monitor := ifrit.Envoke(sigmon.New(group))
+	monitor := ifrit.Invoke(sigmon.New(group))
 
 	logger.Info("started")
 
