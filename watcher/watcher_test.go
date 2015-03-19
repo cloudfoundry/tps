@@ -103,6 +103,7 @@ var _ = Describe("Watcher", func() {
 			Context("and after > before", func() {
 				BeforeEach(func() {
 					after.CrashCount = 1
+					after.CrashReason = "out of memory"
 				})
 
 				It("calls AppCrashed", func() {
@@ -110,11 +111,12 @@ var _ = Describe("Watcher", func() {
 					guid, crashed, _ := ccClient.AppCrashedArgsForCall(0)
 					Ω(guid).Should(Equal("process-guid"))
 					Ω(crashed).Should(Equal(cc_messages.AppCrashedRequest{
-						Instance:       "instance-guid",
-						Index:          1,
-						Reason:         "CRASHED",
-						CrashCount:     1,
-						CrashTimestamp: 3,
+						Instance:        "instance-guid",
+						Index:           1,
+						Reason:          "CRASHED",
+						ExitDescription: "out of memory",
+						CrashCount:      1,
+						CrashTimestamp:  3,
 					}))
 				})
 			})

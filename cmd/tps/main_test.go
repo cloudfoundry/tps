@@ -158,10 +158,11 @@ var _ = Describe("TPS", func() {
 				appCrashed.CrashTimestamp = 0
 
 				Ω(appCrashed).Should(Equal(cc_messages.AppCrashedRequest{
-					Instance:   "some-instance-guid-1",
-					Index:      1,
-					Reason:     "CRASHED",
-					CrashCount: 1,
+					Instance:        "some-instance-guid-1",
+					Index:           1,
+					Reason:          "CRASHED",
+					ExitDescription: "out of memory",
+					CrashCount:      1,
 				}))
 				close(ready)
 			})
@@ -176,7 +177,7 @@ var _ = Describe("TPS", func() {
 			err := bbs.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
 			Ω(err).ShouldNot(HaveOccurred())
 
-			bbs.CrashActualLRP(logger, lrpKey1, instanceKey1)
+			bbs.CrashActualLRP(logger, lrpKey1, instanceKey1, "out of memory")
 		})
 
 		It("POSTs to the CC that the application has crashed", func() {

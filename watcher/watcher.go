@@ -106,11 +106,12 @@ func (watcher *Watcher) handleEvent(logger lager.Logger, event receptor.Event) {
 
 			guid := changed.After.ProcessGuid
 			appCrashed := cc_messages.AppCrashedRequest{
-				Instance:       changed.Before.InstanceGuid,
-				Index:          changed.After.Index,
-				Reason:         "CRASHED",
-				CrashCount:     changed.After.CrashCount,
-				CrashTimestamp: changed.After.Since,
+				Instance:        changed.Before.InstanceGuid,
+				Index:           changed.After.Index,
+				Reason:          "CRASHED",
+				ExitDescription: changed.After.CrashReason,
+				CrashCount:      changed.After.CrashCount,
+				CrashTimestamp:  changed.After.Since,
 			}
 
 			watcher.pool.Submit(func() {
