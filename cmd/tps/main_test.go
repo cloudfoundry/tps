@@ -36,7 +36,7 @@ var _ = Describe("TPS", func() {
 			Domain:      "some-domain",
 			ProcessGuid: "some-process-guid",
 			Instances:   3,
-			Stack:       "some-stack",
+			RootFS:      "some:rootfs",
 			MemoryMB:    1024,
 			DiskMB:      512,
 			LogGuid:     "some-log-guid",
