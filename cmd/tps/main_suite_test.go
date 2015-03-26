@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cloudfoundry-incubator/consuladapter"
 	receptorrunner "github.com/cloudfoundry-incubator/receptor/cmd/receptor/testrunner"
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
 	"github.com/cloudfoundry-incubator/tps/cmd/tps/testrunner"
 	"github.com/cloudfoundry/storeadapter"
 	"github.com/cloudfoundry/storeadapter/storerunner/etcdstorerunner"
 	. "github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/config"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 	"github.com/onsi/gomega/ghttp"
@@ -27,6 +29,10 @@ var (
 	receptorPort int
 
 	etcdPort int
+
+	consulPort    int
+	consulRunner  consuladapter.ClusterRunner
+	consulAdapter consuladapter.Adapter
 
 	tpsPort int
 	tpsAddr string
@@ -77,16 +83,26 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	receptorPath = string(binaries["receptor"])
 	store = etcdRunner.Adapter()
 
+	consulPort = 9001 + config.GinkgoConfig.ParallelNode*consuladapter.PortOffsetLength
+	consulRunner = consuladapter.NewClusterRunner(
+		consulPort,
+		1,
+		"http",
+	)
+
 	logger = lagertest.NewTestLogger("test")
-	bbs = Bbs.NewBBS(store, clock.NewClock(), logger)
 })
 
 var _ = BeforeEach(func() {
 	etcdRunner.Start()
+	consulRunner.Start()
+
+	bbs = Bbs.NewBBS(store, consulRunner.NewAdapter(), clock.NewClock(), logger)
 
 	receptor := receptorrunner.New(receptorPath, receptorrunner.Args{
-		Address:     fmt.Sprintf("127.0.0.1:%d", receptorPort),
-		EtcdCluster: strings.Join(etcdRunner.NodeURLS(), ","),
+		Address:       fmt.Sprintf("127.0.0.1:%d", receptorPort),
+		EtcdCluster:   strings.Join(etcdRunner.NodeURLS(), ","),
+		ConsulCluster: strings.Join(consulRunner.Addresses(), ","),
 	})
 	receptor.StartCheck = "receptor.started"
 	receptorRunner = ginkgomon.Invoke(receptor)
@@ -107,6 +123,7 @@ var _ = AfterEach(func() {
 	fakeCC.Close()
 	ginkgomon.Kill(receptorRunner, 5)
 	etcdRunner.Stop()
+	consulRunner.Stop()
 })
 
 var _ = SynchronizedAfterSuite(func() {
