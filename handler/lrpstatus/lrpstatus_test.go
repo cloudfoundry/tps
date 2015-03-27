@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/runtime-schema/diego_errors"
-	. "github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
+	"github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-golang/lager/lagertest"
@@ -26,7 +26,7 @@ var _ = Describe("LRPStatus", func() {
 	BeforeEach(func() {
 		fakeClient = new(fake_receptor.FakeClient)
 
-		handler := NewHandler(fakeClient, 1, lagertest.NewTestLogger("test"))
+		handler := lrpstatus.NewHandler(fakeClient, 1, lagertest.NewTestLogger("test"))
 		server = httptest.NewServer(handler)
 		fakeResponses = make(chan chan []receptor.ActualLRPResponse, 2)
 

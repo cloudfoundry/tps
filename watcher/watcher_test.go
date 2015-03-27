@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/tps/cc_client/fakes"
-	. "github.com/cloudfoundry-incubator/tps/watcher"
+	"github.com/cloudfoundry-incubator/tps/watcher"
 	"github.com/pivotal-golang/lager/lagertest"
 	"github.com/tedsuo/ifrit"
 
@@ -30,7 +30,7 @@ var _ = Describe("Watcher", func() {
 		eventSource    *fake_receptor.FakeEventSource
 		receptorClient *fake_receptor.FakeClient
 		ccClient       *fakes.FakeCcClient
-		watcher        *Watcher
+		watcherRunner  *watcher.Watcher
 		process        ifrit.Process
 
 		logger *lagertest.TestLogger
@@ -47,7 +47,7 @@ var _ = Describe("Watcher", func() {
 		logger = lagertest.NewTestLogger("test")
 		ccClient = new(fakes.FakeCcClient)
 
-		watcher = NewWatcher(logger, receptorClient, ccClient)
+		watcherRunner = watcher.NewWatcher(logger, receptorClient, ccClient)
 
 		nextErr = atomic.Value{}
 		nextErr := nextErr
@@ -78,7 +78,7 @@ var _ = Describe("Watcher", func() {
 	})
 
 	JustBeforeEach(func() {
-		process = ifrit.Invoke(watcher)
+		process = ifrit.Invoke(watcherRunner)
 	})
 
 	AfterEach(func() {
