@@ -30,8 +30,7 @@ var (
 
 	etcdPort int
 
-	consulPort    int
-	consulRunner  consuladapter.ClusterRunner
+	consulRunner  *consuladapter.ClusterRunner
 	consulAdapter consuladapter.Adapter
 
 	tpsPort int
@@ -83,9 +82,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	receptorPath = string(binaries["receptor"])
 	store = etcdRunner.Adapter()
 
-	consulPort = 9001 + config.GinkgoConfig.ParallelNode*consuladapter.PortOffsetLength
 	consulRunner = consuladapter.NewClusterRunner(
-		consulPort,
+		9001+config.GinkgoConfig.ParallelNode*consuladapter.PortOffsetLength,
 		1,
 		"http",
 	)
@@ -102,7 +100,7 @@ var _ = BeforeEach(func() {
 	receptor := receptorrunner.New(receptorPath, receptorrunner.Args{
 		Address:       fmt.Sprintf("127.0.0.1:%d", receptorPort),
 		EtcdCluster:   strings.Join(etcdRunner.NodeURLS(), ","),
-		ConsulCluster: strings.Join(consulRunner.Addresses(), ","),
+		ConsulCluster: consulRunner.ConsulCluster(),
 	})
 	receptor.StartCheck = "receptor.started"
 	receptorRunner = ginkgomon.Invoke(receptor)
