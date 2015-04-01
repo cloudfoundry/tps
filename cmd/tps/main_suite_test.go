@@ -74,7 +74,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Ω(err).ShouldNot(HaveOccurred())
 
 	etcdPort = 5001 + GinkgoParallelNode()
-	receptorPort = 6001 + GinkgoParallelNode()
+	receptorPort = 6001 + GinkgoParallelNode()*2
 	tpsPort = 1518 + GinkgoParallelNode()
 
 	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1)
@@ -95,14 +95,15 @@ var _ = BeforeEach(func() {
 	etcdRunner.Start()
 	consulRunner.Start()
 
-	bbs = Bbs.NewBBS(store, consulRunner.NewAdapter(), clock.NewClock(), logger)
+	taskHandlerAddress := fmt.Sprintf("127.0.0.1:%d", receptorPort+1)
+	bbs = Bbs.NewBBS(store, consulRunner.NewAdapter(), "http://"+taskHandlerAddress, clock.NewClock(), logger)
 
 	receptor := receptorrunner.New(receptorPath, receptorrunner.Args{
-		Address:       fmt.Sprintf("127.0.0.1:%d", receptorPort),
-		EtcdCluster:   strings.Join(etcdRunner.NodeURLS(), ","),
-		ConsulCluster: consulRunner.ConsulCluster(),
+		Address:            fmt.Sprintf("127.0.0.1:%d", receptorPort),
+		TaskHandlerAddress: taskHandlerAddress,
+		EtcdCluster:        strings.Join(etcdRunner.NodeURLS(), ","),
+		ConsulCluster:      consulRunner.ConsulCluster(),
 	})
-	receptor.StartCheck = "receptor.started"
 	receptorRunner = ginkgomon.Invoke(receptor)
 
 	fakeCC = ghttp.NewServer()
