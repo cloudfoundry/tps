@@ -3,7 +3,6 @@ package main_test
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -17,20 +16,20 @@ import (
 	api "github.com/cloudfoundry-incubator/tps"
 )
 
-var _ = Describe("TPS", func() {
+var _ = Describe("TPS-Listener", func() {
 
 	var httpClient *http.Client
 	var requestGenerator *rata.RequestGenerator
 
 	BeforeEach(func() {
-		requestGenerator = rata.NewRequestGenerator(fmt.Sprintf("http://%s", tpsAddr), api.Routes)
+		requestGenerator = rata.NewRequestGenerator(fmt.Sprintf("http://%s", listenerAddr), api.Routes)
 		httpClient = &http.Client{
 			Transport: &http.Transport{},
 		}
 	})
 
 	JustBeforeEach(func() {
-		tps = ginkgomon.Invoke(runner)
+		listener = ginkgomon.Invoke(runner)
 
 		desiredLRP := models.DesiredLRP{
 			Domain:      "some-domain",
@@ -51,9 +50,9 @@ var _ = Describe("TPS", func() {
 	})
 
 	AfterEach(func() {
-		if tps != nil {
-			tps.Signal(os.Kill)
-			Eventually(tps.Wait()).Should(Receive())
+		if listener != nil {
+			listener.Signal(os.Kill)
+			Eventually(listener.Wait()).Should(Receive())
 		}
 	})
 
@@ -136,52 +135,6 @@ var _ = Describe("TPS", func() {
 
 				Ω(response.StatusCode).Should(Equal(http.StatusInternalServerError))
 			})
-		})
-	})
-
-	Describe("Crashed Apps", func() {
-		var ready chan struct{}
-
-		BeforeEach(func() {
-			ready = make(chan struct{})
-			fakeCC.RouteToHandler("POST", "/internal/apps/some-process-guid/crashed", func(res http.ResponseWriter, req *http.Request) {
-				var appCrashed cc_messages.AppCrashedRequest
-
-				bytes, err := ioutil.ReadAll(req.Body)
-				Ω(err).ShouldNot(HaveOccurred())
-				req.Body.Close()
-
-				err = json.Unmarshal(bytes, &appCrashed)
-				Ω(err).ShouldNot(HaveOccurred())
-
-				Ω(appCrashed.CrashTimestamp).ShouldNot(BeZero())
-				appCrashed.CrashTimestamp = 0
-
-				Ω(appCrashed).Should(Equal(cc_messages.AppCrashedRequest{
-					Instance:        "some-instance-guid-1",
-					Index:           1,
-					Reason:          "CRASHED",
-					ExitDescription: "out of memory",
-					CrashCount:      1,
-				}))
-				close(ready)
-			})
-		})
-
-		JustBeforeEach(func() {
-			lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
-			instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-			netInfo := models.NewActualLRPNetInfo("1.2.3.4", []models.PortMapping{
-				{ContainerPort: 8080, HostPort: 65100},
-			})
-			err := bbs.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
-			Ω(err).ShouldNot(HaveOccurred())
-
-			bbs.CrashActualLRP(logger, lrpKey1, instanceKey1, "out of memory")
-		})
-
-		It("POSTs to the CC that the application has crashed", func() {
-			Eventually(ready).Should(BeClosed())
 		})
 	})
 })

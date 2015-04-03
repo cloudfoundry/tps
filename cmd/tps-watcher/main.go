@@ -2,39 +2,24 @@ package main
 
 import (
 	"flag"
-	"net/http"
 	"os"
 
 	"github.com/cloudfoundry-incubator/cf-debug-server"
 	"github.com/cloudfoundry-incubator/cf-lager"
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/tps/cc_client"
-	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry-incubator/tps/watcher"
 	"github.com/cloudfoundry/dropsonde"
 	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/grouper"
-	"github.com/tedsuo/ifrit/http_server"
 	"github.com/tedsuo/ifrit/sigmon"
-)
-
-var listenAddr = flag.String(
-	"listenAddr",
-	"0.0.0.0:1518", // p and s's offset in the alphabet, do not change
-	"listening address of api server",
 )
 
 var diegoAPIURL = flag.String(
 	"diegoAPIURL",
 	"",
 	"URL of diego API",
-)
-
-var maxInFlightRequests = flag.Int(
-	"maxInFlightRequests",
-	200,
-	"number of requests to handle at a time; any more will receive 503",
 )
 
 var ccBaseURL = flag.String(
@@ -63,7 +48,7 @@ var skipCertVerify = flag.Bool(
 
 const (
 	dropsondeDestination = "localhost:3457"
-	dropsondeOrigin      = "tps"
+	dropsondeOrigin      = "tps_watcher"
 )
 
 func main() {
@@ -71,10 +56,9 @@ func main() {
 	cf_lager.AddFlags(flag.CommandLine)
 	flag.Parse()
 
-	logger, reconfigurableSink := cf_lager.New("tps")
+	logger, reconfigurableSink := cf_lager.New("tps-watcher")
 	initializeDropsonde(logger)
 	receptorClient := receptor.NewClient(*diegoAPIURL)
-	apiHandler := initializeHandler(logger, *maxInFlightRequests, receptorClient)
 	ccClient := cc_client.NewCcClient(*ccBaseURL, *ccUsername, *ccPassword, *skipCertVerify)
 
 	watcher := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
@@ -83,7 +67,6 @@ func main() {
 
 	members := grouper.Members{
 		{"watcher", watcher},
-		{"api", http_server.New(*listenAddr, apiHandler)},
 	}
 
 	if dbgAddr := cf_debug_server.DebugAddress(flag.CommandLine); dbgAddr != "" {
@@ -112,13 +95,4 @@ func initializeDropsonde(logger lager.Logger) {
 	if err != nil {
 		logger.Error("failed to initialize dropsonde: %v", err)
 	}
-}
-
-func initializeHandler(logger lager.Logger, maxInFlight int, apiClient receptor.Client) http.Handler {
-	apiHandler, err := handler.New(apiClient, maxInFlight, logger)
-	if err != nil {
-		logger.Fatal("initialize-handler.failed", err)
-	}
-
-	return dropsonde.InstrumentedHandler(apiHandler)
 }
