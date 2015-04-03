@@ -31,7 +31,7 @@ var (
 	etcdPort int
 
 	consulRunner  *consuladapter.ClusterRunner
-	consulAdapter consuladapter.Adapter
+	consulAdapter *consuladapter.Adapter
 
 	watcher ifrit.Process
 	runner  *ginkgomon.Runner
@@ -91,6 +91,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 var _ = BeforeEach(func() {
 	etcdRunner.Start()
 	consulRunner.Start()
+	consulAdapter = consulRunner.NewAdapter()
 
 	taskHandlerAddress := fmt.Sprintf("127.0.0.1:%d", receptorPort+1)
 	bbs = Bbs.NewBBS(store, consulRunner.NewAdapter(), "http://"+taskHandlerAddress, clock.NewClock(), logger)
@@ -109,6 +110,7 @@ var _ = BeforeEach(func() {
 		string(watcherPath),
 		fmt.Sprintf("http://127.0.0.1:%d", receptorPort),
 		fmt.Sprintf(fakeCC.URL()),
+		consulRunner.ConsulCluster(),
 	)
 })
 

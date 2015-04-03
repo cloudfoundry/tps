@@ -6,10 +6,15 @@ import (
 
 	"github.com/cloudfoundry-incubator/cf-debug-server"
 	"github.com/cloudfoundry-incubator/cf-lager"
+	"github.com/cloudfoundry-incubator/consuladapter"
 	"github.com/cloudfoundry-incubator/receptor"
+	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
+	"github.com/cloudfoundry-incubator/runtime-schema/bbs/lock_bbs"
 	"github.com/cloudfoundry-incubator/tps/cc_client"
 	"github.com/cloudfoundry-incubator/tps/watcher"
 	"github.com/cloudfoundry/dropsonde"
+	"github.com/nu7hatch/gouuid"
+	"github.com/pivotal-golang/clock"
 	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/grouper"
@@ -20,6 +25,24 @@ var diegoAPIURL = flag.String(
 	"diegoAPIURL",
 	"",
 	"URL of diego API",
+)
+
+var consulCluster = flag.String(
+	"consulCluster",
+	"",
+	"comma-separated list of consul server URLs (scheme://ip:port)",
+)
+
+var lockTTL = flag.Duration(
+	"lockTTL",
+	lock_bbs.LockTTL,
+	"TTL for service lock",
+)
+
+var heartbeatRetryInterval = flag.Duration(
+	"heartbeatRetryInterval",
+	lock_bbs.RetryInterval,
+	"interval to wait before retrying a failed lock acquisition",
 )
 
 var ccBaseURL = flag.String(
@@ -47,8 +70,8 @@ var skipCertVerify = flag.Bool(
 )
 
 const (
-	dropsondeDestination = "localhost:3457"
 	dropsondeOrigin      = "tps_watcher"
+	dropsondeDestination = "localhost:3457"
 )
 
 func main() {
@@ -58,7 +81,10 @@ func main() {
 
 	logger, reconfigurableSink := cf_lager.New("tps-watcher")
 	initializeDropsonde(logger)
+
 	receptorClient := receptor.NewClient(*diegoAPIURL)
+	heartbeater := initializeHeartbeater(logger)
+
 	ccClient := cc_client.NewCcClient(*ccBaseURL, *ccUsername, *ccPassword, *skipCertVerify)
 
 	watcher := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
@@ -66,6 +92,7 @@ func main() {
 	})
 
 	members := grouper.Members{
+		{"heartbeater", heartbeater},
 		{"watcher", watcher},
 	}
 
@@ -95,4 +122,29 @@ func initializeDropsonde(logger lager.Logger) {
 	if err != nil {
 		logger.Error("failed to initialize dropsonde: %v", err)
 	}
+}
+
+func initializeBbs(logger lager.Logger) Bbs.TpsBBS {
+	consulScheme, consulAddresses, err := consuladapter.Parse(*consulCluster)
+	if err != nil {
+		logger.Fatal("failed-parsing-consul-cluster", err)
+	}
+
+	consulAdapter, err := consuladapter.NewAdapter(consulAddresses, consulScheme)
+	if err != nil {
+		logger.Fatal("failed-building-consul-adapter", err)
+	}
+
+	return Bbs.NewTpsBBS(consulAdapter, clock.NewClock(), logger)
+}
+
+func initializeHeartbeater(logger lager.Logger) ifrit.Runner {
+	bbs := initializeBbs(logger)
+
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		logger.Fatal("Couldn't generate uuid", err)
+	}
+
+	return bbs.NewTpsWatcherLock(uuid.String(), *lockTTL, *heartbeatRetryInterval)
 }
