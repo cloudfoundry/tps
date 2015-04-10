@@ -125,17 +125,18 @@ func initializeDropsonde(logger lager.Logger) {
 }
 
 func initializeBbs(logger lager.Logger) Bbs.TpsBBS {
-	consulScheme, consulAddresses, err := consuladapter.Parse(*consulCluster)
+	client, err := consuladapter.NewClient(*consulCluster)
 	if err != nil {
-		logger.Fatal("failed-parsing-consul-cluster", err)
+		logger.Fatal("new-client-failed", err)
 	}
 
-	consulAdapter, err := consuladapter.NewAdapter(consulAddresses, consulScheme)
+	sessionMgr := consuladapter.NewSessionManager(client)
+	consulSession, err := consuladapter.NewSession("tps-watcher", *lockTTL, client, sessionMgr)
 	if err != nil {
-		logger.Fatal("failed-building-consul-adapter", err)
+		logger.Fatal("consul-session-failed", err)
 	}
 
-	return Bbs.NewTpsBBS(consulAdapter, clock.NewClock(), logger)
+	return Bbs.NewTpsBBS(consulSession, clock.NewClock(), logger)
 }
 
 func initializeHeartbeater(logger lager.Logger) ifrit.Runner {
@@ -146,5 +147,5 @@ func initializeHeartbeater(logger lager.Logger) ifrit.Runner {
 		logger.Fatal("Couldn't generate uuid", err)
 	}
 
-	return bbs.NewTpsWatcherLock(uuid.String(), *lockTTL, *heartbeatRetryInterval)
+	return bbs.NewTpsWatcherLock(uuid.String(), *heartbeatRetryInterval)
 }

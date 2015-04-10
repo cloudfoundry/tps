@@ -7,13 +7,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/hashicorp/consul/consul/structs"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/ginkgomon"
 
+	"github.com/cloudfoundry-incubator/consuladapter"
 	"github.com/cloudfoundry-incubator/runtime-schema/bbs/shared"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/runtime-schema/models"
@@ -121,15 +121,11 @@ var _ = Describe("TPS", func() {
 
 	Context("when the watcher initially does not have the lock", func() {
 		var runner *ginkgomon.Runner
+		var otherSession *consuladapter.Session
 
 		BeforeEach(func() {
-			consulRunner.WaitUntilReady()
-
-			_, err := consulAdapter.AcquireAndMaintainLock(
-				shared.LockSchemaPath(watcherLockName),
-				[]byte("something-else"),
-				structs.SessionTTLMin,
-				nil)
+			otherSession = consulRunner.NewSession("other-Session")
+			err := otherSession.AcquireLock(shared.LockSchemaPath(watcherLockName), []byte("something-else"))
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
@@ -147,8 +143,7 @@ var _ = Describe("TPS", func() {
 
 		Context("when the lock becomes available", func() {
 			BeforeEach(func() {
-				err := consulAdapter.ReleaseAndDeleteLock(shared.LockSchemaPath(watcherLockName))
-				Ω(err).ShouldNot(HaveOccurred())
+				otherSession.Destroy()
 			})
 
 			It("is updated", func() {

@@ -30,8 +30,7 @@ var (
 
 	etcdPort int
 
-	consulRunner  *consuladapter.ClusterRunner
-	consulAdapter consuladapter.Adapter
+	consulRunner *consuladapter.ClusterRunner
 
 	listenerPort int
 	listenerAddr string
@@ -94,9 +93,10 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 var _ = BeforeEach(func() {
 	etcdRunner.Start()
 	consulRunner.Start()
+	consulRunner.WaitUntilReady()
 
 	taskHandlerAddress := fmt.Sprintf("127.0.0.1:%d", receptorPort+1)
-	bbs = Bbs.NewBBS(store, consulRunner.NewAdapter(), "http://"+taskHandlerAddress, clock.NewClock(), logger)
+	bbs = Bbs.NewBBS(store, consulRunner.NewSession("a-session"), "http://"+taskHandlerAddress, clock.NewClock(), logger)
 
 	receptor := receptorrunner.New(receptorPath, receptorrunner.Args{
 		Address:            fmt.Sprintf("127.0.0.1:%d", receptorPort),
