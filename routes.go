@@ -7,5 +7,5 @@ const (
 )
 
 var Routes = rata.Routes{
-	{Path: "/lrps/:guid", Method: "GET", Name: LRPStatus},
+	{Path: "/v1/actual_lrps/:guid", Method: "GET", Name: LRPStatus},
 }
