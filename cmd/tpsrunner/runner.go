@@ -25,7 +25,7 @@ func NewWatcher(bin string, diegoAPIURL string, ccBaseURL string, consulCluster 
 			bin,
 			"-diegoAPIURL", diegoAPIURL,
 			"-ccBaseURL", ccBaseURL,
-			"-heartbeatRetryInterval", "1s",
+			"-lockRetryInterval", "1s",
 			"-consulCluster", consulCluster,
 		),
 		StartCheck: "tps-watcher.started",

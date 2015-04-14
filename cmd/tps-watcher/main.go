@@ -39,8 +39,8 @@ var lockTTL = flag.Duration(
 	"TTL for service lock",
 )
 
-var heartbeatRetryInterval = flag.Duration(
-	"heartbeatRetryInterval",
+var lockRetryInterval = flag.Duration(
+	"lockRetryInterval",
 	lock_bbs.RetryInterval,
 	"interval to wait before retrying a failed lock acquisition",
 )
@@ -83,7 +83,7 @@ func main() {
 	initializeDropsonde(logger)
 
 	receptorClient := receptor.NewClient(*diegoAPIURL)
-	heartbeater := initializeHeartbeater(logger)
+	lockMaintainer := initializeLockMaintainer(logger)
 
 	ccClient := cc_client.NewCcClient(*ccBaseURL, *ccUsername, *ccPassword, *skipCertVerify)
 
@@ -92,7 +92,7 @@ func main() {
 	})
 
 	members := grouper.Members{
-		{"heartbeater", heartbeater},
+		{"lock-maintainer", lockMaintainer},
 		{"watcher", watcher},
 	}
 
@@ -139,7 +139,7 @@ func initializeBbs(logger lager.Logger) Bbs.TpsBBS {
 	return Bbs.NewTpsBBS(consulSession, clock.NewClock(), logger)
 }
 
-func initializeHeartbeater(logger lager.Logger) ifrit.Runner {
+func initializeLockMaintainer(logger lager.Logger) ifrit.Runner {
 	bbs := initializeBbs(logger)
 
 	uuid, err := uuid.NewV4()
@@ -147,5 +147,5 @@ func initializeHeartbeater(logger lager.Logger) ifrit.Runner {
 		logger.Fatal("Couldn't generate uuid", err)
 	}
 
-	return bbs.NewTpsWatcherLock(uuid.String(), *heartbeatRetryInterval)
+	return bbs.NewTpsWatcherLock(uuid.String(), *lockRetryInterval)
 }
