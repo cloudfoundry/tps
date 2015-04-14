@@ -4,6 +4,7 @@ import (
 	"os"
 	"sync/atomic"
 
+	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/tps/cc_client"
@@ -102,6 +103,7 @@ func (watcher *Watcher) handleEvent(logger lager.Logger, event receptor.Event) {
 			logger.Info("app-crashed", lager.Data{
 				"process-guid": changed.After.ProcessGuid,
 				"index":        changed.After.Index,
+				"domain":       changed.After.Domain,
 			})
 
 			guid := changed.After.ProcessGuid
@@ -114,16 +116,18 @@ func (watcher *Watcher) handleEvent(logger lager.Logger, event receptor.Event) {
 				CrashTimestamp:  changed.After.Since,
 			}
 
-			watcher.pool.Submit(func() {
-				err := watcher.ccClient.AppCrashed(guid, appCrashed, logger)
-				if err != nil {
-					logger.Info("failed-app-crashed", lager.Data{
-						"process-guid": guid,
-						"index":        changed.After.Index,
-						"error":        err,
-					})
-				}
-			})
+			if changed.After.Domain == recipebuilder.LRPDomain {
+				watcher.pool.Submit(func() {
+					err := watcher.ccClient.AppCrashed(guid, appCrashed, logger)
+					if err != nil {
+						logger.Info("failed-app-crashed", lager.Data{
+							"process-guid": guid,
+							"index":        changed.After.Index,
+							"error":        err,
+						})
+					}
+				})
+			}
 		}
 	}
 }

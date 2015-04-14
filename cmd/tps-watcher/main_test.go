@@ -14,6 +14,7 @@ import (
 	"github.com/tedsuo/ifrit/ginkgomon"
 
 	"github.com/cloudfoundry-incubator/consuladapter"
+	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
 	"github.com/cloudfoundry-incubator/runtime-schema/bbs/shared"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/runtime-schema/models"
@@ -38,7 +39,10 @@ var _ = Describe("TPS", func() {
 	})
 
 	Describe("Crashed Apps", func() {
-		var ready chan struct{}
+		var (
+			ready  chan struct{}
+			domain string
+		)
 
 		BeforeEach(func() {
 			ready = make(chan struct{})
@@ -68,9 +72,10 @@ var _ = Describe("TPS", func() {
 
 		JustBeforeEach(func() {
 			watcher, _ = startWatcher(true)
+			domain = recipebuilder.LRPDomain
 
 			desiredLRP := models.DesiredLRP{
-				Domain:      "some-domain",
+				Domain:      domain,
 				ProcessGuid: "some-process-guid",
 				Instances:   3,
 				RootFS:      "some:rootfs",
@@ -85,7 +90,7 @@ var _ = Describe("TPS", func() {
 			err := bbs.DesireLRP(logger, desiredLRP)
 			Ω(err).ShouldNot(HaveOccurred())
 
-			lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
+			lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, domain)
 			instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
 			netInfo := models.NewActualLRPNetInfo("1.2.3.4", []models.PortMapping{
 				{ContainerPort: 8080, HostPort: 65100},

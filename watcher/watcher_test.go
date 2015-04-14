@@ -6,6 +6,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
@@ -106,18 +107,34 @@ var _ = Describe("Watcher", func() {
 					after.CrashReason = "out of memory"
 				})
 
-				It("calls AppCrashed", func() {
-					Eventually(ccClient.AppCrashedCallCount).Should(Equal(1))
-					guid, crashed, _ := ccClient.AppCrashedArgsForCall(0)
-					Ω(guid).Should(Equal("process-guid"))
-					Ω(crashed).Should(Equal(cc_messages.AppCrashedRequest{
-						Instance:        "instance-guid",
-						Index:           1,
-						Reason:          "CRASHED",
-						ExitDescription: "out of memory",
-						CrashCount:      1,
-						CrashTimestamp:  3,
-					}))
+				Context("and the application has the cc-app Domain", func() {
+					BeforeEach(func() {
+						after.Domain = recipebuilder.LRPDomain
+					})
+
+					It("calls AppCrashed", func() {
+						Eventually(ccClient.AppCrashedCallCount).Should(Equal(1))
+						guid, crashed, _ := ccClient.AppCrashedArgsForCall(0)
+						Ω(guid).Should(Equal("process-guid"))
+						Ω(crashed).Should(Equal(cc_messages.AppCrashedRequest{
+							Instance:        "instance-guid",
+							Index:           1,
+							Reason:          "CRASHED",
+							ExitDescription: "out of memory",
+							CrashCount:      1,
+							CrashTimestamp:  3,
+						}))
+					})
+				})
+
+				Context("and the application does not have the cc-app Domain", func() {
+					BeforeEach(func() {
+						after.Domain = "foobar"
+					})
+
+					It("does not call AppCrashed", func() {
+						Consistently(ccClient.AppCrashedCallCount).Should(Equal(0))
+					})
 				})
 			})
 
@@ -126,8 +143,8 @@ var _ = Describe("Watcher", func() {
 					before.CrashCount = 1
 				})
 
-				It("calls AppCrashed", func() {
-					Eventually(ccClient.AppCrashedCallCount).Should(Equal(0))
+				It("does not call AppCrashed", func() {
+					Consistently(ccClient.AppCrashedCallCount).Should(Equal(0))
 				})
 			})
 		})
