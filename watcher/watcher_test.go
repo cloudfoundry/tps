@@ -6,7 +6,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
@@ -109,7 +108,7 @@ var _ = Describe("Watcher", func() {
 
 				Context("and the application has the cc-app Domain", func() {
 					BeforeEach(func() {
-						after.Domain = recipebuilder.LRPDomain
+						after.Domain = cc_messages.AppLRPDomain
 					})
 
 					It("calls AppCrashed", func() {

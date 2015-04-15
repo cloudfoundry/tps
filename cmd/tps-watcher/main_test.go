@@ -14,7 +14,6 @@ import (
 	"github.com/tedsuo/ifrit/ginkgomon"
 
 	"github.com/cloudfoundry-incubator/consuladapter"
-	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
 	"github.com/cloudfoundry-incubator/runtime-schema/bbs/shared"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/runtime-schema/models"
@@ -72,7 +71,7 @@ var _ = Describe("TPS", func() {
 
 		JustBeforeEach(func() {
 			watcher, _ = startWatcher(true)
-			domain = recipebuilder.LRPDomain
+			domain = cc_messages.AppLRPDomain
 
 			desiredLRP := models.DesiredLRP{
 				Domain:      domain,

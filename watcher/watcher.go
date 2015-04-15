@@ -4,7 +4,6 @@ import (
 	"os"
 	"sync/atomic"
 
-	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/tps/cc_client"
@@ -116,7 +115,7 @@ func (watcher *Watcher) handleEvent(logger lager.Logger, event receptor.Event) {
 				CrashTimestamp:  changed.After.Since,
 			}
 
-			if changed.After.Domain == recipebuilder.LRPDomain {
+			if changed.After.Domain == cc_messages.AppLRPDomain {
 				watcher.pool.Submit(func() {
 					err := watcher.ccClient.AppCrashed(guid, appCrashed, logger)
 					if err != nil {
