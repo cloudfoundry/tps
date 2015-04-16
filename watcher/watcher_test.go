@@ -16,6 +16,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
 )
 
 type EventHolder struct {
@@ -91,8 +92,8 @@ var _ = Describe("Watcher", func() {
 		var after receptor.ActualLRPResponse
 
 		BeforeEach(func() {
-			before = receptor.ActualLRPResponse{ProcessGuid: "process-guid", InstanceGuid: "instance-guid", Index: 1, Since: 2, CrashCount: 0}
-			after = receptor.ActualLRPResponse{ProcessGuid: "process-guid", InstanceGuid: "instance-guid", Index: 1, Since: 3, CrashCount: 0}
+			before = receptor.ActualLRPResponse{ProcessGuid: "process-guid", InstanceGuid: "instance-guid", Index: 1, Since: 2, CrashCount: 0, Domain: cc_messages.AppLRPDomain}
+			after = receptor.ActualLRPResponse{ProcessGuid: "process-guid", InstanceGuid: "instance-guid", Index: 1, Since: 3, CrashCount: 0, Domain: cc_messages.AppLRPDomain}
 		})
 
 		JustBeforeEach(func() {
@@ -107,10 +108,6 @@ var _ = Describe("Watcher", func() {
 				})
 
 				Context("and the application has the cc-app Domain", func() {
-					BeforeEach(func() {
-						after.Domain = cc_messages.AppLRPDomain
-					})
-
 					It("calls AppCrashed", func() {
 						Eventually(ccClient.AppCrashedCallCount).Should(Equal(1))
 						guid, crashed, _ := ccClient.AppCrashedArgsForCall(0)
@@ -123,16 +120,38 @@ var _ = Describe("Watcher", func() {
 							CrashCount:      1,
 							CrashTimestamp:  3,
 						}))
+						Ω(logger).Should(Say("app-crashed"))
 					})
 				})
 
 				Context("and the application does not have the cc-app Domain", func() {
+					var otherBefore receptor.ActualLRPResponse
+					var otherAfter receptor.ActualLRPResponse
+
 					BeforeEach(func() {
-						after.Domain = "foobar"
+						otherBefore = receptor.ActualLRPResponse{ProcessGuid: "other-process-guid", InstanceGuid: "instance-guid", Index: 1, Since: 2, CrashCount: 0}
+						otherAfter = receptor.ActualLRPResponse{ProcessGuid: "other-process-guid", InstanceGuid: "instance-guid", Index: 1, Since: 3, CrashCount: 1}
+
+						event := EventHolder{receptor.NewActualLRPChangedEvent(before, after)}
+						otherEvent := EventHolder{receptor.NewActualLRPChangedEvent(otherBefore, otherAfter)}
+						events := []EventHolder{otherEvent, event}
+
+						eventSource.NextStub = func() (receptor.Event, error) {
+							var e EventHolder
+							time.Sleep(10 * time.Millisecond)
+							if len(events) == 0 {
+								return nil, nil
+							}
+							e, events = events[0], events[1:]
+							return e.event, nil
+						}
 					})
 
 					It("does not call AppCrashed", func() {
-						Consistently(ccClient.AppCrashedCallCount).Should(Equal(0))
+						Eventually(ccClient.AppCrashedCallCount).Should(Equal(1))
+						buffer := logger.Buffer()
+						Ω(buffer).Should(Say("process-guid"))
+						Ω(buffer).ShouldNot(Say("other-process-guid"))
 					})
 				})
 			})

@@ -98,24 +98,23 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 
 func (watcher *Watcher) handleEvent(logger lager.Logger, event receptor.Event) {
 	if changed, ok := event.(receptor.ActualLRPChangedEvent); ok {
-		if changed.After.CrashCount > changed.Before.CrashCount {
-			logger.Info("app-crashed", lager.Data{
-				"process-guid": changed.After.ProcessGuid,
-				"index":        changed.After.Index,
-				"domain":       changed.After.Domain,
-			})
+		if changed.After.Domain == cc_messages.AppLRPDomain {
+			if changed.After.CrashCount > changed.Before.CrashCount {
+				logger.Info("app-crashed", lager.Data{
+					"process-guid": changed.After.ProcessGuid,
+					"index":        changed.After.Index,
+				})
 
-			guid := changed.After.ProcessGuid
-			appCrashed := cc_messages.AppCrashedRequest{
-				Instance:        changed.Before.InstanceGuid,
-				Index:           changed.After.Index,
-				Reason:          "CRASHED",
-				ExitDescription: changed.After.CrashReason,
-				CrashCount:      changed.After.CrashCount,
-				CrashTimestamp:  changed.After.Since,
-			}
+				guid := changed.After.ProcessGuid
+				appCrashed := cc_messages.AppCrashedRequest{
+					Instance:        changed.Before.InstanceGuid,
+					Index:           changed.After.Index,
+					Reason:          "CRASHED",
+					ExitDescription: changed.After.CrashReason,
+					CrashCount:      changed.After.CrashCount,
+					CrashTimestamp:  changed.After.Since,
+				}
 
-			if changed.After.Domain == cc_messages.AppLRPDomain {
 				watcher.pool.Submit(func() {
 					err := watcher.ccClient.AppCrashed(guid, appCrashed, logger)
 					if err != nil {
