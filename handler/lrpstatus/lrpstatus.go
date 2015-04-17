@@ -14,31 +14,16 @@ import (
 type handler struct {
 	apiClient receptor.Client
 	logger    lager.Logger
-
-	semaphore chan struct{}
 }
 
-func NewHandler(apiClient receptor.Client, maxInFlight int, logger lager.Logger) http.Handler {
+func NewHandler(apiClient receptor.Client, logger lager.Logger) http.Handler {
 	return &handler{
 		apiClient: apiClient,
 		logger:    logger,
-
-		semaphore: make(chan struct{}, maxInFlight),
 	}
 }
 
 func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	select {
-	case handler.semaphore <- struct{}{}:
-	default:
-		w.WriteHeader(http.StatusServiceUnavailable)
-		return
-	}
-
-	defer func() {
-		<-handler.semaphore
-	}()
-
 	lrpLogger := handler.logger.Session("lrp-handler")
 
 	guid := r.FormValue(":guid")

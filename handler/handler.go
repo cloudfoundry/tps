@@ -12,10 +12,38 @@ import (
 )
 
 func New(apiClient receptor.Client, noaaClient lrpstats.NoaaClient, maxInFlight int, logger lager.Logger) (http.Handler, error) {
+	semaphore := make(chan struct{}, maxInFlight)
+
 	handlers := map[string]http.Handler{
-		tps.LRPStatus: lrpstatus.NewHandler(apiClient, maxInFlight, logger),
-		tps.LRPStats:  lrpstats.NewHandler(apiClient, noaaClient, logger),
+		tps.LRPStatus: tpsHandler{
+			semaphore:       semaphore,
+			delegateHandler: lrpstatus.NewHandler(apiClient, logger),
+		},
+		tps.LRPStats: tpsHandler{
+			semaphore:       semaphore,
+			delegateHandler: lrpstats.NewHandler(apiClient, noaaClient, logger),
+		},
 	}
 
 	return rata.NewRouter(tps.Routes, handlers)
+}
+
+type tpsHandler struct {
+	semaphore       chan struct{}
+	delegateHandler http.Handler
+}
+
+func (handler tpsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	select {
+	case handler.semaphore <- struct{}{}:
+	default:
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	defer func() {
+		<-handler.semaphore
+	}()
+
+	handler.delegateHandler.ServeHTTP(w, r)
 }
