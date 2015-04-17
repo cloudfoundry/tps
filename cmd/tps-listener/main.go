@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"flag"
 	"net/http"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry/dropsonde"
+	"github.com/cloudfoundry/noaa"
 	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/grouper"
@@ -27,6 +29,18 @@ var diegoAPIURL = flag.String(
 	"diegoAPIURL",
 	"",
 	"URL of diego API",
+)
+
+var trafficControllerURL = flag.String(
+	"trafficControllerURL",
+	"",
+	"URL of TrafficController",
+)
+
+var tlsEnabled = flag.Bool(
+	"tlsEnabled",
+	true,
+	"Enable TLS",
 )
 
 var maxInFlightRequests = flag.Int(
@@ -48,7 +62,8 @@ func main() {
 	logger, reconfigurableSink := cf_lager.New("tps-listener")
 	initializeDropsonde(logger)
 	receptorClient := receptor.NewClient(*diegoAPIURL)
-	apiHandler := initializeHandler(logger, *maxInFlightRequests, receptorClient)
+	noaaClient := noaa.NewConsumer(*trafficControllerURL, &tls.Config{InsecureSkipVerify: !*tlsEnabled}, nil)
+	apiHandler := initializeHandler(logger, noaaClient, *maxInFlightRequests, receptorClient)
 
 	members := grouper.Members{
 		{"api", http_server.New(*listenAddr, apiHandler)},
@@ -82,8 +97,8 @@ func initializeDropsonde(logger lager.Logger) {
 	}
 }
 
-func initializeHandler(logger lager.Logger, maxInFlight int, apiClient receptor.Client) http.Handler {
-	apiHandler, err := handler.New(apiClient, maxInFlight, logger)
+func initializeHandler(logger lager.Logger, noaaClient *noaa.Consumer, maxInFlight int, apiClient receptor.Client) http.Handler {
+	apiHandler, err := handler.New(apiClient, noaaClient, maxInFlight, logger)
 	if err != nil {
 		logger.Fatal("initialize-handler.failed", err)
 	}

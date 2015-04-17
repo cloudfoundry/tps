@@ -28,6 +28,10 @@ var (
 	receptorPath string
 	receptorPort int
 
+	trafficControllerAddress string
+	trafficControllerPort    int
+	trafficControllerURL     string
+
 	etcdPort int
 
 	consulRunner *consuladapter.ClusterRunner
@@ -76,6 +80,10 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	receptorPort = 6001 + GinkgoParallelNode()*2
 	listenerPort = 1518 + GinkgoParallelNode()
 
+	trafficControllerPort = 7001 + GinkgoParallelNode()*2
+	trafficControllerAddress = fmt.Sprintf("127.0.0.1:%d", trafficControllerPort)
+	trafficControllerURL = fmt.Sprintf("ws://%s", trafficControllerAddress)
+
 	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1)
 	listenerPath = string(binaries["listener"])
 	receptorPath = string(binaries["receptor"])
@@ -114,6 +122,7 @@ var _ = BeforeEach(func() {
 		string(listenerPath),
 		listenerAddr,
 		fmt.Sprintf("http://127.0.0.1:%d", receptorPort),
+		trafficControllerURL,
 	)
 })
 

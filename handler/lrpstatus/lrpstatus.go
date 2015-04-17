@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/cloudfoundry-incubator/receptor"
+	"github.com/cloudfoundry-incubator/tps/handler/cc_conv"
 	"github.com/pivotal-golang/lager"
 
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
@@ -55,7 +56,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			ProcessGuid:  instance.ProcessGuid,
 			InstanceGuid: instance.InstanceGuid,
 			Index:        uint(instance.Index),
-			State:        stateFor(instance.State, lrpLogger),
+			State:        cc_conv.StateFor(instance.State),
 			Details:      instance.PlacementError,
 			Since:        instance.Since,
 		}
@@ -64,21 +65,5 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(instances)
 	if err != nil {
 		lrpLogger.Error("stream-response-failed", err, lager.Data{"guid": guid})
-	}
-}
-
-func stateFor(state receptor.ActualLRPState, logger lager.Logger) cc_messages.LRPInstanceState {
-	switch state {
-	case receptor.ActualLRPStateUnclaimed:
-		return cc_messages.LRPInstanceStateStarting
-	case receptor.ActualLRPStateClaimed:
-		return cc_messages.LRPInstanceStateStarting
-	case receptor.ActualLRPStateRunning:
-		return cc_messages.LRPInstanceStateRunning
-	case receptor.ActualLRPStateCrashed:
-		return cc_messages.LRPInstanceStateCrashed
-	default:
-		logger.Error("unknown-state", nil, lager.Data{"state": state})
-		return cc_messages.LRPInstanceStateUnknown
 	}
 }
