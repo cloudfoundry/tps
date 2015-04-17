@@ -6,19 +6,21 @@ import (
 	"github.com/tedsuo/ifrit/ginkgomon"
 )
 
-func NewListener(bin string, listenAddr string, diegoAPIURL string) *ginkgomon.Runner {
+func NewListener(bin, listenAddr, diegoAPIURL, trafficControllerURL string) *ginkgomon.Runner {
 	return ginkgomon.New(ginkgomon.Config{
 		Name: "tps-listener",
 		Command: exec.Command(
 			bin,
 			"-diegoAPIURL", diegoAPIURL,
 			"-listenAddr", listenAddr,
+			"-trafficControllerURL", trafficControllerURL,
+			"-tlsEnabled", "false",
 		),
 		StartCheck: "tps-listener.started",
 	})
 }
 
-func NewWatcher(bin string, diegoAPIURL string, ccBaseURL string, consulCluster string) *ginkgomon.Runner {
+func NewWatcher(bin, diegoAPIURL, ccBaseURL, consulCluster string) *ginkgomon.Runner {
 	return ginkgomon.New(ginkgomon.Config{
 		Name: "tps-watcher",
 		Command: exec.Command(
