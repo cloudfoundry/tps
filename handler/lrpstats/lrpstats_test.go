@@ -24,6 +24,7 @@ import (
 var _ = Describe("Stats", func() {
 	const authorization = "something good"
 	const guid = "my-guid"
+	const logGuid = "log-guid"
 
 	var (
 		handler        http.Handler
@@ -82,26 +83,31 @@ var _ = Describe("Stats", func() {
 				},
 			}, nil)
 
+			receptorClient.GetDesiredLRPReturns(receptor.DesiredLRPResponse{
+				LogGuid:     logGuid,
+				ProcessGuid: guid,
+			}, nil)
+
 			receptorClient.ActualLRPsByProcessGuidReturns([]receptor.ActualLRPResponse{
 				{
 					Index:        5,
 					State:        receptor.ActualLRPStateRunning,
 					Since:        124578,
 					InstanceGuid: "instanceId",
-					ProcessGuid:  "appId",
+					ProcessGuid:  guid,
 				},
 			}, nil)
 		})
 
-		It("returns a map of stats & status per index", func() {
+		It("returns a map of stats & status per index in the correct units", func() {
 			expectedLRPInstance := cc_messages.LRPInstance{
-				ProcessGuid:  "appId",
+				ProcessGuid:  guid,
 				InstanceGuid: "instanceId",
 				Index:        5,
 				State:        cc_messages.LRPInstanceStateRunning,
 				Since:        124578,
 				Stats: &cc_messages.LRPInstanceStats{
-					CpuPercentage: 4,
+					CpuPercentage: 0.04,
 					MemoryBytes:   1024,
 					DiskBytes:     2048,
 				},
@@ -118,7 +124,7 @@ var _ = Describe("Stats", func() {
 		It("calls ContainerMetrics", func() {
 			Ω(noaaClient.ContainerMetricsCallCount()).Should(Equal(1))
 			guid, token := noaaClient.ContainerMetricsArgsForCall(0)
-			Ω(guid).Should(Equal(guid))
+			Ω(guid).Should(Equal(logGuid))
 			Ω(token).Should(Equal(authorization))
 		})
 

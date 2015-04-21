@@ -166,9 +166,9 @@ var _ = Describe("TPS-Listener", func() {
 
 			Context("when the traffic controller is running", func() {
 				BeforeEach(func() {
-					message1 := marshalMessage(createContainerMetric("some-process-guid", 0, 3.3, 1024, 2048, 0))
-					message2 := marshalMessage(createContainerMetric("some-process-guid", 1, 4.4, 1024, 2048, 0))
-					message3 := marshalMessage(createContainerMetric("some-process-guid", 2, 5.5, 1024, 2048, 0))
+					message1 := marshalMessage(createContainerMetric("some-process-guid", 0, 3.0, 1024, 2048, 0))
+					message2 := marshalMessage(createContainerMetric("some-process-guid", 1, 4.0, 1024, 2048, 0))
+					message3 := marshalMessage(createContainerMetric("some-process-guid", 2, 5.0, 1024, 2048, 0))
 					messages := [][]byte{message1, message2, message3}
 
 					handler := NewHttpHandler(messages)
@@ -205,7 +205,7 @@ var _ = Describe("TPS-Listener", func() {
 						Index:        0,
 						State:        cc_messages.LRPInstanceStateStarting,
 						Stats: &cc_messages.LRPInstanceStats{
-							CpuPercentage: 3.3,
+							CpuPercentage: 0.03,
 							MemoryBytes:   1024,
 							DiskBytes:     2048,
 						},
@@ -217,7 +217,7 @@ var _ = Describe("TPS-Listener", func() {
 						Index:        1,
 						State:        cc_messages.LRPInstanceStateRunning,
 						Stats: &cc_messages.LRPInstanceStats{
-							CpuPercentage: 4.4,
+							CpuPercentage: 0.04,
 							MemoryBytes:   1024,
 							DiskBytes:     2048,
 						},
@@ -229,7 +229,7 @@ var _ = Describe("TPS-Listener", func() {
 						Index:        2,
 						State:        cc_messages.LRPInstanceStateStarting,
 						Stats: &cc_messages.LRPInstanceStats{
-							CpuPercentage: 5.5,
+							CpuPercentage: 0.05,
 							MemoryBytes:   1024,
 							DiskBytes:     2048,
 						},

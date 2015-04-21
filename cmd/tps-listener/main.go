@@ -37,10 +37,10 @@ var trafficControllerURL = flag.String(
 	"URL of TrafficController",
 )
 
-var tlsEnabled = flag.Bool(
-	"tlsEnabled",
+var skipSSLVerification = flag.Bool(
+	"skipSSLVerification",
 	true,
-	"Enable TLS",
+	"Skip SSL verification",
 )
 
 var maxInFlightRequests = flag.Int(
@@ -62,7 +62,7 @@ func main() {
 	logger, reconfigurableSink := cf_lager.New("tps-listener")
 	initializeDropsonde(logger)
 	receptorClient := receptor.NewClient(*diegoAPIURL)
-	noaaClient := noaa.NewConsumer(*trafficControllerURL, &tls.Config{InsecureSkipVerify: !*tlsEnabled}, nil)
+	noaaClient := noaa.NewConsumer(*trafficControllerURL, &tls.Config{InsecureSkipVerify: *skipSSLVerification}, nil)
 	apiHandler := initializeHandler(logger, noaaClient, *maxInFlightRequests, receptorClient)
 
 	members := grouper.Members{

@@ -40,25 +40,36 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	actualLRPs, err := handler.receptorClient.ActualLRPsByProcessGuid(guid)
+	desiredLRP, err := handler.receptorClient.GetDesiredLRP(guid)
 	if err != nil {
-		handler.logger.Error("fetching-actual-lrp-info-failed", err)
+		handler.logger.Error("fetching-desired-lrp-failed", err, lager.Data{"ProcessGuid": guid})
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	metrics, err := handler.noaaClient.ContainerMetrics(guid, authorization)
+	actualLRPs, err := handler.receptorClient.ActualLRPsByProcessGuid(guid)
+	if err != nil {
+		handler.logger.Error("fetching-actual-lrp-info-failed", err, lager.Data{"ProcessGuid": guid})
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	metrics, err := handler.noaaClient.ContainerMetrics(desiredLRP.LogGuid, authorization)
 	defer handler.noaaClient.Close()
 	if err != nil {
-		handler.logger.Error("container-metrics-failed", err)
+		handler.logger.Error("container-metrics-failed", err, lager.Data{
+			"ProcessGuid": guid,
+			"LogGuid":     desiredLRP.LogGuid,
+		})
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	metricsByInstanceIndex := make(map[uint]*cc_messages.LRPInstanceStats)
 	for _, metric := range metrics {
+		cpuPercentageAsDecimal := metric.GetCpuPercentage() / 100
 		metricsByInstanceIndex[uint(metric.GetInstanceIndex())] = &cc_messages.LRPInstanceStats{
-			CpuPercentage: metric.GetCpuPercentage(),
+			CpuPercentage: cpuPercentageAsDecimal,
 			MemoryBytes:   metric.GetMemoryBytes(),
 			DiskBytes:     metric.GetDiskBytes(),
 		}

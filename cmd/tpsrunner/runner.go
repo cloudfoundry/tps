@@ -14,7 +14,7 @@ func NewListener(bin, listenAddr, diegoAPIURL, trafficControllerURL string) *gin
 			"-diegoAPIURL", diegoAPIURL,
 			"-listenAddr", listenAddr,
 			"-trafficControllerURL", trafficControllerURL,
-			"-tlsEnabled", "false",
+			"-skipSSLVerification", "true",
 		),
 		StartCheck: "tps-listener.started",
 	})
