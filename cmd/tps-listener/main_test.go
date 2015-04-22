@@ -238,8 +238,7 @@ var _ = Describe("TPS-Listener", func() {
 			})
 
 			Context("when the traffic controller is not running", func() {
-
-				It("reports the state of the given process guid's instances", func() {
+				It("reports the status with nil stats", func() {
 					getLRPStats, err := requestGenerator.CreateRequest(
 						api.LRPStats,
 						rata.Params{"guid": "some-process-guid"},
@@ -250,11 +249,19 @@ var _ = Describe("TPS-Listener", func() {
 
 					response, err := httpClient.Do(getLRPStats)
 					Ω(err).ShouldNot(HaveOccurred())
-					Ω(response.StatusCode).Should(Equal(http.StatusInternalServerError))
+					Ω(response.StatusCode).Should(Equal(http.StatusOK))
 
+					var lrpInstances []cc_messages.LRPInstance
+					err = json.NewDecoder(response.Body).Decode(&lrpInstances)
+					Ω(err).ShouldNot(HaveOccurred())
+
+					Ω(lrpInstances).Should(HaveLen(3))
+
+					for _, instance := range lrpInstances {
+						Ω(instance.Stats).Should(BeNil())
+					}
 				})
 			})
-
 		})
 
 		Context("when the receptor is not running", func() {
