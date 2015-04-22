@@ -100,6 +100,7 @@ var _ = Describe("Stats", func() {
 		})
 
 		It("returns a map of stats & status per index in the correct units", func() {
+
 			expectedLRPInstance := cc_messages.LRPInstance{
 				ProcessGuid:  guid,
 				InstanceGuid: "instanceId",
@@ -133,8 +134,22 @@ var _ = Describe("Stats", func() {
 				noaaClient.ContainerMetricsReturns(nil, errors.New("bad stuff happened"))
 			})
 
-			It("responds with a 500", func() {
-				Ω(response.Code).Should(Equal(http.StatusInternalServerError))
+			It("responds with empty stats", func() {
+				expectedLRPInstance := cc_messages.LRPInstance{
+					ProcessGuid:  guid,
+					InstanceGuid: "instanceId",
+					Index:        5,
+					State:        cc_messages.LRPInstanceStateRunning,
+					Since:        124578,
+					Stats:        nil,
+				}
+
+				var stats []cc_messages.LRPInstance
+				Ω(response.Code).Should(Equal(http.StatusOK))
+				Ω(response.Header().Get("Content-Type")).Should(Equal("application/json"))
+				err := json.Unmarshal(response.Body.Bytes(), &stats)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(stats).Should(ConsistOf(expectedLRPInstance))
 			})
 
 			It("logs the failure", func() {

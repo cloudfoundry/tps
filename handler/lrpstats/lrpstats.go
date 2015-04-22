@@ -61,8 +61,6 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			"ProcessGuid": guid,
 			"LogGuid":     desiredLRP.LogGuid,
 		})
-		w.WriteHeader(http.StatusInternalServerError)
-		return
 	}
 
 	metricsByInstanceIndex := make(map[uint]*cc_messages.LRPInstanceStats)
