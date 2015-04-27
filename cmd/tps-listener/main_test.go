@@ -177,6 +177,10 @@ var _ = Describe("TPS-Listener", func() {
 					Ω(trafficControllerProcess.Ready()).Should(BeClosed())
 				})
 
+				AfterEach(func() {
+					ginkgomon.Interrupt(trafficControllerProcess)
+				})
+
 				It("reports the state of the given process guid's instances", func() {
 					getLRPStats, err := requestGenerator.CreateRequest(
 						api.LRPStats,
