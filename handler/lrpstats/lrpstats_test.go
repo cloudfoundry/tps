@@ -157,6 +157,28 @@ var _ = Describe("Stats", func() {
 			})
 		})
 
+		Context("when fetching the desiredLRP fails", func() {
+			Context("when the desiredLRP is not found", func() {
+				BeforeEach(func() {
+					receptorClient.GetDesiredLRPReturns(receptor.DesiredLRPResponse{}, receptor.Error{Type: receptor.DesiredLRPNotFound})
+				})
+
+				It("responds with a 404", func() {
+					Expect(response.Code).To(Equal(http.StatusNotFound))
+				})
+			})
+
+			Context("when another type of error occurs", func() {
+				BeforeEach(func() {
+					receptorClient.GetDesiredLRPReturns(receptor.DesiredLRPResponse{}, errors.New("some error"))
+				})
+
+				It("responds with a 500", func() {
+					Expect(response.Code).To(Equal(http.StatusInternalServerError))
+				})
+			})
+		})
+
 		Context("when fetching actualLRPs fails", func() {
 			BeforeEach(func() {
 				receptorClient.ActualLRPsByProcessGuidReturns(nil, errors.New("bad stuff happened"))

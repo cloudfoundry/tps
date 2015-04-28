@@ -165,6 +165,22 @@ var _ = Describe("TPS-Listener", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 
+			Context("when a DesiredLRP is not found", func() {
+				It("returns a NotFound", func() {
+					getLRPStats, err := requestGenerator.CreateRequest(
+						api.LRPStats,
+						rata.Params{"guid": "some-bogus-guid"},
+						nil,
+					)
+					Expect(err).ToNot(HaveOccurred())
+					getLRPStats.Header.Add("Authorization", "I can do this.")
+
+					response, err := httpClient.Do(getLRPStats)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(response.StatusCode).To(Equal(http.StatusNotFound))
+				})
+			})
+
 			Context("when the traffic controller is running", func() {
 				BeforeEach(func() {
 					message1 := marshalMessage(createContainerMetric("some-process-guid", 0, 3.0, 1024, 2048, 0))

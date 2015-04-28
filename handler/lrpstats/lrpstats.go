@@ -43,7 +43,12 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	desiredLRP, err := handler.receptorClient.GetDesiredLRP(guid)
 	if err != nil {
 		handler.logger.Error("fetching-desired-lrp-failed", err, lager.Data{"ProcessGuid": guid})
-		w.WriteHeader(http.StatusInternalServerError)
+
+		if e, ok := err.(receptor.Error); ok && e.Type == receptor.DesiredLRPNotFound {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 		return
 	}
 
