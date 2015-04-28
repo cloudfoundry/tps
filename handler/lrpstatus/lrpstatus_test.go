@@ -53,19 +53,19 @@ var _ = Describe("LRPStatus", func() {
 
 		It("returns instance state", func() {
 			res, err := http.Get(server.URL)
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
 			response := []cc_messages.LRPInstance{}
 			err = json.NewDecoder(res.Body).Decode(&response)
 			res.Body.Close()
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-			Ω(response).Should(HaveLen(4))
-			Ω(response[0].State).Should(Equal(cc_messages.LRPInstanceStateStarting))
-			Ω(response[1].State).Should(Equal(cc_messages.LRPInstanceStateStarting))
-			Ω(response[2].State).Should(Equal(cc_messages.LRPInstanceStateRunning))
-			Ω(response[3].State).Should(Equal(cc_messages.LRPInstanceStateCrashed))
-			Ω(response[3].Details).Should(Equal(diego_errors.CELL_MISMATCH_MESSAGE))
+			Expect(response).To(HaveLen(4))
+			Expect(response[0].State).To(Equal(cc_messages.LRPInstanceStateStarting))
+			Expect(response[1].State).To(Equal(cc_messages.LRPInstanceStateStarting))
+			Expect(response[2].State).To(Equal(cc_messages.LRPInstanceStateRunning))
+			Expect(response[3].State).To(Equal(cc_messages.LRPInstanceStateCrashed))
+			Expect(response[3].Details).To(Equal(diego_errors.CELL_MISMATCH_MESSAGE))
 		})
 	})
 })

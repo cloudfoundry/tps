@@ -53,8 +53,8 @@ var _ = Describe("CC Client", func() {
 						body, err := ioutil.ReadAll(req.Body)
 						defer req.Body.Close()
 
-						Ω(err).ShouldNot(HaveOccurred())
-						Ω(body).Should(Equal(expectedBody))
+						Expect(err).NotTo(HaveOccurred())
+						Expect(body).To(Equal(expectedBody))
 					},
 				),
 			)
@@ -64,7 +64,7 @@ var _ = Describe("CC Client", func() {
 			err := ccClient.AppCrashed(guid, cc_messages.AppCrashedRequest{
 				Index: 1,
 			}, logger)
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 		})
 	})
 
@@ -92,7 +92,7 @@ var _ = Describe("CC Client", func() {
 				err := ccClient.AppCrashed(guid, cc_messages.AppCrashedRequest{
 					Index: 1,
 				}, logger)
-				Ω(err).Should(HaveOccurred())
+				Expect(err).To(HaveOccurred())
 			})
 		})
 
@@ -105,7 +105,7 @@ var _ = Describe("CC Client", func() {
 				err := ccClient.AppCrashed(guid, cc_messages.AppCrashedRequest{
 					Index: 1,
 				}, logger)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 	})
@@ -121,8 +121,8 @@ var _ = Describe("CC Client", func() {
 				err := ccClient.AppCrashed(guid, cc_messages.AppCrashedRequest{
 					Index: 1,
 				}, logger)
-				Ω(err).Should(HaveOccurred())
-				Ω(err).Should(BeAssignableToTypeOf(&url.Error{}))
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(BeAssignableToTypeOf(&url.Error{}))
 			})
 		})
 
@@ -140,9 +140,9 @@ var _ = Describe("CC Client", func() {
 				err := ccClient.AppCrashed(guid, cc_messages.AppCrashedRequest{
 					Index: 1,
 				}, logger)
-				Ω(err).Should(HaveOccurred())
-				Ω(err).Should(BeAssignableToTypeOf(&cc_client.BadResponseError{}))
-				Ω(err.(*cc_client.BadResponseError).StatusCode).Should(Equal(500))
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(BeAssignableToTypeOf(&cc_client.BadResponseError{}))
+				Expect(err.(*cc_client.BadResponseError).StatusCode).To(Equal(500))
 			})
 		})
 	})

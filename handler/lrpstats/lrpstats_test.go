@@ -44,7 +44,7 @@ var _ = Describe("Stats", func() {
 		handler = lrpstats.NewHandler(receptorClient, noaaClient, logger)
 		response = httptest.NewRecorder()
 		request, err = http.NewRequest("GET", "/v1/actual_lrps/:guid/stats", nil)
-		Ω(err).ShouldNot(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	JustBeforeEach(func() {
@@ -53,7 +53,7 @@ var _ = Describe("Stats", func() {
 
 	Describe("Validation", func() {
 		It("fails with a missing authorization header", func() {
-			Ω(response.Code).Should(Equal(http.StatusUnauthorized))
+			Expect(response.Code).To(Equal(http.StatusUnauthorized))
 		})
 
 		Context("with an authorization header", func() {
@@ -62,7 +62,7 @@ var _ = Describe("Stats", func() {
 			})
 
 			It("fails with no guid", func() {
-				Ω(response.Code).Should(Equal(http.StatusBadRequest))
+				Expect(response.Code).To(Equal(http.StatusBadRequest))
 			})
 		})
 	})
@@ -115,18 +115,18 @@ var _ = Describe("Stats", func() {
 			}
 			var stats []cc_messages.LRPInstance
 
-			Ω(response.Code).Should(Equal(http.StatusOK))
-			Ω(response.Header().Get("Content-Type")).Should(Equal("application/json"))
+			Expect(response.Code).To(Equal(http.StatusOK))
+			Expect(response.Header().Get("Content-Type")).To(Equal("application/json"))
 			err := json.Unmarshal(response.Body.Bytes(), &stats)
-			Ω(err).ShouldNot(HaveOccurred())
-			Ω(stats).Should(ConsistOf(expectedLRPInstance))
+			Expect(err).NotTo(HaveOccurred())
+			Expect(stats).To(ConsistOf(expectedLRPInstance))
 		})
 
 		It("calls ContainerMetrics", func() {
-			Ω(noaaClient.ContainerMetricsCallCount()).Should(Equal(1))
+			Expect(noaaClient.ContainerMetricsCallCount()).To(Equal(1))
 			guid, token := noaaClient.ContainerMetricsArgsForCall(0)
-			Ω(guid).Should(Equal(logGuid))
-			Ω(token).Should(Equal(authorization))
+			Expect(guid).To(Equal(logGuid))
+			Expect(token).To(Equal(authorization))
 		})
 
 		Context("when ContainerMetrics fails", func() {
@@ -145,15 +145,15 @@ var _ = Describe("Stats", func() {
 				}
 
 				var stats []cc_messages.LRPInstance
-				Ω(response.Code).Should(Equal(http.StatusOK))
-				Ω(response.Header().Get("Content-Type")).Should(Equal("application/json"))
+				Expect(response.Code).To(Equal(http.StatusOK))
+				Expect(response.Header().Get("Content-Type")).To(Equal("application/json"))
 				err := json.Unmarshal(response.Body.Bytes(), &stats)
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(stats).Should(ConsistOf(expectedLRPInstance))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(stats).To(ConsistOf(expectedLRPInstance))
 			})
 
 			It("logs the failure", func() {
-				Ω(logger).Should(Say("container-metrics-failed"))
+				Expect(logger).To(Say("container-metrics-failed"))
 			})
 		})
 
@@ -163,16 +163,16 @@ var _ = Describe("Stats", func() {
 			})
 
 			It("responds with a 500", func() {
-				Ω(response.Code).Should(Equal(http.StatusInternalServerError))
+				Expect(response.Code).To(Equal(http.StatusInternalServerError))
 			})
 
 			It("logs the failure", func() {
-				Ω(logger).Should(Say("fetching-actual-lrp-info-failed"))
+				Expect(logger).To(Say("fetching-actual-lrp-info-failed"))
 			})
 		})
 
 		It("calls Close", func() {
-			Ω(noaaClient.CloseCallCount()).Should(Equal(1))
+			Expect(noaaClient.CloseCallCount()).To(Equal(1))
 		})
 
 		Context("when Close fails", func() {
@@ -181,7 +181,7 @@ var _ = Describe("Stats", func() {
 			})
 
 			It("ignores the error and returns a 200", func() {
-				Ω(response.Code).Should(Equal(200))
+				Expect(response.Code).To(Equal(200))
 			})
 		})
 	})

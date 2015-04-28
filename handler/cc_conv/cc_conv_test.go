@@ -10,11 +10,11 @@ import (
 var _ = Describe("CC Conversion Tools", func() {
 	Describe("StateFor", func() {
 		It("converts state from ActualLRPState to cc_messages LRPInstanceState", func() {
-			Ω(StateFor(receptor.ActualLRPStateUnclaimed)).Should(Equal(cc_messages.LRPInstanceStateStarting))
-			Ω(StateFor(receptor.ActualLRPStateClaimed)).Should(Equal(cc_messages.LRPInstanceStateStarting))
-			Ω(StateFor(receptor.ActualLRPStateRunning)).Should(Equal(cc_messages.LRPInstanceStateRunning))
-			Ω(StateFor(receptor.ActualLRPStateCrashed)).Should(Equal(cc_messages.LRPInstanceStateCrashed))
-			Ω(StateFor("foobar")).Should(Equal(cc_messages.LRPInstanceStateUnknown))
+			Expect(StateFor(receptor.ActualLRPStateUnclaimed)).To(Equal(cc_messages.LRPInstanceStateStarting))
+			Expect(StateFor(receptor.ActualLRPStateClaimed)).To(Equal(cc_messages.LRPInstanceStateStarting))
+			Expect(StateFor(receptor.ActualLRPStateRunning)).To(Equal(cc_messages.LRPInstanceStateRunning))
+			Expect(StateFor(receptor.ActualLRPStateCrashed)).To(Equal(cc_messages.LRPInstanceStateCrashed))
+			Expect(StateFor("foobar")).To(Equal(cc_messages.LRPInstanceStateUnknown))
 		})
 	})
 })

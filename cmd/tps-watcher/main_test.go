@@ -49,22 +49,23 @@ var _ = Describe("TPS", func() {
 				var appCrashed cc_messages.AppCrashedRequest
 
 				bytes, err := ioutil.ReadAll(req.Body)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 				req.Body.Close()
 
 				err = json.Unmarshal(bytes, &appCrashed)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
-				Ω(appCrashed.CrashTimestamp).ShouldNot(BeZero())
+				Expect(appCrashed.CrashTimestamp).NotTo(BeZero())
 				appCrashed.CrashTimestamp = 0
 
-				Ω(appCrashed).Should(Equal(cc_messages.AppCrashedRequest{
+				Expect(appCrashed).To(Equal(cc_messages.AppCrashedRequest{
 					Instance:        "some-instance-guid-1",
 					Index:           1,
 					Reason:          "CRASHED",
 					ExitDescription: "out of memory",
 					CrashCount:      1,
 				}))
+
 				close(ready)
 			})
 		})
@@ -87,7 +88,7 @@ var _ = Describe("TPS", func() {
 			}
 
 			err := bbs.DesireLRP(logger, desiredLRP)
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
 			lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, domain)
 			instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
@@ -95,7 +96,7 @@ var _ = Describe("TPS", func() {
 				{ContainerPort: 8080, HostPort: 65100},
 			})
 			err = bbs.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
 			bbs.CrashActualLRP(logger, lrpKey1, instanceKey1, "out of memory")
 		})
@@ -130,7 +131,7 @@ var _ = Describe("TPS", func() {
 		BeforeEach(func() {
 			otherSession = consulRunner.NewSession("other-Session")
 			err := otherSession.AcquireLock(shared.LockSchemaPath(watcherLockName), []byte("something-else"))
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		JustBeforeEach(func() {

@@ -52,7 +52,7 @@ var _ = Describe("TPS-Listener", func() {
 		}
 
 		err := bbs.DesireLRP(logger, desiredLRP)
-		Ω(err).ShouldNot(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
@@ -69,7 +69,7 @@ var _ = Describe("TPS-Listener", func() {
 				instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
 				err := bbs.ClaimActualLRP(logger, lrpKey0, instanceKey0)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
 				instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
@@ -77,7 +77,7 @@ var _ = Describe("TPS-Listener", func() {
 					{ContainerPort: 8080, HostPort: 65100},
 				})
 				err = bbs.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("reports the state of the given process guid's instances", func() {
@@ -86,40 +86,41 @@ var _ = Describe("TPS-Listener", func() {
 					rata.Params{"guid": "some-process-guid"},
 					nil,
 				)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				response, err := httpClient.Do(getLRPs)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				var lrpInstances []cc_messages.LRPInstance
 				err = json.NewDecoder(response.Body).Decode(&lrpInstances)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
-				Ω(lrpInstances).Should(HaveLen(3))
+				Expect(lrpInstances).To(HaveLen(3))
 				for i, _ := range lrpInstances {
 					lrpInstances[i].Since = 0
 				}
 
-				Ω(lrpInstances).Should(ContainElement(cc_messages.LRPInstance{
+				Expect(lrpInstances).To(ContainElement(cc_messages.LRPInstance{
 					ProcessGuid:  "some-process-guid",
 					InstanceGuid: "some-instance-guid-0",
 					Index:        0,
 					State:        cc_messages.LRPInstanceStateStarting,
 				}))
 
-				Ω(lrpInstances).Should(ContainElement(cc_messages.LRPInstance{
+				Expect(lrpInstances).To(ContainElement(cc_messages.LRPInstance{
 					ProcessGuid:  "some-process-guid",
 					InstanceGuid: "some-instance-guid-1",
 					Index:        1,
 					State:        cc_messages.LRPInstanceStateRunning,
 				}))
 
-				Ω(lrpInstances).Should(ContainElement(cc_messages.LRPInstance{
+				Expect(lrpInstances).To(ContainElement(cc_messages.LRPInstance{
 					ProcessGuid:  "some-process-guid",
 					InstanceGuid: "",
 					Index:        2,
 					State:        cc_messages.LRPInstanceStateStarting,
 				}))
+
 			})
 		})
 
@@ -134,12 +135,12 @@ var _ = Describe("TPS-Listener", func() {
 					rata.Params{"guid": "some-process-guid"},
 					nil,
 				)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				response, err := httpClient.Do(getLRPs)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
-				Ω(response.StatusCode).Should(Equal(http.StatusInternalServerError))
+				Expect(response.StatusCode).To(Equal(http.StatusInternalServerError))
 			})
 		})
 	})
@@ -153,7 +154,7 @@ var _ = Describe("TPS-Listener", func() {
 				instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
 				err := bbs.ClaimActualLRP(logger, lrpKey0, instanceKey0)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
 				instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
@@ -161,7 +162,7 @@ var _ = Describe("TPS-Listener", func() {
 					{ContainerPort: 8080, HostPort: 65100},
 				})
 				err = bbs.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			Context("when the traffic controller is running", func() {
@@ -174,7 +175,7 @@ var _ = Describe("TPS-Listener", func() {
 					handler := NewHttpHandler(messages)
 					httpServer := http_server.New(trafficControllerAddress, handler)
 					trafficControllerProcess = ifrit.Invoke(sigmon.New(httpServer))
-					Ω(trafficControllerProcess.Ready()).Should(BeClosed())
+					Expect(trafficControllerProcess.Ready()).To(BeClosed())
 				})
 
 				AfterEach(func() {
@@ -187,23 +188,23 @@ var _ = Describe("TPS-Listener", func() {
 						rata.Params{"guid": "some-process-guid"},
 						nil,
 					)
-					Ω(err).ShouldNot(HaveOccurred())
+					Expect(err).NotTo(HaveOccurred())
 					getLRPStats.Header.Add("Authorization", "I can do this.")
 
 					response, err := httpClient.Do(getLRPStats)
-					Ω(err).ShouldNot(HaveOccurred())
-					Ω(response.StatusCode).Should(Equal(http.StatusOK))
+					Expect(err).NotTo(HaveOccurred())
+					Expect(response.StatusCode).To(Equal(http.StatusOK))
 
 					var lrpInstances []cc_messages.LRPInstance
 					err = json.NewDecoder(response.Body).Decode(&lrpInstances)
-					Ω(err).ShouldNot(HaveOccurred())
+					Expect(err).NotTo(HaveOccurred())
 
-					Ω(lrpInstances).Should(HaveLen(3))
+					Expect(lrpInstances).To(HaveLen(3))
 					for i, _ := range lrpInstances {
 						lrpInstances[i].Since = 0
 					}
 
-					Ω(lrpInstances).Should(ContainElement(cc_messages.LRPInstance{
+					Expect(lrpInstances).To(ContainElement(cc_messages.LRPInstance{
 						ProcessGuid:  "some-process-guid",
 						InstanceGuid: "some-instance-guid-0",
 						Index:        0,
@@ -215,7 +216,7 @@ var _ = Describe("TPS-Listener", func() {
 						},
 					}))
 
-					Ω(lrpInstances).Should(ContainElement(cc_messages.LRPInstance{
+					Expect(lrpInstances).To(ContainElement(cc_messages.LRPInstance{
 						ProcessGuid:  "some-process-guid",
 						InstanceGuid: "some-instance-guid-1",
 						Index:        1,
@@ -227,7 +228,7 @@ var _ = Describe("TPS-Listener", func() {
 						},
 					}))
 
-					Ω(lrpInstances).Should(ContainElement(cc_messages.LRPInstance{
+					Expect(lrpInstances).To(ContainElement(cc_messages.LRPInstance{
 						ProcessGuid:  "some-process-guid",
 						InstanceGuid: "",
 						Index:        2,
@@ -238,6 +239,7 @@ var _ = Describe("TPS-Listener", func() {
 							DiskBytes:     2048,
 						},
 					}))
+
 				})
 			})
 
@@ -248,21 +250,21 @@ var _ = Describe("TPS-Listener", func() {
 						rata.Params{"guid": "some-process-guid"},
 						nil,
 					)
-					Ω(err).ShouldNot(HaveOccurred())
+					Expect(err).NotTo(HaveOccurred())
 					getLRPStats.Header.Add("Authorization", "I can do this.")
 
 					response, err := httpClient.Do(getLRPStats)
-					Ω(err).ShouldNot(HaveOccurred())
-					Ω(response.StatusCode).Should(Equal(http.StatusOK))
+					Expect(err).NotTo(HaveOccurred())
+					Expect(response.StatusCode).To(Equal(http.StatusOK))
 
 					var lrpInstances []cc_messages.LRPInstance
 					err = json.NewDecoder(response.Body).Decode(&lrpInstances)
-					Ω(err).ShouldNot(HaveOccurred())
+					Expect(err).NotTo(HaveOccurred())
 
-					Ω(lrpInstances).Should(HaveLen(3))
+					Expect(lrpInstances).To(HaveLen(3))
 
 					for _, instance := range lrpInstances {
-						Ω(instance.Stats).Should(BeNil())
+						Expect(instance.Stats).To(BeNil())
 					}
 				})
 			})
@@ -279,12 +281,12 @@ var _ = Describe("TPS-Listener", func() {
 					rata.Params{"guid": "some-process-guid"},
 					nil,
 				)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				response, err := httpClient.Do(getLRPs)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
-				Ω(response.StatusCode).Should(Equal(http.StatusInternalServerError))
+				Expect(response.StatusCode).To(Equal(http.StatusInternalServerError))
 			})
 		})
 	})

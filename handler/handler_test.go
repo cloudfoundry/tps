@@ -43,7 +43,7 @@ var _ = Describe("Handler", func() {
 			noaaClient = &fakes.FakeNoaaClient{}
 
 			httpHandler, err = handler.New(receptorClient, noaaClient, 2, logger)
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
 			server = httptest.NewServer(httpHandler)
 
@@ -64,11 +64,11 @@ var _ = Describe("Handler", func() {
 			}, nil)
 
 			statsRequest, err = http.NewRequest("GET", server.URL+"/v1/actual_lrps/some-guid/stats", nil)
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 			statsRequest.Header.Set("Authorization", "something")
 
 			statusRequest, err = http.NewRequest("GET", server.URL+"/v1/actual_lrps/some-guid", nil)
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		AfterEach(func() {
@@ -84,27 +84,27 @@ var _ = Describe("Handler", func() {
 				defer GinkgoRecover()
 
 				res, err := httpClient.Do(statusRequest)
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(res.StatusCode).To(Equal(http.StatusOK))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(res.StatusCode).To(Equal(http.StatusOK))
 			}()
 
 			go func() {
 				defer GinkgoRecover()
 
 				res, err := httpClient.Do(statsRequest)
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(res.StatusCode).To(Equal(http.StatusOK))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(res.StatusCode).To(Equal(http.StatusOK))
 			}()
 
 			Eventually(receptorClient.ActualLRPsByProcessGuidCallCount).Should(Equal(2))
 
 			// hit it again, assert we get a 503
 			resp, err := httpClient.Do(statusRequest)
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(resp.StatusCode).To(Equal(http.StatusServiceUnavailable))
 
 			resp, err = httpClient.Do(statsRequest)
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(resp.StatusCode).To(Equal(http.StatusServiceUnavailable))
 
 			// un-hang one http call
@@ -114,8 +114,8 @@ var _ = Describe("Handler", func() {
 				defer GinkgoRecover()
 
 				res, err := httpClient.Do(statsRequest)
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(res.StatusCode).To(Equal(http.StatusOK))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(res.StatusCode).To(Equal(http.StatusOK))
 			}()
 
 			fakeActualLRPResponses <- []receptor.ActualLRPResponse{}

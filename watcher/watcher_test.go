@@ -111,8 +111,8 @@ var _ = Describe("Watcher", func() {
 					It("calls AppCrashed", func() {
 						Eventually(ccClient.AppCrashedCallCount).Should(Equal(1))
 						guid, crashed, _ := ccClient.AppCrashedArgsForCall(0)
-						Ω(guid).Should(Equal("process-guid"))
-						Ω(crashed).Should(Equal(cc_messages.AppCrashedRequest{
+						Expect(guid).To(Equal("process-guid"))
+						Expect(crashed).To(Equal(cc_messages.AppCrashedRequest{
 							Instance:        "instance-guid",
 							Index:           1,
 							Reason:          "CRASHED",
@@ -120,7 +120,8 @@ var _ = Describe("Watcher", func() {
 							CrashCount:      1,
 							CrashTimestamp:  3,
 						}))
-						Ω(logger).Should(Say("app-crashed"))
+
+						Expect(logger).To(Say("app-crashed"))
 					})
 				})
 
@@ -150,8 +151,8 @@ var _ = Describe("Watcher", func() {
 					It("does not call AppCrashed", func() {
 						Eventually(ccClient.AppCrashedCallCount).Should(Equal(1))
 						buffer := logger.Buffer()
-						Ω(buffer).Should(Say("process-guid"))
-						Ω(buffer).ShouldNot(Say("other-process-guid"))
+						Expect(buffer).To(Say("process-guid"))
+						Expect(buffer).NotTo(Say("other-process-guid"))
 					})
 				})
 			})
