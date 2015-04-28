@@ -35,19 +35,16 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	instances := make([]cc_messages.LRPInstance, 0, len(actual))
-	for _, instance := range actual {
-		if instance.State == receptor.ActualLRPStateUnclaimed {
-			continue
-		}
-		instances = append(instances, cc_messages.LRPInstance{
+	instances := make([]cc_messages.LRPInstance, len(actual))
+	for i, instance := range actual {
+		instances[i] = cc_messages.LRPInstance{
 			ProcessGuid:  instance.ProcessGuid,
 			InstanceGuid: instance.InstanceGuid,
 			Index:        uint(instance.Index),
 			State:        cc_conv.StateFor(instance.State),
 			Details:      instance.PlacementError,
 			Since:        instance.Since,
-		})
+		}
 	}
 
 	err = json.NewEncoder(w).Encode(instances)

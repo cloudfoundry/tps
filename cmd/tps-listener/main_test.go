@@ -95,7 +95,7 @@ var _ = Describe("TPS-Listener", func() {
 				err = json.NewDecoder(response.Body).Decode(&lrpInstances)
 				Ω(err).ShouldNot(HaveOccurred())
 
-				Ω(lrpInstances).Should(HaveLen(2))
+				Ω(lrpInstances).Should(HaveLen(3))
 				for i, _ := range lrpInstances {
 					lrpInstances[i].Since = 0
 				}
@@ -112,6 +112,13 @@ var _ = Describe("TPS-Listener", func() {
 					InstanceGuid: "some-instance-guid-1",
 					Index:        1,
 					State:        cc_messages.LRPInstanceStateRunning,
+				}))
+
+				Ω(lrpInstances).Should(ContainElement(cc_messages.LRPInstance{
+					ProcessGuid:  "some-process-guid",
+					InstanceGuid: "",
+					Index:        2,
+					State:        cc_messages.LRPInstanceStateStarting,
 				}))
 			})
 		})
