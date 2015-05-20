@@ -23,14 +23,19 @@ func NewWatcher(
 	logger lager.Logger,
 	receptorClient receptor.Client,
 	ccClient cc_client.CcClient,
-) *Watcher {
+) (*Watcher, error) {
+	workPool, err := workpool.NewWorkPool(500)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Watcher{
 		receptorClient: receptorClient,
 		ccClient:       ccClient,
 		logger:         logger.Session("watcher"),
 
-		pool: workpool.NewWorkPool(500),
-	}
+		pool: workPool,
+	}, nil
 }
 
 func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) error {

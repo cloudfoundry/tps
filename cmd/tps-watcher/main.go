@@ -88,7 +88,12 @@ func main() {
 	ccClient := cc_client.NewCcClient(*ccBaseURL, *ccUsername, *ccPassword, *skipCertVerify)
 
 	watcher := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
-		return watcher.NewWatcher(logger, receptorClient, ccClient).Run(signals, ready)
+		w, err := watcher.NewWatcher(logger, receptorClient, ccClient)
+		if err != nil {
+			return err
+		}
+
+		return w.Run(signals, ready)
 	})
 
 	members := grouper.Members{

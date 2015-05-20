@@ -48,7 +48,9 @@ var _ = Describe("Watcher", func() {
 		logger = lagertest.NewTestLogger("test")
 		ccClient = new(fakes.FakeCcClient)
 
-		watcherRunner = watcher.NewWatcher(logger, receptorClient, ccClient)
+		var err error
+		watcherRunner, err = watcher.NewWatcher(logger, receptorClient, ccClient)
+		Expect(err).NotTo(HaveOccurred())
 
 		nextErr = atomic.Value{}
 		nextErr := nextErr
