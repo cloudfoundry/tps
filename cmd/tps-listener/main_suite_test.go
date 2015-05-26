@@ -7,7 +7,9 @@ import (
 
 	"github.com/cloudfoundry-incubator/consuladapter"
 	receptorrunner "github.com/cloudfoundry-incubator/receptor/cmd/receptor/testrunner"
-	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
+	"github.com/cloudfoundry-incubator/runtime-schema/bbs/lrp_bbs"
+	"github.com/cloudfoundry-incubator/runtime-schema/bbs/services_bbs"
+	"github.com/cloudfoundry-incubator/runtime-schema/cb"
 	"github.com/cloudfoundry-incubator/tps/cmd/tpsrunner"
 	"github.com/cloudfoundry/storeadapter"
 	"github.com/cloudfoundry/storeadapter/storerunner/etcdstorerunner"
@@ -47,7 +49,7 @@ var (
 	etcdRunner     *etcdstorerunner.ETCDClusterRunner
 	receptorRunner ifrit.Process
 	store          storeadapter.StoreAdapter
-	bbs            *Bbs.BBS
+	lrpBBS         *lrp_bbs.LRPBBS
 	logger         *lagertest.TestLogger
 )
 
@@ -104,7 +106,14 @@ var _ = BeforeEach(func() {
 	consulRunner.WaitUntilReady()
 
 	taskHandlerAddress := fmt.Sprintf("127.0.0.1:%d", receptorPort+1)
-	bbs = Bbs.NewBBS(store, consulRunner.NewSession("a-session"), "http://"+taskHandlerAddress, clock.NewClock(), logger)
+	clock := clock.NewClock()
+	lrpBBS = lrp_bbs.New(
+		store,
+		clock,
+		cb.NewCellClient(),
+		cb.NewAuctioneerClient(),
+		services_bbs.New(consulRunner.NewSession("a-session"), clock, logger.Session("services-bbs")),
+	)
 
 	receptor := receptorrunner.New(receptorPath, receptorrunner.Args{
 		Address:            fmt.Sprintf("127.0.0.1:%d", receptorPort),

@@ -20,7 +20,7 @@ import (
 
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/runtime-schema/models"
-	api "github.com/cloudfoundry-incubator/tps"
+	"github.com/cloudfoundry-incubator/tps"
 )
 
 var _ = Describe("TPS-Listener", func() {
@@ -29,7 +29,7 @@ var _ = Describe("TPS-Listener", func() {
 	var requestGenerator *rata.RequestGenerator
 
 	BeforeEach(func() {
-		requestGenerator = rata.NewRequestGenerator(fmt.Sprintf("http://%s", listenerAddr), api.Routes)
+		requestGenerator = rata.NewRequestGenerator(fmt.Sprintf("http://%s", listenerAddr), tps.Routes)
 		httpClient = &http.Client{
 			Transport: &http.Transport{},
 		}
@@ -51,7 +51,7 @@ var _ = Describe("TPS-Listener", func() {
 			},
 		}
 
-		err := bbs.DesireLRP(logger, desiredLRP)
+		err := lrpBBS.DesireLRP(logger, desiredLRP)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -68,7 +68,7 @@ var _ = Describe("TPS-Listener", func() {
 				lrpKey0 := models.NewActualLRPKey("some-process-guid", 0, "some-domain")
 				instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
-				err := bbs.ClaimActualLRP(logger, lrpKey0, instanceKey0)
+				err := lrpBBS.ClaimActualLRP(logger, lrpKey0, instanceKey0)
 				Expect(err).NotTo(HaveOccurred())
 
 				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
@@ -76,13 +76,13 @@ var _ = Describe("TPS-Listener", func() {
 				netInfo := models.NewActualLRPNetInfo("1.2.3.4", []models.PortMapping{
 					{ContainerPort: 8080, HostPort: 65100},
 				})
-				err = bbs.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
+				err = lrpBBS.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("reports the state of the given process guid's instances", func() {
 				getLRPs, err := requestGenerator.CreateRequest(
-					api.LRPStatus,
+					tps.LRPStatus,
 					rata.Params{"guid": "some-process-guid"},
 					nil,
 				)
@@ -131,7 +131,7 @@ var _ = Describe("TPS-Listener", func() {
 
 			It("returns 500", func() {
 				getLRPs, err := requestGenerator.CreateRequest(
-					api.LRPStatus,
+					tps.LRPStatus,
 					rata.Params{"guid": "some-process-guid"},
 					nil,
 				)
@@ -153,7 +153,7 @@ var _ = Describe("TPS-Listener", func() {
 				lrpKey0 := models.NewActualLRPKey("some-process-guid", 0, "some-domain")
 				instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
-				err := bbs.ClaimActualLRP(logger, lrpKey0, instanceKey0)
+				err := lrpBBS.ClaimActualLRP(logger, lrpKey0, instanceKey0)
 				Expect(err).NotTo(HaveOccurred())
 
 				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
@@ -161,14 +161,14 @@ var _ = Describe("TPS-Listener", func() {
 				netInfo := models.NewActualLRPNetInfo("1.2.3.4", []models.PortMapping{
 					{ContainerPort: 8080, HostPort: 65100},
 				})
-				err = bbs.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
+				err = lrpBBS.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
 			Context("when a DesiredLRP is not found", func() {
 				It("returns a NotFound", func() {
 					getLRPStats, err := requestGenerator.CreateRequest(
-						api.LRPStats,
+						tps.LRPStats,
 						rata.Params{"guid": "some-bogus-guid"},
 						nil,
 					)
@@ -200,7 +200,7 @@ var _ = Describe("TPS-Listener", func() {
 
 				It("reports the state of the given process guid's instances", func() {
 					getLRPStats, err := requestGenerator.CreateRequest(
-						api.LRPStats,
+						tps.LRPStats,
 						rata.Params{"guid": "some-process-guid"},
 						nil,
 					)
@@ -262,7 +262,7 @@ var _ = Describe("TPS-Listener", func() {
 			Context("when the traffic controller is not running", func() {
 				It("reports the status with nil stats", func() {
 					getLRPStats, err := requestGenerator.CreateRequest(
-						api.LRPStats,
+						tps.LRPStats,
 						rata.Params{"guid": "some-process-guid"},
 						nil,
 					)
@@ -293,7 +293,7 @@ var _ = Describe("TPS-Listener", func() {
 
 			It("returns internal server error", func() {
 				getLRPs, err := requestGenerator.CreateRequest(
-					api.LRPStatus,
+					tps.LRPStatus,
 					rata.Params{"guid": "some-process-guid"},
 					nil,
 				)
