@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstats"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstats/fakes"
-	"github.com/cloudfoundry/noaa/events"
+	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
 	"github.com/pivotal-golang/lager/lagertest"
 
