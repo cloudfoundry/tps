@@ -192,19 +192,5 @@ var _ = Describe("Stats", func() {
 				Expect(logger).To(Say("fetching-actual-lrp-info-failed"))
 			})
 		})
-
-		It("calls Close", func() {
-			Expect(noaaClient.CloseCallCount()).To(Equal(1))
-		})
-
-		Context("when Close fails", func() {
-			BeforeEach(func() {
-				noaaClient.CloseReturns(errors.New("you failed"))
-			})
-
-			It("ignores the error and returns a 200", func() {
-				Expect(response.Code).To(Equal(200))
-			})
-		})
 	})
 })

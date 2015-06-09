@@ -24,7 +24,6 @@ import (
 )
 
 var _ = Describe("TPS-Listener", func() {
-
 	var httpClient *http.Client
 	var requestGenerator *rata.RequestGenerator
 

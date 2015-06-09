@@ -63,6 +63,7 @@ func main() {
 	initializeDropsonde(logger)
 	receptorClient := receptor.NewClient(*diegoAPIURL)
 	noaaClient := noaa.NewConsumer(*trafficControllerURL, &tls.Config{InsecureSkipVerify: *skipSSLVerification}, nil)
+	defer noaaClient.Close()
 	apiHandler := initializeHandler(logger, noaaClient, *maxInFlightRequests, receptorClient)
 
 	members := grouper.Members{

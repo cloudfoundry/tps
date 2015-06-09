@@ -60,7 +60,6 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	metrics, err := handler.noaaClient.ContainerMetrics(desiredLRP.LogGuid, authorization)
-	defer handler.noaaClient.Close()
 	if err != nil {
 		handler.logger.Error("container-metrics-failed", err, lager.Data{
 			"ProcessGuid": guid,
