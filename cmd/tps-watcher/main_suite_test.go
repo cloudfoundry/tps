@@ -45,6 +45,8 @@ var (
 	logger         *lagertest.TestLogger
 )
 
+const assetsPath = "../../../../cloudfoundry/storeadapter/assets/"
+
 func TestTPS(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "TPS-Watcher Suite")
@@ -73,10 +75,21 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	etcdPort = 5001 + GinkgoParallelNode()
 	receptorPort = 6001 + GinkgoParallelNode()*2
 
-	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1)
+	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1,
+		&etcdstorerunner.SSLConfig{
+			CertFile: assetsPath + "server.crt",
+			KeyFile:  assetsPath + "server.key",
+			CAFile:   assetsPath + "ca.crt",
+		})
+
 	watcherPath = string(binaries["watcher"])
 	receptorPath = string(binaries["receptor"])
-	store = etcdRunner.Adapter()
+	store = etcdRunner.Adapter(
+		&etcdstorerunner.SSLConfig{
+			CertFile: assetsPath + "client.crt",
+			KeyFile:  assetsPath + "client.key",
+			CAFile:   assetsPath + "ca.crt",
+		})
 
 	consulRunner = consuladapter.NewClusterRunner(
 		9001+config.GinkgoConfig.ParallelNode*consuladapter.PortOffsetLength,
@@ -101,6 +114,9 @@ var _ = BeforeEach(func() {
 		TaskHandlerAddress: taskHandlerAddress,
 		EtcdCluster:        strings.Join(etcdRunner.NodeURLS(), ","),
 		ConsulCluster:      consulRunner.ConsulCluster(),
+		ClientCert:         assetsPath + "client.crt",
+		ClientKey:          assetsPath + "client.key",
+		CACert:             assetsPath + "ca.crt",
 	})
 	receptorRunner = ginkgomon.Invoke(receptor)
 
