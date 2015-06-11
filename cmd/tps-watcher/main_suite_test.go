@@ -73,10 +73,11 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	etcdPort = 5001 + GinkgoParallelNode()
 	receptorPort = 6001 + GinkgoParallelNode()*2
 
-	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1)
+	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1, nil)
+
 	watcherPath = string(binaries["watcher"])
 	receptorPath = string(binaries["receptor"])
-	store = etcdRunner.Adapter()
+	store = etcdRunner.Adapter(nil)
 
 	consulRunner = consuladapter.NewClusterRunner(
 		9001+config.GinkgoConfig.ParallelNode*consuladapter.PortOffsetLength,

@@ -86,10 +86,11 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	trafficControllerAddress = fmt.Sprintf("127.0.0.1:%d", trafficControllerPort)
 	trafficControllerURL = fmt.Sprintf("ws://%s", trafficControllerAddress)
 
-	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1)
+	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1, nil)
+
 	listenerPath = string(binaries["listener"])
 	receptorPath = string(binaries["receptor"])
-	store = etcdRunner.Adapter()
+	store = etcdRunner.Adapter(nil)
 
 	consulRunner = consuladapter.NewClusterRunner(
 		9001+config.GinkgoConfig.ParallelNode*consuladapter.PortOffsetLength,

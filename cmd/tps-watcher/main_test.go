@@ -98,11 +98,15 @@ var _ = Describe("TPS", func() {
 			err = bbs.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
 			Expect(err).NotTo(HaveOccurred())
 
+			// work around the fact that the event source has to sleep
+			// see github.com/cloudfoundry/storeadapter/etcdstoreadapter/etcd_store_adapter.go
+			time.Sleep(150 * time.Millisecond)
+
 			bbs.CrashActualLRP(logger, lrpKey1, instanceKey1, "out of memory")
 		})
 
 		It("POSTs to the CC that the application has crashed", func() {
-			Eventually(ready).Should(BeClosed())
+			Eventually(ready, 5*time.Second).Should(BeClosed())
 		})
 	})
 
