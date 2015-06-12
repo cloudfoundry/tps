@@ -215,8 +215,10 @@ var _ = Describe("TPS-Listener", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(lrpInstances).To(HaveLen(3))
+					zeroTime := time.Unix(0, 0)
 					for i, _ := range lrpInstances {
 						lrpInstances[i].Since = 0
+						lrpInstances[i].Stats.Time = zeroTime
 					}
 
 					Expect(lrpInstances).To(ContainElement(cc_messages.LRPInstance{
@@ -225,6 +227,7 @@ var _ = Describe("TPS-Listener", func() {
 						Index:        0,
 						State:        cc_messages.LRPInstanceStateStarting,
 						Stats: &cc_messages.LRPInstanceStats{
+							Time:          zeroTime,
 							CpuPercentage: 0.03,
 							MemoryBytes:   1024,
 							DiskBytes:     2048,
@@ -236,7 +239,10 @@ var _ = Describe("TPS-Listener", func() {
 						InstanceGuid: "some-instance-guid-1",
 						Index:        1,
 						State:        cc_messages.LRPInstanceStateRunning,
+						Host:         "1.2.3.4",
+						Port:         65100,
 						Stats: &cc_messages.LRPInstanceStats{
+							Time:          zeroTime,
 							CpuPercentage: 0.04,
 							MemoryBytes:   1024,
 							DiskBytes:     2048,
@@ -249,6 +255,7 @@ var _ = Describe("TPS-Listener", func() {
 						Index:        2,
 						State:        cc_messages.LRPInstanceStateStarting,
 						Stats: &cc_messages.LRPInstanceStats{
+							Time:          zeroTime,
 							CpuPercentage: 0.05,
 							MemoryBytes:   1024,
 							DiskBytes:     2048,

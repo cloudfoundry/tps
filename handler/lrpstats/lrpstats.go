@@ -3,10 +3,12 @@ package lrpstats
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
+	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
-	"github.com/cloudfoundry-incubator/tps/handler/cc_conv"
+	"github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/pivotal-golang/lager"
 )
@@ -68,26 +70,25 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	metricsByInstanceIndex := make(map[uint]*cc_messages.LRPInstanceStats)
+	currentTime := time.Now()
 	for _, metric := range metrics {
 		cpuPercentageAsDecimal := metric.GetCpuPercentage() / 100
 		metricsByInstanceIndex[uint(metric.GetInstanceIndex())] = &cc_messages.LRPInstanceStats{
+			Time:          currentTime,
 			CpuPercentage: cpuPercentageAsDecimal,
 			MemoryBytes:   metric.GetMemoryBytes(),
 			DiskBytes:     metric.GetDiskBytes(),
 		}
 	}
 
-	instances := make([]cc_messages.LRPInstance, len(actualLRPs))
-	for i, instance := range actualLRPs {
-		instances[i] = cc_messages.LRPInstance{
-			ProcessGuid:  instance.ProcessGuid,
-			InstanceGuid: instance.InstanceGuid,
-			Index:        uint(instance.Index),
-			Since:        instance.Since,
-			State:        cc_conv.StateFor(instance.State),
-			Stats:        metricsByInstanceIndex[uint(instance.Index)],
-		}
-	}
+	instances := lrpstatus.LRPInstances(actualLRPs,
+		func(instance *cc_messages.LRPInstance, actual *receptor.ActualLRPResponse) {
+			instance.Host = actual.Address
+			instance.Port = getDefaultPort(actual.Ports)
+			stats := metricsByInstanceIndex[uint(actual.Index)]
+			instance.Stats = stats
+		},
+	)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
@@ -96,6 +97,16 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		handler.logger.Error("stream-response-failed", err, lager.Data{"guid": guid})
 	}
+}
+
+func getDefaultPort(mappings []receptor.PortMapping) uint16 {
+	for _, mapping := range mappings {
+		if mapping.ContainerPort == recipebuilder.DefaultPort {
+			return mapping.HostPort
+		}
+	}
+
+	return 0
 }
 
 func stateFor(state receptor.ActualLRPState, logger lager.Logger) cc_messages.LRPInstanceState {

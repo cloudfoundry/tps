@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"time"
 
+	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
@@ -90,9 +92,19 @@ var _ = Describe("Stats", func() {
 
 			receptorClient.ActualLRPsByProcessGuidReturns([]receptor.ActualLRPResponse{
 				{
-					Index:        5,
-					State:        receptor.ActualLRPStateRunning,
-					Since:        124578,
+					Index:   5,
+					State:   receptor.ActualLRPStateRunning,
+					Since:   124578,
+					Address: "host",
+					Ports: []receptor.PortMapping{
+						{
+							ContainerPort: 7890,
+							HostPort:      5432,
+						},
+						{
+							ContainerPort: recipebuilder.DefaultPort,
+							HostPort:      1234,
+						}},
 					InstanceGuid: "instanceId",
 					ProcessGuid:  guid,
 				},
@@ -100,14 +112,16 @@ var _ = Describe("Stats", func() {
 		})
 
 		It("returns a map of stats & status per index in the correct units", func() {
-
 			expectedLRPInstance := cc_messages.LRPInstance{
 				ProcessGuid:  guid,
 				InstanceGuid: "instanceId",
 				Index:        5,
 				State:        cc_messages.LRPInstanceStateRunning,
+				Host:         "host",
+				Port:         1234,
 				Since:        124578,
 				Stats: &cc_messages.LRPInstanceStats{
+					Time:          time.Unix(0, 0),
 					CpuPercentage: 0.04,
 					MemoryBytes:   1024,
 					DiskBytes:     2048,
@@ -119,6 +133,8 @@ var _ = Describe("Stats", func() {
 			Expect(response.Header().Get("Content-Type")).To(Equal("application/json"))
 			err := json.Unmarshal(response.Body.Bytes(), &stats)
 			Expect(err).NotTo(HaveOccurred())
+			Expect(stats[0].Stats.Time).NotTo(BeZero())
+			expectedLRPInstance.Stats.Time = stats[0].Stats.Time
 			Expect(stats).To(ConsistOf(expectedLRPInstance))
 		})
 
@@ -140,6 +156,8 @@ var _ = Describe("Stats", func() {
 					InstanceGuid: "instanceId",
 					Index:        5,
 					State:        cc_messages.LRPInstanceStateRunning,
+					Host:         "host",
+					Port:         1234,
 					Since:        124578,
 					Stats:        nil,
 				}

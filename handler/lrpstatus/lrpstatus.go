@@ -28,27 +28,45 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	guid := r.FormValue(":guid")
 
-	actual, err := handler.apiClient.ActualLRPsByProcessGuid(guid)
+	actuals, err := handler.apiClient.ActualLRPsByProcessGuid(guid)
 	if err != nil {
 		lrpLogger.Error("failed-retrieving-lrp-info", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	instances := make([]cc_messages.LRPInstance, len(actual))
-	for i, instance := range actual {
-		instances[i] = cc_messages.LRPInstance{
-			ProcessGuid:  instance.ProcessGuid,
-			InstanceGuid: instance.InstanceGuid,
-			Index:        uint(instance.Index),
-			State:        cc_conv.StateFor(instance.State),
-			Details:      instance.PlacementError,
-			Since:        instance.Since,
-		}
-	}
+	instances := LRPInstances(actuals,
+		func(instance *cc_messages.LRPInstance, actual *receptor.ActualLRPResponse) {
+			instance.Details = actual.PlacementError
+		},
+	)
 
 	err = json.NewEncoder(w).Encode(instances)
 	if err != nil {
 		lrpLogger.Error("stream-response-failed", err, lager.Data{"guid": guid})
 	}
+}
+
+func LRPInstances(
+	actualLRPs []receptor.ActualLRPResponse,
+	addInfo func(*cc_messages.LRPInstance, *receptor.ActualLRPResponse),
+) []cc_messages.LRPInstance {
+	instances := make([]cc_messages.LRPInstance, len(actualLRPs))
+	for i, actual := range actualLRPs {
+		instance := cc_messages.LRPInstance{
+			ProcessGuid:  actual.ProcessGuid,
+			InstanceGuid: actual.InstanceGuid,
+			Index:        uint(actual.Index),
+			Since:        actual.Since,
+			State:        cc_conv.StateFor(actual.State),
+		}
+
+		if addInfo != nil {
+			addInfo(&instance, &actual)
+		}
+
+		instances[i] = instance
+	}
+
+	return instances
 }
