@@ -57,7 +57,7 @@ func LRPInstances(
 			ProcessGuid:  actual.ProcessGuid,
 			InstanceGuid: actual.InstanceGuid,
 			Index:        uint(actual.Index),
-			Since:        actual.Since,
+			Since:        actual.Since / 1e9,
 			State:        cc_conv.StateFor(actual.State),
 		}
 

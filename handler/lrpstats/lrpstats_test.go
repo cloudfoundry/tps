@@ -94,7 +94,7 @@ var _ = Describe("Stats", func() {
 				{
 					Index:   5,
 					State:   receptor.ActualLRPStateRunning,
-					Since:   124578,
+					Since:   124578000000,
 					Address: "host",
 					Ports: []receptor.PortMapping{
 						{
@@ -119,7 +119,7 @@ var _ = Describe("Stats", func() {
 				State:        cc_messages.LRPInstanceStateRunning,
 				Host:         "host",
 				Port:         1234,
-				Since:        124578,
+				Since:        124,
 				Stats: &cc_messages.LRPInstanceStats{
 					Time:          time.Unix(0, 0),
 					CpuPercentage: 0.04,
@@ -158,7 +158,7 @@ var _ = Describe("Stats", func() {
 					State:        cc_messages.LRPInstanceStateRunning,
 					Host:         "host",
 					Port:         1234,
-					Since:        124578,
+					Since:        124,
 					Stats:        nil,
 				}
 

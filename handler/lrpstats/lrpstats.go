@@ -108,19 +108,3 @@ func getDefaultPort(mappings []receptor.PortMapping) uint16 {
 
 	return 0
 }
-
-func stateFor(state receptor.ActualLRPState, logger lager.Logger) cc_messages.LRPInstanceState {
-	switch state {
-	case receptor.ActualLRPStateUnclaimed:
-		return cc_messages.LRPInstanceStateStarting
-	case receptor.ActualLRPStateClaimed:
-		return cc_messages.LRPInstanceStateStarting
-	case receptor.ActualLRPStateRunning:
-		return cc_messages.LRPInstanceStateRunning
-	case receptor.ActualLRPStateCrashed:
-		return cc_messages.LRPInstanceStateCrashed
-	default:
-		logger.Error("unknown-state", nil, lager.Data{"state": state})
-		return cc_messages.LRPInstanceStateUnknown
-	}
-}
