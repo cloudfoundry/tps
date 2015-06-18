@@ -3,13 +3,13 @@ package lrpstats
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
 	"github.com/cloudfoundry/sonde-go/events"
+	"github.com/pivotal-golang/clock"
 	"github.com/pivotal-golang/lager"
 )
 
@@ -22,11 +22,12 @@ type NoaaClient interface {
 type handler struct {
 	receptorClient receptor.Client
 	noaaClient     NoaaClient
+	clock          clock.Clock
 	logger         lager.Logger
 }
 
-func NewHandler(receptorClient receptor.Client, noaaClient NoaaClient, logger lager.Logger) http.Handler {
-	return &handler{receptorClient: receptorClient, noaaClient: noaaClient, logger: logger}
+func NewHandler(receptorClient receptor.Client, noaaClient NoaaClient, clk clock.Clock, logger lager.Logger) http.Handler {
+	return &handler{receptorClient: receptorClient, noaaClient: noaaClient, clock: clk, logger: logger}
 }
 
 func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +71,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	metricsByInstanceIndex := make(map[uint]*cc_messages.LRPInstanceStats)
-	currentTime := time.Now()
+	currentTime := handler.clock.Now()
 	for _, metric := range metrics {
 		cpuPercentageAsDecimal := metric.GetCpuPercentage() / 100
 		metricsByInstanceIndex[uint(metric.GetInstanceIndex())] = &cc_messages.LRPInstanceStats{
@@ -88,6 +89,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			stats := metricsByInstanceIndex[uint(actual.Index)]
 			instance.Stats = stats
 		},
+		handler.clock,
 	)
 
 	w.WriteHeader(http.StatusOK)

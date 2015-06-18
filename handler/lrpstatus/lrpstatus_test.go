@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
@@ -12,6 +13,7 @@ import (
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/pivotal-golang/clock/fakeclock"
 	"github.com/pivotal-golang/lager/lagertest"
 )
 
@@ -25,8 +27,9 @@ var _ = Describe("LRPStatus", func() {
 
 	BeforeEach(func() {
 		fakeClient = new(fake_receptor.FakeClient)
+		fakeClock := fakeclock.NewFakeClock(time.Now())
 
-		handler := lrpstatus.NewHandler(fakeClient, lagertest.NewTestLogger("test"))
+		handler := lrpstatus.NewHandler(fakeClient, fakeClock, lagertest.NewTestLogger("test"))
 		server = httptest.NewServer(handler)
 		fakeResponses = make(chan chan []receptor.ActualLRPResponse, 2)
 

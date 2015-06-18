@@ -6,6 +6,7 @@ import (
 
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/tps/handler/cc_conv"
+	"github.com/pivotal-golang/clock"
 	"github.com/pivotal-golang/lager"
 
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
@@ -13,12 +14,14 @@ import (
 
 type handler struct {
 	apiClient receptor.Client
+	clock     clock.Clock
 	logger    lager.Logger
 }
 
-func NewHandler(apiClient receptor.Client, logger lager.Logger) http.Handler {
+func NewHandler(apiClient receptor.Client, clk clock.Clock, logger lager.Logger) http.Handler {
 	return &handler{
 		apiClient: apiClient,
+		clock:     clk,
 		logger:    logger,
 	}
 }
@@ -39,6 +42,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		func(instance *cc_messages.LRPInstance, actual *receptor.ActualLRPResponse) {
 			instance.Details = actual.PlacementError
 		},
+		handler.clock,
 	)
 
 	err = json.NewEncoder(w).Encode(instances)
@@ -50,6 +54,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func LRPInstances(
 	actualLRPs []receptor.ActualLRPResponse,
 	addInfo func(*cc_messages.LRPInstance, *receptor.ActualLRPResponse),
+	clk clock.Clock,
 ) []cc_messages.LRPInstance {
 	instances := make([]cc_messages.LRPInstance, len(actualLRPs))
 	for i, actual := range actualLRPs {
@@ -57,7 +62,7 @@ func LRPInstances(
 			ProcessGuid:  actual.ProcessGuid,
 			InstanceGuid: actual.InstanceGuid,
 			Index:        uint(actual.Index),
-			Since:        actual.Since / 1e9,
+			Uptime:       (clk.Now().UnixNano() - actual.Since) / 1e9,
 			State:        cc_conv.StateFor(actual.State),
 		}
 

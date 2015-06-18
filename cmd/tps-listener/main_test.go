@@ -96,7 +96,7 @@ var _ = Describe("TPS-Listener", func() {
 
 				Expect(lrpInstances).To(HaveLen(3))
 				for i, _ := range lrpInstances {
-					lrpInstances[i].Since = 0
+					lrpInstances[i].Uptime = 0
 				}
 
 				Expect(lrpInstances).To(ContainElement(cc_messages.LRPInstance{
@@ -217,7 +217,7 @@ var _ = Describe("TPS-Listener", func() {
 					Expect(lrpInstances).To(HaveLen(3))
 					zeroTime := time.Unix(0, 0)
 					for i, _ := range lrpInstances {
-						lrpInstances[i].Since = 0
+						lrpInstances[i].Uptime = 0
 						lrpInstances[i].Stats.Time = zeroTime
 					}
 

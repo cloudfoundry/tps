@@ -16,6 +16,7 @@ import (
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstats/fakes"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
+	"github.com/pivotal-golang/clock/fakeclock"
 	"github.com/pivotal-golang/lager/lagertest"
 
 	. "github.com/onsi/ginkgo"
@@ -35,6 +36,7 @@ var _ = Describe("Stats", func() {
 		noaaClient     *fakes.FakeNoaaClient
 		receptorClient *fake_receptor.FakeClient
 		logger         *lagertest.TestLogger
+		fakeClock      *fakeclock.FakeClock
 	)
 
 	BeforeEach(func() {
@@ -43,7 +45,8 @@ var _ = Describe("Stats", func() {
 		receptorClient = new(fake_receptor.FakeClient)
 		noaaClient = &fakes.FakeNoaaClient{}
 		logger = lagertest.NewTestLogger("test")
-		handler = lrpstats.NewHandler(receptorClient, noaaClient, logger)
+		fakeClock = fakeclock.NewFakeClock(time.Date(2008, 8, 8, 8, 8, 8, 8, time.UTC))
+		handler = lrpstats.NewHandler(receptorClient, noaaClient, fakeClock, logger)
 		response = httptest.NewRecorder()
 		request, err = http.NewRequest("GET", "/v1/actual_lrps/:guid/stats", nil)
 		Expect(err).NotTo(HaveOccurred())
@@ -94,7 +97,7 @@ var _ = Describe("Stats", func() {
 				{
 					Index:   5,
 					State:   receptor.ActualLRPStateRunning,
-					Since:   124578000000,
+					Since:   fakeClock.Now().UnixNano(),
 					Address: "host",
 					Ports: []receptor.PortMapping{
 						{
@@ -111,31 +114,37 @@ var _ = Describe("Stats", func() {
 			}, nil)
 		})
 
-		It("returns a map of stats & status per index in the correct units", func() {
-			expectedLRPInstance := cc_messages.LRPInstance{
-				ProcessGuid:  guid,
-				InstanceGuid: "instanceId",
-				Index:        5,
-				State:        cc_messages.LRPInstanceStateRunning,
-				Host:         "host",
-				Port:         1234,
-				Since:        124,
-				Stats: &cc_messages.LRPInstanceStats{
-					Time:          time.Unix(0, 0),
-					CpuPercentage: 0.04,
-					MemoryBytes:   1024,
-					DiskBytes:     2048,
-				},
-			}
-			var stats []cc_messages.LRPInstance
+		Context("when the LRP has been running for a while", func() {
+			BeforeEach(func() {
+				fakeClock.Increment(5 * time.Second)
+			})
 
-			Expect(response.Code).To(Equal(http.StatusOK))
-			Expect(response.Header().Get("Content-Type")).To(Equal("application/json"))
-			err := json.Unmarshal(response.Body.Bytes(), &stats)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(stats[0].Stats.Time).NotTo(BeZero())
-			expectedLRPInstance.Stats.Time = stats[0].Stats.Time
-			Expect(stats).To(ConsistOf(expectedLRPInstance))
+			It("returns a map of stats & status per index in the correct units", func() {
+				expectedLRPInstance := cc_messages.LRPInstance{
+					ProcessGuid:  guid,
+					InstanceGuid: "instanceId",
+					Index:        5,
+					State:        cc_messages.LRPInstanceStateRunning,
+					Host:         "host",
+					Port:         1234,
+					Uptime:       5,
+					Stats: &cc_messages.LRPInstanceStats{
+						Time:          time.Unix(0, 0),
+						CpuPercentage: 0.04,
+						MemoryBytes:   1024,
+						DiskBytes:     2048,
+					},
+				}
+				var stats []cc_messages.LRPInstance
+
+				Expect(response.Code).To(Equal(http.StatusOK))
+				Expect(response.Header().Get("Content-Type")).To(Equal("application/json"))
+				err := json.Unmarshal(response.Body.Bytes(), &stats)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(stats[0].Stats.Time).NotTo(BeZero())
+				expectedLRPInstance.Stats.Time = stats[0].Stats.Time
+				Expect(stats).To(ConsistOf(expectedLRPInstance))
+			})
 		})
 
 		It("calls ContainerMetrics", func() {
@@ -158,7 +167,7 @@ var _ = Describe("Stats", func() {
 					State:        cc_messages.LRPInstanceStateRunning,
 					Host:         "host",
 					Port:         1234,
-					Since:        124,
+					Uptime:       0,
 					Stats:        nil,
 				}
 

@@ -7,21 +7,23 @@ import (
 	"github.com/cloudfoundry-incubator/tps"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstats"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
+	"github.com/pivotal-golang/clock"
 	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/rata"
 )
 
 func New(apiClient receptor.Client, noaaClient lrpstats.NoaaClient, maxInFlight int, logger lager.Logger) (http.Handler, error) {
 	semaphore := make(chan struct{}, maxInFlight)
+	clock := clock.NewClock()
 
 	handlers := map[string]http.Handler{
 		tps.LRPStatus: tpsHandler{
 			semaphore:       semaphore,
-			delegateHandler: lrpstatus.NewHandler(apiClient, logger),
+			delegateHandler: lrpstatus.NewHandler(apiClient, clock, logger),
 		},
 		tps.LRPStats: tpsHandler{
 			semaphore:       semaphore,
-			delegateHandler: lrpstats.NewHandler(apiClient, noaaClient, logger),
+			delegateHandler: lrpstats.NewHandler(apiClient, noaaClient, clock, logger),
 		},
 	}
 
