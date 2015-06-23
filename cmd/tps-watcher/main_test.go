@@ -83,6 +83,7 @@ var _ = Describe("TPS", func() {
 				DiskMB:      512,
 				LogGuid:     "some-log-guid",
 				Action: &models.RunAction{
+					User: "me",
 					Path: "ls",
 				},
 			}
