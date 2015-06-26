@@ -3,8 +3,10 @@ package main_test
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
 
+	bbstestrunner "github.com/cloudfoundry-incubator/bbs/cmd/bbs/testrunner"
 	"github.com/cloudfoundry-incubator/consuladapter/consulrunner"
 	receptorrunner "github.com/cloudfoundry-incubator/receptor/cmd/receptor/testrunner"
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
@@ -44,7 +46,13 @@ var (
 	store          storeadapter.StoreAdapter
 	bbs            *Bbs.BBS
 	logger         *lagertest.TestLogger
+	bbsPath        string
+	bbsURL         *url.URL
 )
+
+var bbsArgs bbstestrunner.Args
+var bbsRunner *ginkgomon.Runner
+var bbsProcess ifrit.Process
 
 func TestTPS(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -58,9 +66,13 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	receptor, err := gexec.Build("github.com/cloudfoundry-incubator/receptor/cmd/receptor", "-race")
 	Expect(err).NotTo(HaveOccurred())
 
+	bbs, err := gexec.Build("github.com/cloudfoundry-incubator/bbs/cmd/bbs", "-race")
+	Expect(err).NotTo(HaveOccurred())
+
 	payload, err := json.Marshal(map[string]string{
 		"watcher":  tps,
 		"receptor": receptor,
+		"bbs":      bbs,
 	})
 	Expect(err).NotTo(HaveOccurred())
 
@@ -87,6 +99,19 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	)
 
 	logger = lagertest.NewTestLogger("test")
+
+	bbsPath = string(binaries["bbs"])
+	bbsAddress := fmt.Sprintf("127.0.0.1:%d", 13000+GinkgoParallelNode())
+
+	bbsURL = &url.URL{
+		Scheme: "http",
+		Host:   bbsAddress,
+	}
+
+	bbsArgs = bbstestrunner.Args{
+		Address:     bbsAddress,
+		EtcdCluster: strings.Join(etcdRunner.NodeURLS(), ","),
+	}
 })
 
 var _ = BeforeEach(func() {
@@ -95,11 +120,15 @@ var _ = BeforeEach(func() {
 	consulRunner.Start()
 	consulRunner.WaitUntilReady()
 
+	bbsRunner = bbstestrunner.New(bbsPath, bbsArgs)
+	bbsProcess = ginkgomon.Invoke(bbsRunner)
+
 	taskHandlerAddress := fmt.Sprintf("127.0.0.1:%d", receptorPort+1)
 	bbs = Bbs.NewBBS(store, consulRunner.NewSession("a-session"), "http://"+taskHandlerAddress, clock.NewClock(), logger)
 
 	receptor := receptorrunner.New(receptorPath, receptorrunner.Args{
 		Address:            fmt.Sprintf("127.0.0.1:%d", receptorPort),
+		BBSAddress:         bbsURL.String(),
 		TaskHandlerAddress: taskHandlerAddress,
 		EtcdCluster:        strings.Join(etcdRunner.NodeURLS(), ","),
 		ConsulCluster:      consulRunner.ConsulCluster(),
@@ -117,6 +146,7 @@ var _ = BeforeEach(func() {
 })
 
 var _ = AfterEach(func() {
+	ginkgomon.Kill(bbsProcess)
 	fakeCC.Close()
 	ginkgomon.Kill(receptorRunner, 5)
 	etcdRunner.Stop()
