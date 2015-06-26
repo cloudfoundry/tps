@@ -97,6 +97,10 @@ var _ = Describe("TPS-Listener", func() {
 
 				Expect(lrpInstances).To(HaveLen(3))
 				for i, _ := range lrpInstances {
+					Expect(lrpInstances[i]).NotTo(BeZero())
+					lrpInstances[i].Since = 0
+
+					Eventually(lrpInstances[i]).ShouldNot(BeZero())
 					lrpInstances[i].Uptime = 0
 				}
 
@@ -218,8 +222,14 @@ var _ = Describe("TPS-Listener", func() {
 					Expect(lrpInstances).To(HaveLen(3))
 					zeroTime := time.Unix(0, 0)
 					for i, _ := range lrpInstances {
-						lrpInstances[i].Uptime = 0
+						Expect(lrpInstances[i].Stats.Time).NotTo(BeZero())
 						lrpInstances[i].Stats.Time = zeroTime
+
+						Expect(lrpInstances[i]).NotTo(BeZero())
+						lrpInstances[i].Since = 0
+
+						Eventually(lrpInstances[i]).ShouldNot(BeZero())
+						lrpInstances[i].Uptime = 0
 					}
 
 					Expect(lrpInstances).To(ContainElement(cc_messages.LRPInstance{
@@ -262,7 +272,6 @@ var _ = Describe("TPS-Listener", func() {
 							DiskBytes:     2048,
 						},
 					}))
-
 				})
 			})
 

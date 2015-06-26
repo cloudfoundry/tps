@@ -115,7 +115,10 @@ var _ = Describe("Stats", func() {
 		})
 
 		Context("when the LRP has been running for a while", func() {
+			var expectedSinceTime int64
+
 			BeforeEach(func() {
+				expectedSinceTime = fakeClock.Now().Unix()
 				fakeClock.Increment(5 * time.Second)
 			})
 
@@ -127,6 +130,7 @@ var _ = Describe("Stats", func() {
 					State:        cc_messages.LRPInstanceStateRunning,
 					Host:         "host",
 					Port:         1234,
+					Since:        expectedSinceTime,
 					Uptime:       5,
 					Stats: &cc_messages.LRPInstanceStats{
 						Time:          time.Unix(0, 0),
@@ -167,6 +171,7 @@ var _ = Describe("Stats", func() {
 					State:        cc_messages.LRPInstanceStateRunning,
 					Host:         "host",
 					Port:         1234,
+					Since:        fakeClock.Now().Unix(),
 					Uptime:       0,
 					Stats:        nil,
 				}
