@@ -84,7 +84,7 @@ var _ = Describe("Stats", func() {
 					InstanceIndex: proto.Int32(5),
 					CpuPercentage: proto.Float64(4),
 					MemoryBytes:   proto.Uint64(1024),
-					DiskBytes:     proto.Uint64(2048),
+					DiskBytes:     proto.Uint64(2048 * 1024),
 				},
 			}, nil)
 
@@ -136,7 +136,7 @@ var _ = Describe("Stats", func() {
 						Time:          time.Unix(0, 0),
 						CpuPercentage: 0.04,
 						MemoryBytes:   1024,
-						DiskBytes:     1024,
+						DiskBytes:     1024 * 1024,
 					},
 				}
 				var stats []cc_messages.LRPInstance
