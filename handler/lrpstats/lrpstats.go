@@ -69,16 +69,19 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			"LogGuid":     desiredLRP.LogGuid,
 		})
 	}
-
 	metricsByInstanceIndex := make(map[uint]*cc_messages.LRPInstanceStats)
 	currentTime := handler.clock.Now()
 	for _, metric := range metrics {
 		cpuPercentageAsDecimal := metric.GetCpuPercentage() / 100
+		disk := uint64(0)
+		if metric.GetDiskBytes() > 1024 {
+			disk = metric.GetDiskBytes() - 1024
+		}
 		metricsByInstanceIndex[uint(metric.GetInstanceIndex())] = &cc_messages.LRPInstanceStats{
 			Time:          currentTime,
 			CpuPercentage: cpuPercentageAsDecimal,
 			MemoryBytes:   metric.GetMemoryBytes(),
-			DiskBytes:     metric.GetDiskBytes(),
+			DiskBytes:     disk,
 		}
 	}
 

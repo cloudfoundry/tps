@@ -241,7 +241,7 @@ var _ = Describe("TPS-Listener", func() {
 							Time:          zeroTime,
 							CpuPercentage: 0.03,
 							MemoryBytes:   1024,
-							DiskBytes:     2048,
+							DiskBytes:     1024,
 						},
 					}))
 
@@ -256,7 +256,7 @@ var _ = Describe("TPS-Listener", func() {
 							Time:          zeroTime,
 							CpuPercentage: 0.04,
 							MemoryBytes:   1024,
-							DiskBytes:     2048,
+							DiskBytes:     1024,
 						},
 					}))
 
@@ -269,7 +269,7 @@ var _ = Describe("TPS-Listener", func() {
 							Time:          zeroTime,
 							CpuPercentage: 0.05,
 							MemoryBytes:   1024,
-							DiskBytes:     2048,
+							DiskBytes:     1024,
 						},
 					}))
 				})
