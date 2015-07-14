@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/tps"
+	"github.com/cloudfoundry-incubator/tps/handler/bulklrpstats"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstats"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
 	"github.com/pivotal-golang/clock"
@@ -24,6 +25,10 @@ func New(apiClient receptor.Client, noaaClient lrpstats.NoaaClient, maxInFlight 
 		tps.LRPStats: tpsHandler{
 			semaphore:       semaphore,
 			delegateHandler: lrpstats.NewHandler(apiClient, noaaClient, clock, logger),
+		},
+		tps.BulkLRPStats: tpsHandler{
+			semaphore:       semaphore,
+			delegateHandler: bulklrpstats.NewHandler(apiClient, noaaClient, clock, logger),
 		},
 	}
 
