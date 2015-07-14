@@ -69,6 +69,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			"LogGuid":     desiredLRP.LogGuid,
 		})
 	}
+
 	metricsByInstanceIndex := make(map[uint]*cc_messages.LRPInstanceStats)
 	currentTime := handler.clock.Now()
 	for _, metric := range metrics {

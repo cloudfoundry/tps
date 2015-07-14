@@ -24,8 +24,12 @@ import (
 )
 
 var _ = Describe("TPS-Listener", func() {
-	var httpClient *http.Client
-	var requestGenerator *rata.RequestGenerator
+	var (
+		httpClient       *http.Client
+		requestGenerator *rata.RequestGenerator
+
+		desiredLRP, desiredLRP2 models.DesiredLRP
+	)
 
 	BeforeEach(func() {
 		requestGenerator = rata.NewRequestGenerator(fmt.Sprintf("http://%s", listenerAddr), tps.Routes)
@@ -37,7 +41,7 @@ var _ = Describe("TPS-Listener", func() {
 	JustBeforeEach(func() {
 		listener = ginkgomon.Invoke(runner)
 
-		desiredLRP := models.DesiredLRP{
+		desiredLRP = models.DesiredLRP{
 			Domain:      "some-domain",
 			ProcessGuid: "some-process-guid",
 			Instances:   3,
@@ -124,7 +128,6 @@ var _ = Describe("TPS-Listener", func() {
 					Index:        2,
 					State:        cc_messages.LRPInstanceStateStarting,
 				}))
-
 			})
 		})
 
@@ -190,7 +193,9 @@ var _ = Describe("TPS-Listener", func() {
 					message1 := marshalMessage(createContainerMetric("some-process-guid", 0, 3.0, 1024, 2048*1024*1024, 0))
 					message2 := marshalMessage(createContainerMetric("some-process-guid", 1, 4.0, 1024, 2048*1024*1024, 0))
 					message3 := marshalMessage(createContainerMetric("some-process-guid", 2, 5.0, 1024, 2048*1024*1024, 0))
-					messages := [][]byte{message1, message2, message3}
+
+					messages := map[string][][]byte{}
+					messages["some-log-guid"] = [][]byte{message1, message2, message3}
 
 					handler := NewHttpHandler(messages)
 					httpServer := http_server.New(trafficControllerAddress, handler)
@@ -309,17 +314,113 @@ var _ = Describe("TPS-Listener", func() {
 
 			It("returns internal server error", func() {
 				getLRPs, err := requestGenerator.CreateRequest(
-					tps.LRPStatus,
+					tps.LRPStats,
 					rata.Params{"guid": "some-process-guid"},
 					nil,
 				)
 				Expect(err).NotTo(HaveOccurred())
+				getLRPs.Header.Add("Authorization", "I can do this.")
 
 				response, err := httpClient.Do(getLRPs)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(response.StatusCode).To(Equal(http.StatusInternalServerError))
 			})
+		})
+	})
+
+	Describe("GET /v1/bulk_actual_lrp_status", func() {
+		startActualLRP := func(processGuid string) {
+			lrpKey0 := models.NewActualLRPKey(processGuid, 0, "some-domain")
+			instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
+
+			err := lrpBBS.ClaimActualLRP(logger, lrpKey0, instanceKey0)
+			Expect(err).NotTo(HaveOccurred())
+
+			lrpKey1 := models.NewActualLRPKey(processGuid, 1, "some-domain")
+			instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
+			netInfo := models.NewActualLRPNetInfo("1.2.3.4", []models.PortMapping{
+				{ContainerPort: 8080, HostPort: 65100},
+			})
+
+			err = lrpBBS.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
+			Expect(err).NotTo(HaveOccurred())
+		}
+
+		JustBeforeEach(func() {
+			desiredLRP2 = models.DesiredLRP{
+				Domain:      "some-domain",
+				ProcessGuid: "some-other-process-guid",
+				Instances:   3,
+				RootFS:      "some:rootfs",
+				MemoryMB:    1024,
+				DiskMB:      512,
+				LogGuid:     "some-other-log-guid",
+				Action: &models.RunAction{
+					User: "me",
+					Path: "ls",
+				},
+			}
+
+			err := lrpBBS.DesireLRP(logger, desiredLRP2)
+			Expect(err).NotTo(HaveOccurred())
+
+			startActualLRP(desiredLRP.ProcessGuid)
+			startActualLRP(desiredLRP2.ProcessGuid)
+		})
+
+		It("reports the status for all the process guids supplied", func() {
+			getLRPStatus, err := requestGenerator.CreateRequest(
+				tps.BulkLRPStatus,
+				nil,
+				nil,
+			)
+			Expect(err).NotTo(HaveOccurred())
+			getLRPStatus.Header.Add("Authorization", "I can do this.")
+
+			query := getLRPStatus.URL.Query()
+			query.Set("guids", "some-process-guid,some-other-process-guid")
+			getLRPStatus.URL.RawQuery = query.Encode()
+
+			response, err := httpClient.Do(getLRPStatus)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+			var lrpInstanceStatus map[string][]cc_messages.LRPInstance
+			err = json.NewDecoder(response.Body).Decode(&lrpInstanceStatus)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(lrpInstanceStatus).To(HaveLen(2))
+			for guid, instances := range lrpInstanceStatus {
+				for i, _ := range instances {
+					Expect(instances[i]).NotTo(BeZero())
+					instances[i].Since = 0
+
+					Eventually(instances[i]).ShouldNot(BeZero())
+					instances[i].Uptime = 0
+				}
+
+				Expect(instances).To(ContainElement(cc_messages.LRPInstance{
+					ProcessGuid:  guid,
+					InstanceGuid: "some-instance-guid-0",
+					Index:        0,
+					State:        cc_messages.LRPInstanceStateStarting,
+				}))
+
+				Expect(instances).To(ContainElement(cc_messages.LRPInstance{
+					ProcessGuid:  guid,
+					InstanceGuid: "some-instance-guid-1",
+					Index:        1,
+					State:        cc_messages.LRPInstanceStateRunning,
+				}))
+
+				Expect(instances).To(ContainElement(cc_messages.LRPInstance{
+					ProcessGuid:  guid,
+					InstanceGuid: "",
+					Index:        2,
+					State:        cc_messages.LRPInstanceStateStarting,
+				}))
+			}
 		})
 	})
 })

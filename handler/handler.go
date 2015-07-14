@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/tps"
+	"github.com/cloudfoundry-incubator/tps/handler/bulklrpstatus"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstats"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
 	"github.com/cloudfoundry/dropsonde"
@@ -25,6 +26,10 @@ func New(apiClient receptor.Client, noaaClient lrpstats.NoaaClient, maxInFlight 
 		tps.LRPStats: tpsHandler{
 			semaphore:       semaphore,
 			delegateHandler: LogWrap(lrpstats.NewHandler(apiClient, noaaClient, clock, logger), logger),
+		},
+		tps.BulkLRPStatus: tpsHandler{
+			semaphore:       semaphore,
+			delegateHandler: bulklrpstatus.NewHandler(apiClient, clock, logger),
 		},
 	}
 
