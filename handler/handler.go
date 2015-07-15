@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry-incubator/tps"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstats"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
+	"github.com/cloudfoundry/dropsonde"
 	"github.com/pivotal-golang/clock"
 	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/rata"
@@ -19,11 +20,11 @@ func New(apiClient receptor.Client, noaaClient lrpstats.NoaaClient, maxInFlight 
 	handlers := map[string]http.Handler{
 		tps.LRPStatus: tpsHandler{
 			semaphore:       semaphore,
-			delegateHandler: lrpstatus.NewHandler(apiClient, clock, logger),
+			delegateHandler: LogWrap(lrpstatus.NewHandler(apiClient, clock, logger), logger),
 		},
 		tps.LRPStats: tpsHandler{
 			semaphore:       semaphore,
-			delegateHandler: lrpstats.NewHandler(apiClient, noaaClient, clock, logger),
+			delegateHandler: LogWrap(lrpstats.NewHandler(apiClient, noaaClient, clock, logger), logger),
 		},
 	}
 
@@ -48,4 +49,19 @@ func (handler tpsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	handler.delegateHandler.ServeHTTP(w, r)
+}
+
+func logWrap(handler http.Handler, logger lager.Logger) http.HandlerFunc {
+	handler = dropsonde.InstrumentedHandler(handler)
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		requestLog := logger.Session("request", lager.Data{
+			"method":  r.Method,
+			"request": r.URL.String(),
+		})
+
+		requestLog.Info("serving")
+		handler.ServeHTTP(w, r)
+		requestLog.Info("done")
+	}
 }
