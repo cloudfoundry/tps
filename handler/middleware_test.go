@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/cloudfoundry-incubator/receptor/handlers"
-	"github.com/cloudfoundry-incubator/receptor/handlers/handler_fakes"
+	"github.com/cloudfoundry-incubator/tps/handler"
+	"github.com/cloudfoundry-incubator/tps/handler/handler_fakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
@@ -14,7 +14,7 @@ import (
 )
 
 var _ = Describe("Middleware", func() {
-	var handler http.Handler
+	var httpHandler http.Handler
 	var wrappedHandler *handler_fakes.FakeHandler
 	var req *http.Request
 	var res *httptest.ResponseRecorder
@@ -29,12 +29,12 @@ var _ = Describe("Middleware", func() {
 
 	Describe("LogWrap", func() {
 		BeforeEach(func() {
-			handler = handlers.LogWrap(wrappedHandler, logger)
+			httpHandler = handler.LogWrap(wrappedHandler, logger)
 		})
 
 		Context("when the handler serves request", func() {
 			BeforeEach(func() {
-				handler.ServeHTTP(res, req)
+				httpHandler.ServeHTTP(res, req)
 			})
 
 			It("calls the wrapped handler", func() {
