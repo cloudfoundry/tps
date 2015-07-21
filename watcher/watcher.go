@@ -3,6 +3,7 @@ package watcher
 import (
 	"os"
 	"sync/atomic"
+	"time"
 
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
@@ -72,6 +73,8 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 				event, err = es.Next()
 				if err != nil {
 					watcher.logger.Error("failed-getting-next-event", err)
+					// wait a bit before retrying
+					time.Sleep(time.Second)
 					break
 				}
 

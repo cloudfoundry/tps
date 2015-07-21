@@ -209,7 +209,7 @@ var _ = Describe("Watcher", func() {
 		})
 
 		It("re-subscribes", func() {
-			Eventually(receptorClient.SubscribeToEventsCallCount).Should(BeNumerically(">", 1))
+			Eventually(receptorClient.SubscribeToEventsCallCount, 2*time.Second).Should(BeNumerically(">", 1))
 		})
 
 		Context("when re-subscribing fails", func() {
