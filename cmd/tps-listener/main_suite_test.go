@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/cloudfoundry-incubator/bbs"
 	bbstestrunner "github.com/cloudfoundry-incubator/bbs/cmd/bbs/testrunner"
 	"github.com/cloudfoundry-incubator/consuladapter/consulrunner"
 	receptorrunner "github.com/cloudfoundry-incubator/receptor/cmd/receptor/testrunner"
@@ -51,10 +52,12 @@ var (
 	etcdRunner     *etcdstorerunner.ETCDClusterRunner
 	receptorRunner ifrit.Process
 	store          storeadapter.StoreAdapter
-	lrpBBS         *lrp_bbs.LRPBBS
-	logger         *lagertest.TestLogger
-	bbsPath        string
-	bbsURL         *url.URL
+
+	bbsClient    bbs.Client
+	legacyLRPBBS *lrp_bbs.LRPBBS
+	logger       *lagertest.TestLogger
+	bbsPath      string
+	bbsURL       *url.URL
 )
 
 var bbsArgs bbstestrunner.Args
@@ -120,6 +123,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		Host:   bbsAddress,
 	}
 
+	bbsClient = bbs.NewClient(bbsURL.String())
+
 	bbsArgs = bbstestrunner.Args{
 		Address:     bbsAddress,
 		EtcdCluster: strings.Join(etcdRunner.NodeURLS(), ","),
@@ -136,7 +141,7 @@ var _ = BeforeEach(func() {
 
 	taskHandlerAddress := fmt.Sprintf("127.0.0.1:%d", receptorPort+1)
 	clock := clock.NewClock()
-	lrpBBS = lrp_bbs.New(
+	legacyLRPBBS = lrp_bbs.New(
 		store,
 		clock,
 		cb.NewCellClient(),

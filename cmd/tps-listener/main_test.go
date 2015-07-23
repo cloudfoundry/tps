@@ -18,8 +18,9 @@ import (
 	"github.com/tedsuo/ifrit/sigmon"
 	"github.com/tedsuo/rata"
 
+	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
-	"github.com/cloudfoundry-incubator/runtime-schema/models"
+	oldmodels "github.com/cloudfoundry-incubator/runtime-schema/models"
 	"github.com/cloudfoundry-incubator/tps"
 )
 
@@ -28,7 +29,7 @@ var _ = Describe("TPS-Listener", func() {
 		httpClient       *http.Client
 		requestGenerator *rata.RequestGenerator
 
-		desiredLRP, desiredLRP2 models.DesiredLRP
+		desiredLRP, desiredLRP2 oldmodels.DesiredLRP
 	)
 
 	BeforeEach(func() {
@@ -41,7 +42,7 @@ var _ = Describe("TPS-Listener", func() {
 	JustBeforeEach(func() {
 		listener = ginkgomon.Invoke(runner)
 
-		desiredLRP = models.DesiredLRP{
+		desiredLRP = oldmodels.DesiredLRP{
 			Domain:      "some-domain",
 			ProcessGuid: "some-process-guid",
 			Instances:   3,
@@ -49,13 +50,13 @@ var _ = Describe("TPS-Listener", func() {
 			MemoryMB:    1024,
 			DiskMB:      512,
 			LogGuid:     "some-log-guid",
-			Action: &models.RunAction{
+			Action: &oldmodels.RunAction{
 				User: "me",
 				Path: "ls",
 			},
 		}
 
-		err := lrpBBS.DesireLRP(logger, desiredLRP)
+		err := legacyLRPBBS.DesireLRP(logger, desiredLRP)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -69,18 +70,17 @@ var _ = Describe("TPS-Listener", func() {
 	Describe("GET /v1/actual_lrps/:guid", func() {
 		Context("when the receptor is running", func() {
 			JustBeforeEach(func() {
-				lrpKey0 := models.NewActualLRPKey("some-process-guid", 0, "some-domain")
 				instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
-				err := lrpBBS.ClaimActualLRP(logger, lrpKey0, instanceKey0)
+				_, err := bbsClient.ClaimActualLRP("some-process-guid", 0, instanceKey0)
 				Expect(err).NotTo(HaveOccurred())
 
-				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
-				instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-				netInfo := models.NewActualLRPNetInfo("1.2.3.4", []models.PortMapping{
+				lrpKey1 := oldmodels.NewActualLRPKey("some-process-guid", 1, "some-domain")
+				instanceKey1 := oldmodels.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
+				netInfo := oldmodels.NewActualLRPNetInfo("1.2.3.4", []oldmodels.PortMapping{
 					{ContainerPort: 8080, HostPort: 65100},
 				})
-				err = lrpBBS.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
+				err = legacyLRPBBS.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
@@ -157,18 +157,17 @@ var _ = Describe("TPS-Listener", func() {
 			var trafficControllerProcess ifrit.Process
 
 			JustBeforeEach(func() {
-				lrpKey0 := models.NewActualLRPKey("some-process-guid", 0, "some-domain")
 				instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
-				err := lrpBBS.ClaimActualLRP(logger, lrpKey0, instanceKey0)
+				_, err := bbsClient.ClaimActualLRP("some-process-guid", 0, instanceKey0)
 				Expect(err).NotTo(HaveOccurred())
 
-				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
-				instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-				netInfo := models.NewActualLRPNetInfo("1.2.3.4", []models.PortMapping{
+				lrpKey1 := oldmodels.NewActualLRPKey("some-process-guid", 1, "some-domain")
+				instanceKey1 := oldmodels.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
+				netInfo := oldmodels.NewActualLRPNetInfo("1.2.3.4", []oldmodels.PortMapping{
 					{ContainerPort: 8080, HostPort: 65100},
 				})
-				err = lrpBBS.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
+				err = legacyLRPBBS.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
@@ -331,24 +330,23 @@ var _ = Describe("TPS-Listener", func() {
 
 	Describe("GET /v1/bulk_actual_lrp_status", func() {
 		startActualLRP := func(processGuid string) {
-			lrpKey0 := models.NewActualLRPKey(processGuid, 0, "some-domain")
 			instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
-			err := lrpBBS.ClaimActualLRP(logger, lrpKey0, instanceKey0)
+			_, err := bbsClient.ClaimActualLRP(processGuid, 0, instanceKey0)
 			Expect(err).NotTo(HaveOccurred())
 
-			lrpKey1 := models.NewActualLRPKey(processGuid, 1, "some-domain")
-			instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-			netInfo := models.NewActualLRPNetInfo("1.2.3.4", []models.PortMapping{
+			lrpKey1 := oldmodels.NewActualLRPKey(processGuid, 1, "some-domain")
+			instanceKey1 := oldmodels.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
+			netInfo := oldmodels.NewActualLRPNetInfo("1.2.3.4", []oldmodels.PortMapping{
 				{ContainerPort: 8080, HostPort: 65100},
 			})
 
-			err = lrpBBS.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
+			err = legacyLRPBBS.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
 			Expect(err).NotTo(HaveOccurred())
 		}
 
 		JustBeforeEach(func() {
-			desiredLRP2 = models.DesiredLRP{
+			desiredLRP2 = oldmodels.DesiredLRP{
 				Domain:      "some-domain",
 				ProcessGuid: "some-other-process-guid",
 				Instances:   3,
@@ -356,13 +354,13 @@ var _ = Describe("TPS-Listener", func() {
 				MemoryMB:    1024,
 				DiskMB:      512,
 				LogGuid:     "some-other-log-guid",
-				Action: &models.RunAction{
+				Action: &oldmodels.RunAction{
 					User: "me",
 					Path: "ls",
 				},
 			}
 
-			err := lrpBBS.DesireLRP(logger, desiredLRP2)
+			err := legacyLRPBBS.DesireLRP(logger, desiredLRP2)
 			Expect(err).NotTo(HaveOccurred())
 
 			startActualLRP(desiredLRP.ProcessGuid)
