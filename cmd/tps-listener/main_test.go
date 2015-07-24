@@ -75,12 +75,10 @@ var _ = Describe("TPS-Listener", func() {
 				_, err := bbsClient.ClaimActualLRP("some-process-guid", 0, instanceKey0)
 				Expect(err).NotTo(HaveOccurred())
 
-				lrpKey1 := oldmodels.NewActualLRPKey("some-process-guid", 1, "some-domain")
-				instanceKey1 := oldmodels.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-				netInfo := oldmodels.NewActualLRPNetInfo("1.2.3.4", []oldmodels.PortMapping{
-					{ContainerPort: 8080, HostPort: 65100},
-				})
-				err = legacyLRPBBS.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
+				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
+				instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
+				netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
+				_, err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
@@ -162,12 +160,10 @@ var _ = Describe("TPS-Listener", func() {
 				_, err := bbsClient.ClaimActualLRP("some-process-guid", 0, instanceKey0)
 				Expect(err).NotTo(HaveOccurred())
 
-				lrpKey1 := oldmodels.NewActualLRPKey("some-process-guid", 1, "some-domain")
-				instanceKey1 := oldmodels.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-				netInfo := oldmodels.NewActualLRPNetInfo("1.2.3.4", []oldmodels.PortMapping{
-					{ContainerPort: 8080, HostPort: 65100},
-				})
-				err = legacyLRPBBS.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
+				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
+				instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
+				netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
+				_, err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
@@ -335,13 +331,11 @@ var _ = Describe("TPS-Listener", func() {
 			_, err := bbsClient.ClaimActualLRP(processGuid, 0, instanceKey0)
 			Expect(err).NotTo(HaveOccurred())
 
-			lrpKey1 := oldmodels.NewActualLRPKey(processGuid, 1, "some-domain")
-			instanceKey1 := oldmodels.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-			netInfo := oldmodels.NewActualLRPNetInfo("1.2.3.4", []oldmodels.PortMapping{
-				{ContainerPort: 8080, HostPort: 65100},
-			})
+			lrpKey1 := models.NewActualLRPKey(processGuid, 1, "some-domain")
+			instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
+			netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
 
-			err = legacyLRPBBS.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
+			_, err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
 			Expect(err).NotTo(HaveOccurred())
 		}
 

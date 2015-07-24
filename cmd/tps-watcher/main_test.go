@@ -13,10 +13,12 @@ import (
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/ginkgomon"
 
+	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/consuladapter"
+	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/bbs/shared"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
-	"github.com/cloudfoundry-incubator/runtime-schema/models"
+	oldmodels "github.com/cloudfoundry-incubator/runtime-schema/models"
 )
 
 const watcherLockName = "tps_watcher_lock"
@@ -74,7 +76,7 @@ var _ = Describe("TPS", func() {
 			watcher, _ = startWatcher(true)
 			domain = cc_messages.AppLRPDomain
 
-			desiredLRP := models.DesiredLRP{
+			desiredLRP := receptor.DesiredLRPCreateRequest{
 				Domain:      domain,
 				ProcessGuid: "some-process-guid",
 				Instances:   3,
@@ -82,28 +84,28 @@ var _ = Describe("TPS", func() {
 				MemoryMB:    1024,
 				DiskMB:      512,
 				LogGuid:     "some-log-guid",
-				Action: &models.RunAction{
+				Action: &oldmodels.RunAction{
 					User: "me",
 					Path: "ls",
 				},
 			}
 
-			err := bbs.DesireLRP(logger, desiredLRP)
+			err := receptorClient.CreateDesiredLRP(desiredLRP)
 			Expect(err).NotTo(HaveOccurred())
 
 			lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, domain)
 			instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-			netInfo := models.NewActualLRPNetInfo("1.2.3.4", []models.PortMapping{
-				{ContainerPort: 8080, HostPort: 65100},
-			})
-			err = bbs.StartActualLRP(logger, lrpKey1, instanceKey1, netInfo)
+			netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
+			_, err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
 			Expect(err).NotTo(HaveOccurred())
 
 			// work around the fact that the event source has to sleep
 			// see github.com/cloudfoundry/storeadapter/etcdstoreadapter/etcd_store_adapter.go
 			time.Sleep(150 * time.Millisecond)
 
-			bbs.CrashActualLRP(logger, lrpKey1, instanceKey1, "out of memory")
+			oldLrpKey1 := oldmodels.NewActualLRPKey("some-process-guid", 1, domain)
+			oldInstanceKey1 := oldmodels.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
+			legacyBBS.CrashActualLRP(logger, oldLrpKey1, oldInstanceKey1, "out of memory")
 		})
 
 		It("POSTs to the CC that the application has crashed", func() {

@@ -6,8 +6,10 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/cloudfoundry-incubator/bbs"
 	bbstestrunner "github.com/cloudfoundry-incubator/bbs/cmd/bbs/testrunner"
 	"github.com/cloudfoundry-incubator/consuladapter/consulrunner"
+	"github.com/cloudfoundry-incubator/receptor"
 	receptorrunner "github.com/cloudfoundry-incubator/receptor/cmd/receptor/testrunner"
 	Bbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
 	"github.com/cloudfoundry-incubator/tps/cmd/tpsrunner"
@@ -43,8 +45,10 @@ var (
 	fakeCC         *ghttp.Server
 	etcdRunner     *etcdstorerunner.ETCDClusterRunner
 	receptorRunner ifrit.Process
+	receptorClient receptor.Client
 	store          storeadapter.StoreAdapter
-	bbs            *Bbs.BBS
+	legacyBBS      *Bbs.BBS
+	bbsClient      bbs.Client
 	logger         *lagertest.TestLogger
 	bbsPath        string
 	bbsURL         *url.URL
@@ -124,16 +128,19 @@ var _ = BeforeEach(func() {
 	bbsProcess = ginkgomon.Invoke(bbsRunner)
 
 	taskHandlerAddress := fmt.Sprintf("127.0.0.1:%d", receptorPort+1)
-	bbs = Bbs.NewBBS(store, consulRunner.NewSession("a-session"), "http://"+taskHandlerAddress, clock.NewClock(), logger)
+	legacyBBS = Bbs.NewBBS(store, consulRunner.NewSession("a-session"), "http://"+taskHandlerAddress, clock.NewClock(), logger)
 
-	receptor := receptorrunner.New(receptorPath, receptorrunner.Args{
+	bbsClient = bbs.NewClient(bbsURL.String())
+
+	receptorProcess := receptorrunner.New(receptorPath, receptorrunner.Args{
 		Address:            fmt.Sprintf("127.0.0.1:%d", receptorPort),
 		BBSAddress:         bbsURL.String(),
 		TaskHandlerAddress: taskHandlerAddress,
 		EtcdCluster:        strings.Join(etcdRunner.NodeURLS(), ","),
 		ConsulCluster:      consulRunner.ConsulCluster(),
 	})
-	receptorRunner = ginkgomon.Invoke(receptor)
+	receptorRunner = ginkgomon.Invoke(receptorProcess)
+	receptorClient = receptor.NewClient(fmt.Sprintf("http://127.0.0.1:%d", receptorPort))
 
 	fakeCC = ghttp.NewServer()
 
