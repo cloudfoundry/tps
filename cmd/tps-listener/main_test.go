@@ -72,7 +72,7 @@ var _ = Describe("TPS-Listener", func() {
 			JustBeforeEach(func() {
 				instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
-				_, err := bbsClient.ClaimActualLRP("some-process-guid", 0, instanceKey0)
+				_, err := bbsClient.ClaimActualLRP("some-process-guid", 0, &instanceKey0)
 				Expect(err).NotTo(HaveOccurred())
 
 				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
@@ -157,7 +157,7 @@ var _ = Describe("TPS-Listener", func() {
 			JustBeforeEach(func() {
 				instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
-				_, err := bbsClient.ClaimActualLRP("some-process-guid", 0, instanceKey0)
+				_, err := bbsClient.ClaimActualLRP("some-process-guid", 0, &instanceKey0)
 				Expect(err).NotTo(HaveOccurred())
 
 				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
@@ -328,7 +328,7 @@ var _ = Describe("TPS-Listener", func() {
 		startActualLRP := func(processGuid string) {
 			instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
-			_, err := bbsClient.ClaimActualLRP(processGuid, 0, instanceKey0)
+			_, err := bbsClient.ClaimActualLRP(processGuid, 0, &instanceKey0)
 			Expect(err).NotTo(HaveOccurred())
 
 			lrpKey1 := models.NewActualLRPKey(processGuid, 1, "some-domain")
