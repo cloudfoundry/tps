@@ -3,6 +3,7 @@ package main_test
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -63,6 +64,7 @@ var (
 var bbsArgs bbstestrunner.Args
 var bbsRunner *ginkgomon.Runner
 var bbsProcess ifrit.Process
+var auctioneerServer *ghttp.Server
 
 func TestTPS(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -125,9 +127,13 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	bbsClient = bbs.NewClient(bbsURL.String())
 
+	auctioneerServer = ghttp.NewServer()
+	auctioneerServer.AppendHandlers(ghttp.RespondWith(http.StatusAccepted, nil))
+
 	bbsArgs = bbstestrunner.Args{
-		Address:     bbsAddress,
-		EtcdCluster: strings.Join(etcdRunner.NodeURLS(), ","),
+		Address:           bbsAddress,
+		AuctioneerAddress: auctioneerServer.URL(),
+		EtcdCluster:       strings.Join(etcdRunner.NodeURLS(), ","),
 	}
 })
 
@@ -176,6 +182,7 @@ var _ = AfterEach(func() {
 	ginkgomon.Kill(receptorRunner, 5)
 	etcdRunner.Stop()
 	consulRunner.Stop()
+	auctioneerServer.Close()
 })
 
 var _ = SynchronizedAfterSuite(func() {

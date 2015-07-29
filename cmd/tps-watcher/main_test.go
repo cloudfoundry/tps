@@ -103,9 +103,7 @@ var _ = Describe("TPS", func() {
 			// see github.com/cloudfoundry/storeadapter/etcdstoreadapter/etcd_store_adapter.go
 			time.Sleep(150 * time.Millisecond)
 
-			oldLrpKey1 := oldmodels.NewActualLRPKey("some-process-guid", 1, domain)
-			oldInstanceKey1 := oldmodels.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-			legacyBBS.CrashActualLRP(logger, oldLrpKey1, oldInstanceKey1, "out of memory")
+			bbsClient.CrashActualLRP(&lrpKey1, &instanceKey1, "out of memory")
 		})
 
 		It("POSTs to the CC that the application has crashed", func() {
