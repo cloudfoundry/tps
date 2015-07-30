@@ -185,9 +185,9 @@ var _ = Describe("TPS-Listener", func() {
 
 			Context("when the traffic controller is running", func() {
 				BeforeEach(func() {
-					message1 := marshalMessage(createContainerMetric("some-process-guid", 0, 3.0, 1024, 2048*1024, 0))
-					message2 := marshalMessage(createContainerMetric("some-process-guid", 1, 4.0, 1024, 2048*1024, 0))
-					message3 := marshalMessage(createContainerMetric("some-process-guid", 2, 5.0, 1024, 2048*1024, 0))
+					message1 := marshalMessage(createContainerMetric("some-process-guid", 0, 3.0, 1024, 2048, 0))
+					message2 := marshalMessage(createContainerMetric("some-process-guid", 1, 4.0, 1024, 2048, 0))
+					message3 := marshalMessage(createContainerMetric("some-process-guid", 2, 5.0, 1024, 2048, 0))
 
 					messages := map[string][][]byte{}
 					messages["some-log-guid"] = [][]byte{message1, message2, message3}
@@ -241,7 +241,7 @@ var _ = Describe("TPS-Listener", func() {
 							Time:          zeroTime,
 							CpuPercentage: 0.03,
 							MemoryBytes:   1024,
-							DiskBytes:     1024 * 1024,
+							DiskBytes:     1024,
 						},
 					}))
 
@@ -256,7 +256,7 @@ var _ = Describe("TPS-Listener", func() {
 							Time:          zeroTime,
 							CpuPercentage: 0.04,
 							MemoryBytes:   1024,
-							DiskBytes:     1024 * 1024,
+							DiskBytes:     1024,
 						},
 					}))
 
@@ -269,7 +269,7 @@ var _ = Describe("TPS-Listener", func() {
 							Time:          zeroTime,
 							CpuPercentage: 0.05,
 							MemoryBytes:   1024,
-							DiskBytes:     1024 * 1024,
+							DiskBytes:     1024,
 						},
 					}))
 				})
