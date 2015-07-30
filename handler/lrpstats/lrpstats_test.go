@@ -136,7 +136,7 @@ var _ = Describe("Stats", func() {
 						Time:          time.Unix(0, 0),
 						CpuPercentage: 0.04,
 						MemoryBytes:   1024,
-						DiskBytes:     1024,
+						DiskBytes:     2048,
 					},
 				}
 				var stats []cc_messages.LRPInstance
