@@ -121,6 +121,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		Address:           bbsAddress,
 		AuctioneerAddress: auctioneerServer.URL(),
 		EtcdCluster:       strings.Join(etcdRunner.NodeURLS(), ","),
+		ConsulCluster:     consulRunner.ConsulCluster(),
 	}
 })
 
