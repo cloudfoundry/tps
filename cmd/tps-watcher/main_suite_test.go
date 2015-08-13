@@ -165,10 +165,10 @@ var _ = AfterEach(func() {
 	ginkgomon.Kill(receptorRunner, 5)
 	etcdRunner.Stop()
 	consulRunner.Stop()
-	auctioneerServer.Close()
 })
 
 var _ = SynchronizedAfterSuite(func() {
+	auctioneerServer.Close()
 }, func() {
 	gexec.CleanupBuildArtifacts()
 })
