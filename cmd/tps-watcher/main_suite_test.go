@@ -107,22 +107,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	logger = lagertest.NewTestLogger("test")
 
 	bbsPath = string(binaries["bbs"])
-	bbsAddress := fmt.Sprintf("127.0.0.1:%d", 13000+GinkgoParallelNode())
-
-	bbsURL = &url.URL{
-		Scheme: "http",
-		Host:   bbsAddress,
-	}
-
-	auctioneerServer = ghttp.NewServer()
-	auctioneerServer.AppendHandlers(ghttp.RespondWith(http.StatusAccepted, nil))
-
-	bbsArgs = bbstestrunner.Args{
-		Address:           bbsAddress,
-		AuctioneerAddress: auctioneerServer.URL(),
-		EtcdCluster:       strings.Join(etcdRunner.NodeURLS(), ","),
-		ConsulCluster:     consulRunner.ConsulCluster(),
-	}
 })
 
 var _ = BeforeEach(func() {
@@ -131,11 +115,28 @@ var _ = BeforeEach(func() {
 	consulRunner.Start()
 	consulRunner.WaitUntilReady()
 
-	bbsRunner = bbstestrunner.New(bbsPath, bbsArgs)
-	bbsProcess = ginkgomon.Invoke(bbsRunner)
-
 	taskHandlerAddress := fmt.Sprintf("127.0.0.1:%d", receptorPort+1)
 	legacyBBS = Bbs.NewBBS(store, consulRunner.NewSession("a-session"), "http://"+taskHandlerAddress, clock.NewClock(), logger)
+
+	auctioneerServer = ghttp.NewServer()
+	auctioneerServer.AppendHandlers(ghttp.RespondWith(http.StatusAccepted, nil))
+
+	bbsAddress := fmt.Sprintf("127.0.0.1:%d", 13000+GinkgoParallelNode())
+
+	bbsURL = &url.URL{
+		Scheme: "http",
+		Host:   bbsAddress,
+	}
+
+	bbsArgs = bbstestrunner.Args{
+		Address:           bbsAddress,
+		AuctioneerAddress: auctioneerServer.URL(),
+		EtcdCluster:       strings.Join(etcdRunner.NodeURLS(), ","),
+		ConsulCluster:     consulRunner.ConsulCluster(),
+	}
+
+	bbsRunner = bbstestrunner.New(bbsPath, bbsArgs)
+	bbsProcess = ginkgomon.Invoke(bbsRunner)
 
 	bbsClient = bbs.NewClient(bbsURL.String())
 
