@@ -72,13 +72,13 @@ var _ = Describe("TPS-Listener", func() {
 			JustBeforeEach(func() {
 				instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
-				_, err := bbsClient.ClaimActualLRP("some-process-guid", 0, &instanceKey0)
+				err := bbsClient.ClaimActualLRP("some-process-guid", 0, &instanceKey0)
 				Expect(err).NotTo(HaveOccurred())
 
 				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
 				instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
 				netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
-				_, err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
+				err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
@@ -157,13 +157,13 @@ var _ = Describe("TPS-Listener", func() {
 			JustBeforeEach(func() {
 				instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
-				_, err := bbsClient.ClaimActualLRP("some-process-guid", 0, &instanceKey0)
+				err := bbsClient.ClaimActualLRP("some-process-guid", 0, &instanceKey0)
 				Expect(err).NotTo(HaveOccurred())
 
 				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
 				instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
 				netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
-				_, err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
+				err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
@@ -328,14 +328,14 @@ var _ = Describe("TPS-Listener", func() {
 		startActualLRP := func(processGuid string) {
 			instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
-			_, err := bbsClient.ClaimActualLRP(processGuid, 0, &instanceKey0)
+			err := bbsClient.ClaimActualLRP(processGuid, 0, &instanceKey0)
 			Expect(err).NotTo(HaveOccurred())
 
 			lrpKey1 := models.NewActualLRPKey(processGuid, 1, "some-domain")
 			instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
 			netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
 
-			_, err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
+			err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
 			Expect(err).NotTo(HaveOccurred())
 		}
 

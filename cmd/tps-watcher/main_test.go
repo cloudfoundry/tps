@@ -96,7 +96,7 @@ var _ = Describe("TPS", func() {
 			lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, domain)
 			instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
 			netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
-			_, err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
+			err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
 			Expect(err).NotTo(HaveOccurred())
 
 			// work around the fact that the event source has to sleep
