@@ -11,9 +11,6 @@ import (
 	bbstestrunner "github.com/cloudfoundry-incubator/bbs/cmd/bbs/testrunner"
 	"github.com/cloudfoundry-incubator/consuladapter/consulrunner"
 	receptorrunner "github.com/cloudfoundry-incubator/receptor/cmd/receptor/testrunner"
-	"github.com/cloudfoundry-incubator/runtime-schema/bbs/lrp_bbs"
-	"github.com/cloudfoundry-incubator/runtime-schema/bbs/services_bbs"
-	"github.com/cloudfoundry-incubator/runtime-schema/cb"
 	"github.com/cloudfoundry-incubator/tps/cmd/tpsrunner"
 	"github.com/cloudfoundry/storeadapter"
 	"github.com/cloudfoundry/storeadapter/storerunner/etcdstorerunner"
@@ -22,7 +19,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 	"github.com/onsi/gomega/ghttp"
-	"github.com/pivotal-golang/clock"
 	"github.com/pivotal-golang/lager/lagertest"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/ginkgomon"
@@ -54,11 +50,10 @@ var (
 	receptorRunner ifrit.Process
 	store          storeadapter.StoreAdapter
 
-	bbsClient    bbs.Client
-	legacyLRPBBS *lrp_bbs.LRPBBS
-	logger       *lagertest.TestLogger
-	bbsPath      string
-	bbsURL       *url.URL
+	bbsClient bbs.Client
+	logger    *lagertest.TestLogger
+	bbsPath   string
+	bbsURL    *url.URL
 )
 
 var bbsArgs bbstestrunner.Args
@@ -148,14 +143,6 @@ var _ = BeforeEach(func() {
 	bbsProcess = ginkgomon.Invoke(bbsRunner)
 
 	taskHandlerAddress := fmt.Sprintf("127.0.0.1:%d", receptorPort+1)
-	clock := clock.NewClock()
-	legacyLRPBBS = lrp_bbs.New(
-		store,
-		clock,
-		cb.NewCellClient(),
-		cb.NewAuctioneerClient(),
-		services_bbs.New(consulRunner.NewSession("a-session"), clock, logger.Session("services-bbs")),
-	)
 
 	receptor := receptorrunner.New(receptorPath, receptorrunner.Args{
 		Address:            fmt.Sprintf("127.0.0.1:%d", receptorPort),
