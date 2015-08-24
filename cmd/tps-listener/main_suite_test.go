@@ -128,7 +128,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	bbsClient = bbs.NewClient(bbsURL.String())
 
 	auctioneerServer = ghttp.NewServer()
-	auctioneerServer.AppendHandlers(ghttp.RespondWith(http.StatusAccepted, nil))
+	auctioneerServer.UnhandledRequestStatusCode = http.StatusAccepted
+	auctioneerServer.AllowUnhandledRequests = true
 
 	bbsArgs = bbstestrunner.Args{
 		Address:           bbsAddress,

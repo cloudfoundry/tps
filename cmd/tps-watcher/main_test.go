@@ -18,7 +18,6 @@ import (
 	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/bbs/shared"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
-	oldmodels "github.com/cloudfoundry-incubator/runtime-schema/models"
 )
 
 const watcherLockName = "tps_watcher_lock"
@@ -84,10 +83,10 @@ var _ = Describe("TPS", func() {
 				MemoryMB:    1024,
 				DiskMB:      512,
 				LogGuid:     "some-log-guid",
-				Action: &oldmodels.RunAction{
+				Action: models.WrapAction(&models.RunAction{
 					User: "me",
 					Path: "ls",
-				},
+				}),
 			}
 
 			err := receptorClient.CreateDesiredLRP(desiredLRP)

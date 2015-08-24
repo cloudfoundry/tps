@@ -20,7 +20,6 @@ import (
 
 	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
-	oldmodels "github.com/cloudfoundry-incubator/runtime-schema/models"
 	"github.com/cloudfoundry-incubator/tps"
 )
 
@@ -29,7 +28,7 @@ var _ = Describe("TPS-Listener", func() {
 		httpClient       *http.Client
 		requestGenerator *rata.RequestGenerator
 
-		desiredLRP, desiredLRP2 oldmodels.DesiredLRP
+		desiredLRP, desiredLRP2 *models.DesiredLRP
 	)
 
 	BeforeEach(func() {
@@ -42,21 +41,21 @@ var _ = Describe("TPS-Listener", func() {
 	JustBeforeEach(func() {
 		listener = ginkgomon.Invoke(runner)
 
-		desiredLRP = oldmodels.DesiredLRP{
+		desiredLRP = &models.DesiredLRP{
 			Domain:      "some-domain",
 			ProcessGuid: "some-process-guid",
 			Instances:   3,
-			RootFS:      "some:rootfs",
-			MemoryMB:    1024,
-			DiskMB:      512,
+			RootFs:      "some:rootfs",
+			MemoryMb:    1024,
+			DiskMb:      512,
 			LogGuid:     "some-log-guid",
-			Action: &oldmodels.RunAction{
+			Action: models.WrapAction(&models.RunAction{
 				User: "me",
 				Path: "ls",
-			},
+			}),
 		}
 
-		err := legacyLRPBBS.DesireLRP(logger, desiredLRP)
+		err := bbsClient.DesireLRP(desiredLRP)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -340,21 +339,21 @@ var _ = Describe("TPS-Listener", func() {
 		}
 
 		JustBeforeEach(func() {
-			desiredLRP2 = oldmodels.DesiredLRP{
+			desiredLRP2 = &models.DesiredLRP{
 				Domain:      "some-domain",
 				ProcessGuid: "some-other-process-guid",
 				Instances:   3,
-				RootFS:      "some:rootfs",
-				MemoryMB:    1024,
-				DiskMB:      512,
+				RootFs:      "some:rootfs",
+				MemoryMb:    1024,
+				DiskMb:      512,
 				LogGuid:     "some-other-log-guid",
-				Action: &oldmodels.RunAction{
+				Action: models.WrapAction(&models.RunAction{
 					User: "me",
 					Path: "ls",
-				},
+				}),
 			}
 
-			err := legacyLRPBBS.DesireLRP(logger, desiredLRP2)
+			err := bbsClient.DesireLRP(desiredLRP2)
 			Expect(err).NotTo(HaveOccurred())
 
 			startActualLRP(desiredLRP.ProcessGuid)
