@@ -142,14 +142,11 @@ var _ = BeforeEach(func() {
 	bbsRunner = bbstestrunner.New(bbsPath, bbsArgs)
 	bbsProcess = ginkgomon.Invoke(bbsRunner)
 
-	taskHandlerAddress := fmt.Sprintf("127.0.0.1:%d", receptorPort+1)
-
 	receptor := receptorrunner.New(receptorPath, receptorrunner.Args{
-		Address:            fmt.Sprintf("127.0.0.1:%d", receptorPort),
-		BBSAddress:         bbsURL.String(),
-		TaskHandlerAddress: taskHandlerAddress,
-		EtcdCluster:        strings.Join(etcdRunner.NodeURLS(), ","),
-		ConsulCluster:      consulRunner.ConsulCluster(),
+		Address:       fmt.Sprintf("127.0.0.1:%d", receptorPort),
+		BBSAddress:    bbsURL.String(),
+		EtcdCluster:   strings.Join(etcdRunner.NodeURLS(), ","),
+		ConsulCluster: consulRunner.ConsulCluster(),
 	})
 	receptorRunner = ginkgomon.Invoke(receptor)
 

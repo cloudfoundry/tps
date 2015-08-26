@@ -135,17 +135,15 @@ var _ = BeforeEach(func() {
 	bbsRunner = bbstestrunner.New(bbsPath, bbsArgs)
 	bbsProcess = ginkgomon.Invoke(bbsRunner)
 
-	taskHandlerAddress := fmt.Sprintf("127.0.0.1:%d", receptorPort+1)
-	legacyBBS = Bbs.NewBBS(store, consulRunner.NewSession("a-session"), "http://"+taskHandlerAddress, clock.NewClock(), logger)
+	legacyBBS = Bbs.NewBBS(store, consulRunner.NewSession("a-session"), clock.NewClock(), logger)
 
 	bbsClient = bbs.NewClient(bbsURL.String())
 
 	receptorProcess := receptorrunner.New(receptorPath, receptorrunner.Args{
-		Address:            fmt.Sprintf("127.0.0.1:%d", receptorPort),
-		BBSAddress:         bbsURL.String(),
-		TaskHandlerAddress: taskHandlerAddress,
-		EtcdCluster:        strings.Join(etcdRunner.NodeURLS(), ","),
-		ConsulCluster:      consulRunner.ConsulCluster(),
+		Address:       fmt.Sprintf("127.0.0.1:%d", receptorPort),
+		BBSAddress:    bbsURL.String(),
+		EtcdCluster:   strings.Join(etcdRunner.NodeURLS(), ","),
+		ConsulCluster: consulRunner.ConsulCluster(),
 	})
 	receptorRunner = ginkgomon.Invoke(receptorProcess)
 	receptorClient = receptor.NewClient(fmt.Sprintf("http://127.0.0.1:%d", receptorPort))
