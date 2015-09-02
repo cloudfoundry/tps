@@ -6,12 +6,12 @@ import (
 	"github.com/tedsuo/ifrit/ginkgomon"
 )
 
-func NewListener(bin, listenAddr, diegoAPIURL, trafficControllerURL string) *ginkgomon.Runner {
+func NewListener(bin, listenAddr, bbsAddress, trafficControllerURL string) *ginkgomon.Runner {
 	return ginkgomon.New(ginkgomon.Config{
 		Name: "tps-listener",
 		Command: exec.Command(
 			bin,
-			"-diegoAPIURL", diegoAPIURL,
+			"-bbsAddress", bbsAddress,
 			"-listenAddr", listenAddr,
 			"-trafficControllerURL", trafficControllerURL,
 			"-skipSSLVerification", "true",

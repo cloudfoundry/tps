@@ -6,8 +6,9 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/cloudfoundry-incubator/receptor"
-	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
+	"github.com/cloudfoundry-incubator/bbs/fake_bbs"
+	"github.com/cloudfoundry-incubator/bbs/models"
+	"github.com/cloudfoundry-incubator/bbs/models/test/model_helpers"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/runtime-schema/diego_errors"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
@@ -19,23 +20,17 @@ import (
 
 var _ = Describe("LRPStatus", func() {
 	var (
-		fakeClient *fake_receptor.FakeClient
+		fakeClient *fake_bbs.FakeClient
 
-		server        *httptest.Server
-		fakeResponses chan chan []receptor.ActualLRPResponse
+		server *httptest.Server
 	)
 
 	BeforeEach(func() {
-		fakeClient = new(fake_receptor.FakeClient)
+		fakeClient = new(fake_bbs.FakeClient)
 		fakeClock := fakeclock.NewFakeClock(time.Now())
 
 		handler := lrpstatus.NewHandler(fakeClient, fakeClock, lagertest.NewTestLogger("test"))
 		server = httptest.NewServer(handler)
-		fakeResponses = make(chan chan []receptor.ActualLRPResponse, 2)
-
-		fakeClient.ActualLRPsByProcessGuidStub = func(string) ([]receptor.ActualLRPResponse, error) {
-			return <-<-fakeResponses, nil
-		}
 	})
 
 	AfterEach(func() {
@@ -44,12 +39,12 @@ var _ = Describe("LRPStatus", func() {
 
 	Describe("Instance state", func() {
 		BeforeEach(func() {
-			fakeClient.ActualLRPsByProcessGuidStub = func(string) ([]receptor.ActualLRPResponse, error) {
-				return []receptor.ActualLRPResponse{
-					{Index: 0, State: receptor.ActualLRPStateUnclaimed},
-					{Index: 1, State: receptor.ActualLRPStateClaimed},
-					{Index: 2, State: receptor.ActualLRPStateRunning},
-					{Index: 3, State: receptor.ActualLRPStateCrashed, PlacementError: diego_errors.CELL_MISMATCH_MESSAGE},
+			fakeClient.ActualLRPGroupsByProcessGuidStub = func(string) ([]*models.ActualLRPGroup, error) {
+				return []*models.ActualLRPGroup{
+					makeActualLRPGroup(1, models.ActualLRPStateUnclaimed, ""),
+					makeActualLRPGroup(2, models.ActualLRPStateClaimed, ""),
+					makeActualLRPGroup(3, models.ActualLRPStateRunning, ""),
+					makeActualLRPGroup(4, models.ActualLRPStateCrashed, diego_errors.CELL_MISMATCH_MESSAGE),
 				}, nil
 			}
 		})
@@ -72,3 +67,11 @@ var _ = Describe("LRPStatus", func() {
 		})
 	})
 })
+
+func makeActualLRPGroup(index int32, state string, placementError string) *models.ActualLRPGroup {
+	actual := model_helpers.NewValidActualLRP("guid", index)
+	actual.PlacementError = placementError
+	actual.State = state
+
+	return &models.ActualLRPGroup{Instance: actual}
+}

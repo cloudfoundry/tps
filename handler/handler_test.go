@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/cloudfoundry-incubator/receptor"
-	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
+	"github.com/cloudfoundry-incubator/bbs/fake_bbs"
+	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstats/fakes"
 	"github.com/cloudfoundry/sonde-go/events"
@@ -21,13 +21,13 @@ var _ = Describe("Handler", func() {
 	Describe("rate limiting", func() {
 
 		var (
-			noaaClient     *fakes.FakeNoaaClient
-			receptorClient *fake_receptor.FakeClient
+			noaaClient *fakes.FakeNoaaClient
+			bbsClient  *fake_bbs.FakeClient
 
 			logger *lagertest.TestLogger
 
 			server                 *httptest.Server
-			fakeActualLRPResponses chan []receptor.ActualLRPResponse
+			fakeActualLRPResponses chan []*models.ActualLRPGroup
 			statsRequest           *http.Request
 			statusRequest          *http.Request
 			httpClient             *http.Client
@@ -39,17 +39,21 @@ var _ = Describe("Handler", func() {
 
 			httpClient = &http.Client{}
 			logger = lagertest.NewTestLogger("test")
-			receptorClient = new(fake_receptor.FakeClient)
+			bbsClient = new(fake_bbs.FakeClient)
 			noaaClient = &fakes.FakeNoaaClient{}
 
-			httpHandler, err = handler.New(receptorClient, noaaClient, 2, logger)
+			httpHandler, err = handler.New(bbsClient, noaaClient, 2, logger)
 			Expect(err).NotTo(HaveOccurred())
 
 			server = httptest.NewServer(httpHandler)
 
-			fakeActualLRPResponses = make(chan []receptor.ActualLRPResponse, 2)
+			fakeActualLRPResponses = make(chan []*models.ActualLRPGroup, 2)
 
-			receptorClient.ActualLRPsByProcessGuidStub = func(string) ([]receptor.ActualLRPResponse, error) {
+			bbsClient.DesiredLRPByProcessGuidStub = func(string) (*models.DesiredLRP, error) {
+				return &models.DesiredLRP{}, nil
+			}
+
+			bbsClient.ActualLRPGroupsByProcessGuidStub = func(string) ([]*models.ActualLRPGroup, error) {
 				return <-fakeActualLRPResponses, nil
 			}
 
@@ -76,7 +80,7 @@ var _ = Describe("Handler", func() {
 		})
 
 		It("returns 503 if the limit is exceeded", func() {
-			// hit both status and stats endpoints once, make fake receptor hang
+			// hit both status and stats endpoints once, make fake bbs hang
 
 			defer close(fakeActualLRPResponses)
 
@@ -96,7 +100,7 @@ var _ = Describe("Handler", func() {
 				Expect(res.StatusCode).To(Equal(http.StatusOK))
 			}()
 
-			Eventually(receptorClient.ActualLRPsByProcessGuidCallCount).Should(Equal(2))
+			Eventually(bbsClient.ActualLRPGroupsByProcessGuidCallCount).Should(Equal(2))
 
 			// hit it again, assert we get a 503
 			resp, err := httpClient.Do(statusRequest)
@@ -108,7 +112,7 @@ var _ = Describe("Handler", func() {
 			Expect(resp.StatusCode).To(Equal(http.StatusServiceUnavailable))
 
 			// un-hang one http call
-			fakeActualLRPResponses <- []receptor.ActualLRPResponse{}
+			fakeActualLRPResponses <- []*models.ActualLRPGroup{}
 
 			go func() {
 				defer GinkgoRecover()
@@ -118,8 +122,8 @@ var _ = Describe("Handler", func() {
 				Expect(res.StatusCode).To(Equal(http.StatusOK))
 			}()
 
-			fakeActualLRPResponses <- []receptor.ActualLRPResponse{}
-			fakeActualLRPResponses <- []receptor.ActualLRPResponse{}
+			fakeActualLRPResponses <- []*models.ActualLRPGroup{}
+			fakeActualLRPResponses <- []*models.ActualLRPGroup{}
 
 		})
 	})

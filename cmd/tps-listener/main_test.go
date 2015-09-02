@@ -67,7 +67,7 @@ var _ = Describe("TPS-Listener", func() {
 	})
 
 	Describe("GET /v1/actual_lrps/:guid", func() {
-		Context("when the receptor is running", func() {
+		Context("when the bbs is running", func() {
 			JustBeforeEach(func() {
 				instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
 
@@ -128,9 +128,9 @@ var _ = Describe("TPS-Listener", func() {
 			})
 		})
 
-		Context("when the receptor is not running", func() {
-			BeforeEach(func() {
-				ginkgomon.Kill(receptorRunner, 5)
+		Context("when the bbs is not running", func() {
+			JustBeforeEach(func() {
+				ginkgomon.Kill(bbsProcess, 5)
 			})
 
 			It("returns 500", func() {
@@ -150,7 +150,7 @@ var _ = Describe("TPS-Listener", func() {
 	})
 
 	Describe("GET /v1/actual_lrps/:guid/stats", func() {
-		Context("when the receptor is running", func() {
+		Context("when the bbs is running", func() {
 			var trafficControllerProcess ifrit.Process
 
 			JustBeforeEach(func() {
@@ -301,9 +301,9 @@ var _ = Describe("TPS-Listener", func() {
 			})
 		})
 
-		Context("when the receptor is not running", func() {
-			BeforeEach(func() {
-				ginkgomon.Kill(receptorRunner, 5)
+		Context("when the bbs is not running", func() {
+			JustBeforeEach(func() {
+				ginkgomon.Kill(bbsProcess, 5)
 			})
 
 			It("returns internal server error", func() {

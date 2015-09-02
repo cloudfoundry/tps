@@ -8,9 +8,9 @@ import (
 	"net/http/httptest"
 	"time"
 
+	"github.com/cloudfoundry-incubator/bbs/fake_bbs"
+	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
-	"github.com/cloudfoundry-incubator/receptor"
-	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/tps/handler/bulklrpstatus"
 	"github.com/pivotal-golang/clock/fakeclock"
@@ -29,21 +29,21 @@ var _ = Describe("Bulk Status", func() {
 	const logGuid2 = "log-guid2"
 
 	var (
-		handler        http.Handler
-		response       *httptest.ResponseRecorder
-		request        *http.Request
-		receptorClient *fake_receptor.FakeClient
-		logger         *lagertest.TestLogger
-		fakeClock      *fakeclock.FakeClock
+		handler   http.Handler
+		response  *httptest.ResponseRecorder
+		request   *http.Request
+		bbsClient *fake_bbs.FakeClient
+		logger    *lagertest.TestLogger
+		fakeClock *fakeclock.FakeClock
 	)
 
 	BeforeEach(func() {
 		var err error
 
-		receptorClient = new(fake_receptor.FakeClient)
+		bbsClient = new(fake_bbs.FakeClient)
 		logger = lagertest.NewTestLogger("test")
 		fakeClock = fakeclock.NewFakeClock(time.Date(2008, 8, 8, 8, 8, 8, 8, time.UTC))
-		handler = bulklrpstatus.NewHandler(receptorClient, fakeClock, logger)
+		handler = bulklrpstatus.NewHandler(bbsClient, fakeClock, logger)
 		response = httptest.NewRecorder()
 		url := "/v1/bulk_actual_lrp_status"
 		request, err = http.NewRequest("GET", url, nil)
@@ -92,48 +92,38 @@ var _ = Describe("Bulk Status", func() {
 			query.Set("guids", fmt.Sprintf("%s,%s", guid1, guid2))
 			request.URL.RawQuery = query.Encode()
 
-			receptorClient.ActualLRPsByProcessGuidStub = func(processGuid string) ([]receptor.ActualLRPResponse, error) {
-				if processGuid == guid1 {
-					return []receptor.ActualLRPResponse{
-						{
-							Index:   5,
-							State:   receptor.ActualLRPStateRunning,
-							Since:   actualSinceTime,
-							Address: "host1",
-							Ports: []receptor.PortMapping{
-								{
-									ContainerPort: 7890,
-									HostPort:      5432,
-								},
-								{
-									ContainerPort: recipebuilder.DefaultPort,
-									HostPort:      1234,
-								}},
-							InstanceGuid: "instanceId",
-							ProcessGuid:  guid1,
-						},
-					}, nil
-				} else if processGuid == guid2 {
-					return []receptor.ActualLRPResponse{
-						{
-							Index:   6,
-							State:   receptor.ActualLRPStateRunning,
-							Since:   actualSinceTime,
-							Address: "host2",
-							Ports: []receptor.PortMapping{
-								{
-									ContainerPort: 7891,
-									HostPort:      5433,
-								},
-								{
-									ContainerPort: recipebuilder.DefaultPort,
-									HostPort:      1235,
-								}},
-							InstanceGuid: "instanceId",
-							ProcessGuid:  guid2,
-						},
-					}, nil
-				} else {
+			bbsClient.ActualLRPGroupsByProcessGuidStub = func(processGuid string) ([]*models.ActualLRPGroup, error) {
+				switch processGuid {
+
+				case guid1:
+					actualLRP := &models.ActualLRP{
+						ActualLRPKey:         models.NewActualLRPKey(processGuid, 5, "some-domain"),
+						ActualLRPInstanceKey: models.NewActualLRPInstanceKey("instanceId", "some-cell"),
+						ActualLRPNetInfo: models.NewActualLRPNetInfo(
+							"host",
+							models.NewPortMapping(5432, 7890),
+							models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
+						),
+						State: models.ActualLRPStateRunning,
+						Since: actualSinceTime,
+					}
+					return []*models.ActualLRPGroup{{Instance: actualLRP}}, nil
+
+				case guid2:
+					actualLRP := &models.ActualLRP{
+						ActualLRPKey:         models.NewActualLRPKey(processGuid, 6, "some-domain"),
+						ActualLRPInstanceKey: models.NewActualLRPInstanceKey("instanceId", "some-cell"),
+						ActualLRPNetInfo: models.NewActualLRPNetInfo(
+							"host2",
+							models.NewPortMapping(5432, 7890),
+							models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
+						),
+						State: models.ActualLRPStateRunning,
+						Since: actualSinceTime,
+					}
+					return []*models.ActualLRPGroup{{Instance: actualLRP}}, nil
+
+				default:
 					return nil, errors.New("WHAT?")
 				}
 			}
@@ -173,17 +163,29 @@ var _ = Describe("Bulk Status", func() {
 
 		Context("when fetching one of the actualLRPs fails", func() {
 			BeforeEach(func() {
-				receptorClient.ActualLRPsByProcessGuidStub = func(processGuid string) ([]receptor.ActualLRPResponse, error) {
-					if processGuid == guid1 {
-						return []receptor.ActualLRPResponse{
-							{
-								ProcessGuid: guid1,
-							},
-						}, nil
-					} else if processGuid == guid2 {
-						return []receptor.ActualLRPResponse{}, errors.New("boom")
+				bbsClient.ActualLRPGroupsByProcessGuidStub = func(processGuid string) ([]*models.ActualLRPGroup, error) {
+					switch processGuid {
+
+					case guid1:
+						actualLRP := &models.ActualLRP{
+							ActualLRPKey:         models.NewActualLRPKey(processGuid, 5, "some-domain"),
+							ActualLRPInstanceKey: models.NewActualLRPInstanceKey("instanceId", "some-cell"),
+							ActualLRPNetInfo: models.NewActualLRPNetInfo(
+								"host",
+								models.NewPortMapping(5432, 7890),
+								models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
+							),
+							State: models.ActualLRPStateRunning,
+							Since: actualSinceTime,
+						}
+						return []*models.ActualLRPGroup{{Instance: actualLRP}}, nil
+
+					case guid2:
+						return nil, errors.New("boom")
+
+					default:
+						return nil, errors.New("UNEXPECTED GUID YO")
 					}
-					return []receptor.ActualLRPResponse{}, errors.New("UNEXPECTED GUID YO")
 				}
 			})
 

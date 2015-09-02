@@ -8,9 +8,9 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/cloudfoundry-incubator/bbs/fake_bbs"
+	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
-	"github.com/cloudfoundry-incubator/receptor"
-	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstats"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstats/fakes"
@@ -30,23 +30,23 @@ var _ = Describe("Stats", func() {
 	const logGuid = "log-guid"
 
 	var (
-		handler        http.Handler
-		response       *httptest.ResponseRecorder
-		request        *http.Request
-		noaaClient     *fakes.FakeNoaaClient
-		receptorClient *fake_receptor.FakeClient
-		logger         *lagertest.TestLogger
-		fakeClock      *fakeclock.FakeClock
+		handler    http.Handler
+		response   *httptest.ResponseRecorder
+		request    *http.Request
+		noaaClient *fakes.FakeNoaaClient
+		bbsClient  *fake_bbs.FakeClient
+		logger     *lagertest.TestLogger
+		fakeClock  *fakeclock.FakeClock
 	)
 
 	BeforeEach(func() {
 		var err error
 
-		receptorClient = new(fake_receptor.FakeClient)
+		bbsClient = new(fake_bbs.FakeClient)
 		noaaClient = &fakes.FakeNoaaClient{}
 		logger = lagertest.NewTestLogger("test")
 		fakeClock = fakeclock.NewFakeClock(time.Date(2008, 8, 8, 8, 8, 8, 8, time.UTC))
-		handler = lrpstats.NewHandler(receptorClient, noaaClient, fakeClock, logger)
+		handler = lrpstats.NewHandler(bbsClient, noaaClient, fakeClock, logger)
 		response = httptest.NewRecorder()
 		request, err = http.NewRequest("GET", "/v1/actual_lrps/:guid/stats", nil)
 		Expect(err).NotTo(HaveOccurred())
@@ -88,29 +88,25 @@ var _ = Describe("Stats", func() {
 				},
 			}, nil)
 
-			receptorClient.GetDesiredLRPReturns(receptor.DesiredLRPResponse{
+			bbsClient.DesiredLRPByProcessGuidReturns(&models.DesiredLRP{
 				LogGuid:     logGuid,
 				ProcessGuid: guid,
 			}, nil)
 
-			receptorClient.ActualLRPsByProcessGuidReturns([]receptor.ActualLRPResponse{
-				{
-					Index:   5,
-					State:   receptor.ActualLRPStateRunning,
-					Since:   fakeClock.Now().UnixNano(),
-					Address: "host",
-					Ports: []receptor.PortMapping{
-						{
-							ContainerPort: 7890,
-							HostPort:      5432,
-						},
-						{
-							ContainerPort: recipebuilder.DefaultPort,
-							HostPort:      1234,
-						}},
-					InstanceGuid: "instanceId",
-					ProcessGuid:  guid,
-				},
+			actualLRP := &models.ActualLRP{
+				ActualLRPKey:         models.NewActualLRPKey(guid, 5, "some-domain"),
+				ActualLRPInstanceKey: models.NewActualLRPInstanceKey("instanceId", "some-cell"),
+				ActualLRPNetInfo: models.NewActualLRPNetInfo(
+					"host",
+					models.NewPortMapping(5432, 7890),
+					models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
+				),
+				State: models.ActualLRPStateRunning,
+				Since: fakeClock.Now().UnixNano(),
+			}
+
+			bbsClient.ActualLRPGroupsByProcessGuidReturns([]*models.ActualLRPGroup{{
+				Instance: actualLRP},
 			}, nil)
 		})
 
@@ -192,7 +188,7 @@ var _ = Describe("Stats", func() {
 		Context("when fetching the desiredLRP fails", func() {
 			Context("when the desiredLRP is not found", func() {
 				BeforeEach(func() {
-					receptorClient.GetDesiredLRPReturns(receptor.DesiredLRPResponse{}, receptor.Error{Type: receptor.DesiredLRPNotFound})
+					bbsClient.DesiredLRPByProcessGuidReturns(&models.DesiredLRP{}, models.ErrResourceNotFound)
 				})
 
 				It("responds with a 404", func() {
@@ -202,7 +198,7 @@ var _ = Describe("Stats", func() {
 
 			Context("when another type of error occurs", func() {
 				BeforeEach(func() {
-					receptorClient.GetDesiredLRPReturns(receptor.DesiredLRPResponse{}, errors.New("some error"))
+					bbsClient.DesiredLRPByProcessGuidReturns(&models.DesiredLRP{}, errors.New("garbage"))
 				})
 
 				It("responds with a 500", func() {
@@ -213,7 +209,7 @@ var _ = Describe("Stats", func() {
 
 		Context("when fetching actualLRPs fails", func() {
 			BeforeEach(func() {
-				receptorClient.ActualLRPsByProcessGuidReturns(nil, errors.New("bad stuff happened"))
+				bbsClient.ActualLRPGroupsByProcessGuidReturns(nil, errors.New("bad stuff happened"))
 			})
 
 			It("responds with a 500", func() {

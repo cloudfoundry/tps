@@ -10,7 +10,6 @@ import (
 	"github.com/cloudfoundry-incubator/bbs"
 	bbstestrunner "github.com/cloudfoundry-incubator/bbs/cmd/bbs/testrunner"
 	"github.com/cloudfoundry-incubator/consuladapter/consulrunner"
-	receptorrunner "github.com/cloudfoundry-incubator/receptor/cmd/receptor/testrunner"
 	"github.com/cloudfoundry-incubator/tps/cmd/tpsrunner"
 	"github.com/cloudfoundry/storeadapter"
 	"github.com/cloudfoundry/storeadapter/storerunner/etcdstorerunner"
@@ -27,9 +26,6 @@ import (
 )
 
 var (
-	receptorPath string
-	receptorPort int
-
 	trafficControllerAddress string
 	trafficControllerPort    int
 	trafficControllerURL     string
@@ -45,10 +41,9 @@ var (
 
 	listenerPath string
 
-	fakeCC         *ghttp.Server
-	etcdRunner     *etcdstorerunner.ETCDClusterRunner
-	receptorRunner ifrit.Process
-	store          storeadapter.StoreAdapter
+	fakeCC     *ghttp.Server
+	etcdRunner *etcdstorerunner.ETCDClusterRunner
+	store      storeadapter.StoreAdapter
 
 	bbsClient bbs.Client
 	logger    *lagertest.TestLogger
@@ -70,15 +65,11 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	tps, err := gexec.Build("github.com/cloudfoundry-incubator/tps/cmd/tps-listener", "-race")
 	Expect(err).NotTo(HaveOccurred())
 
-	receptor, err := gexec.Build("github.com/cloudfoundry-incubator/receptor/cmd/receptor", "-race")
-	Expect(err).NotTo(HaveOccurred())
-
 	bbs, err := gexec.Build("github.com/cloudfoundry-incubator/bbs/cmd/bbs", "-race")
 	Expect(err).NotTo(HaveOccurred())
 
 	payload, err := json.Marshal(map[string]string{
 		"listener": tps,
-		"receptor": receptor,
 		"bbs":      bbs,
 	})
 	Expect(err).NotTo(HaveOccurred())
@@ -91,7 +82,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(err).NotTo(HaveOccurred())
 
 	etcdPort = 5001 + GinkgoParallelNode()
-	receptorPort = 6001 + GinkgoParallelNode()*2
 	listenerPort = 1518 + GinkgoParallelNode()
 
 	trafficControllerPort = 7001 + GinkgoParallelNode()*2
@@ -101,7 +91,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1, nil)
 
 	listenerPath = string(binaries["listener"])
-	receptorPath = string(binaries["receptor"])
 	store = etcdRunner.Adapter(nil)
 
 	consulRunner = consulrunner.NewClusterRunner(
@@ -142,14 +131,6 @@ var _ = BeforeEach(func() {
 	bbsRunner = bbstestrunner.New(bbsPath, bbsArgs)
 	bbsProcess = ginkgomon.Invoke(bbsRunner)
 
-	receptor := receptorrunner.New(receptorPath, receptorrunner.Args{
-		Address:       fmt.Sprintf("127.0.0.1:%d", receptorPort),
-		BBSAddress:    bbsURL.String(),
-		EtcdCluster:   strings.Join(etcdRunner.NodeURLS(), ","),
-		ConsulCluster: consulRunner.ConsulCluster(),
-	})
-	receptorRunner = ginkgomon.Invoke(receptor)
-
 	fakeCC = ghttp.NewServer()
 
 	listenerAddr = fmt.Sprintf("127.0.0.1:%d", uint16(listenerPort))
@@ -157,7 +138,7 @@ var _ = BeforeEach(func() {
 	runner = tpsrunner.NewListener(
 		string(listenerPath),
 		listenerAddr,
-		fmt.Sprintf("http://127.0.0.1:%d", receptorPort),
+		bbsURL.String(),
 		trafficControllerURL,
 	)
 })
@@ -165,7 +146,6 @@ var _ = BeforeEach(func() {
 var _ = AfterEach(func() {
 	ginkgomon.Kill(bbsProcess)
 	fakeCC.Close()
-	ginkgomon.Kill(receptorRunner, 5)
 	etcdRunner.Stop()
 	consulRunner.Stop()
 })

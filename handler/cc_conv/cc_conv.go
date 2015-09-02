@@ -1,19 +1,19 @@
 package cc_conv
 
 import (
-	"github.com/cloudfoundry-incubator/receptor"
+	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 )
 
-func StateFor(state receptor.ActualLRPState) cc_messages.LRPInstanceState {
+func StateFor(state string) cc_messages.LRPInstanceState {
 	switch state {
-	case receptor.ActualLRPStateUnclaimed:
+	case models.ActualLRPStateUnclaimed:
 		return cc_messages.LRPInstanceStateStarting
-	case receptor.ActualLRPStateClaimed:
+	case models.ActualLRPStateClaimed:
 		return cc_messages.LRPInstanceStateStarting
-	case receptor.ActualLRPStateRunning:
+	case models.ActualLRPStateRunning:
 		return cc_messages.LRPInstanceStateRunning
-	case receptor.ActualLRPStateCrashed:
+	case models.ActualLRPStateCrashed:
 		return cc_messages.LRPInstanceStateCrashed
 	default:
 		return cc_messages.LRPInstanceStateUnknown

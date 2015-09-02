@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/cloudfoundry-incubator/receptor"
+	"github.com/cloudfoundry-incubator/bbs"
 	"github.com/cloudfoundry-incubator/tps"
 	"github.com/cloudfoundry-incubator/tps/handler/bulklrpstatus"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstats"
@@ -14,7 +14,7 @@ import (
 	"github.com/tedsuo/rata"
 )
 
-func New(apiClient receptor.Client, noaaClient lrpstats.NoaaClient, maxInFlight int, logger lager.Logger) (http.Handler, error) {
+func New(apiClient bbs.Client, noaaClient lrpstats.NoaaClient, maxInFlight int, logger lager.Logger) (http.Handler, error) {
 	semaphore := make(chan struct{}, maxInFlight)
 	clock := clock.NewClock()
 

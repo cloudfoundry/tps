@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/cloudfoundry-incubator/receptor"
+	"github.com/cloudfoundry-incubator/bbs"
+	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/tps/handler/cc_conv"
 	"github.com/pivotal-golang/clock"
 	"github.com/pivotal-golang/lager"
@@ -13,12 +14,12 @@ import (
 )
 
 type handler struct {
-	apiClient receptor.Client
+	apiClient bbs.Client
 	clock     clock.Clock
 	logger    lager.Logger
 }
 
-func NewHandler(apiClient receptor.Client, clk clock.Clock, logger lager.Logger) http.Handler {
+func NewHandler(apiClient bbs.Client, clk clock.Clock, logger lager.Logger) http.Handler {
 	return &handler{
 		apiClient: apiClient,
 		clock:     clk,
@@ -31,15 +32,15 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	guid := r.FormValue(":guid")
 
-	actuals, err := handler.apiClient.ActualLRPsByProcessGuid(guid)
+	actualLRPGroups, err := handler.apiClient.ActualLRPGroupsByProcessGuid(guid)
 	if err != nil {
 		lrpLogger.Error("failed-retrieving-lrp-info", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	instances := LRPInstances(actuals,
-		func(instance *cc_messages.LRPInstance, actual *receptor.ActualLRPResponse) {
+	instances := LRPInstances(actualLRPGroups,
+		func(instance *cc_messages.LRPInstance, actual *models.ActualLRP) {
 			instance.Details = actual.PlacementError
 		},
 		handler.clock,
@@ -52,12 +53,14 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func LRPInstances(
-	actualLRPs []receptor.ActualLRPResponse,
-	addInfo func(*cc_messages.LRPInstance, *receptor.ActualLRPResponse),
+	actualLRPGroups []*models.ActualLRPGroup,
+	addInfo func(*cc_messages.LRPInstance, *models.ActualLRP),
 	clk clock.Clock,
 ) []cc_messages.LRPInstance {
-	instances := make([]cc_messages.LRPInstance, len(actualLRPs))
-	for i, actual := range actualLRPs {
+	instances := make([]cc_messages.LRPInstance, len(actualLRPGroups))
+	for i, actualLRPGroup := range actualLRPGroups {
+		actual, _ := actualLRPGroup.Resolve()
+
 		instance := cc_messages.LRPInstance{
 			ProcessGuid:  actual.ProcessGuid,
 			InstanceGuid: actual.InstanceGuid,
@@ -68,7 +71,7 @@ func LRPInstances(
 		}
 
 		if addInfo != nil {
-			addInfo(&instance, &actual)
+			addInfo(&instance, actual)
 		}
 
 		instances[i] = instance

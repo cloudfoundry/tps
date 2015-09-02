@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/cloudfoundry-incubator/bbs"
+	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
-	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
 	"github.com/cloudfoundry/sonde-go/events"
@@ -20,14 +21,14 @@ type NoaaClient interface {
 }
 
 type handler struct {
-	receptorClient receptor.Client
-	noaaClient     NoaaClient
-	clock          clock.Clock
-	logger         lager.Logger
+	bbsClient  bbs.Client
+	noaaClient NoaaClient
+	clock      clock.Clock
+	logger     lager.Logger
 }
 
-func NewHandler(receptorClient receptor.Client, noaaClient NoaaClient, clk clock.Clock, logger lager.Logger) http.Handler {
-	return &handler{receptorClient: receptorClient, noaaClient: noaaClient, clock: clk, logger: logger}
+func NewHandler(bbsClient bbs.Client, noaaClient NoaaClient, clk clock.Clock, logger lager.Logger) http.Handler {
+	return &handler{bbsClient: bbsClient, noaaClient: noaaClient, clock: clk, logger: logger}
 }
 
 func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -43,19 +44,19 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	desiredLRP, err := handler.receptorClient.GetDesiredLRP(guid)
+	desiredLRP, err := handler.bbsClient.DesiredLRPByProcessGuid(guid)
 	if err != nil {
 		handler.logger.Error("fetching-desired-lrp-failed", err, lager.Data{"ProcessGuid": guid})
-
-		if e, ok := err.(receptor.Error); ok && e.Type == receptor.DesiredLRPNotFound {
+		switch models.ConvertError(err).Type {
+		case models.Error_ResourceNotFound:
 			w.WriteHeader(http.StatusNotFound)
-		} else {
+		default:
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 		return
 	}
 
-	actualLRPs, err := handler.receptorClient.ActualLRPsByProcessGuid(guid)
+	actualLRPs, err := handler.bbsClient.ActualLRPGroupsByProcessGuid(guid)
 	if err != nil {
 		handler.logger.Error("fetching-actual-lrp-info-failed", err, lager.Data{"ProcessGuid": guid})
 		w.WriteHeader(http.StatusInternalServerError)
@@ -83,7 +84,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	instances := lrpstatus.LRPInstances(actualLRPs,
-		func(instance *cc_messages.LRPInstance, actual *receptor.ActualLRPResponse) {
+		func(instance *cc_messages.LRPInstance, actual *models.ActualLRP) {
 			instance.Host = actual.Address
 			instance.Port = getDefaultPort(actual.Ports)
 			stats := metricsByInstanceIndex[uint(actual.Index)]
@@ -101,10 +102,10 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getDefaultPort(mappings []receptor.PortMapping) uint16 {
+func getDefaultPort(mappings []*models.PortMapping) uint16 {
 	for _, mapping := range mappings {
-		if mapping.ContainerPort == recipebuilder.DefaultPort {
-			return mapping.HostPort
+		if uint16(mapping.ContainerPort) == recipebuilder.DefaultPort {
+			return uint16(mapping.HostPort)
 		}
 	}
 

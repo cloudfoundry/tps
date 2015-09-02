@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/cloudfoundry-incubator/bbs"
 	"github.com/cloudfoundry-incubator/cf-debug-server"
 	"github.com/cloudfoundry-incubator/cf-lager"
-	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry/dropsonde"
 	"github.com/cloudfoundry/noaa"
@@ -25,10 +25,10 @@ var listenAddr = flag.String(
 	"listening address of api server",
 )
 
-var diegoAPIURL = flag.String(
-	"diegoAPIURL",
+var bbsAddress = flag.String(
+	"bbsAddress",
 	"",
-	"URL of diego API",
+	"Address to the BBS Server",
 )
 
 var trafficControllerURL = flag.String(
@@ -61,10 +61,10 @@ func main() {
 
 	logger, reconfigurableSink := cf_lager.New("tps-listener")
 	initializeDropsonde(logger)
-	receptorClient := receptor.NewClient(*diegoAPIURL)
+	bbsClient := bbs.NewClient(*bbsAddress)
 	noaaClient := noaa.NewConsumer(*trafficControllerURL, &tls.Config{InsecureSkipVerify: *skipSSLVerification}, nil)
 	defer noaaClient.Close()
-	apiHandler := initializeHandler(logger, noaaClient, *maxInFlightRequests, receptorClient)
+	apiHandler := initializeHandler(logger, noaaClient, *maxInFlightRequests, bbsClient)
 
 	members := grouper.Members{
 		{"api", http_server.New(*listenAddr, apiHandler)},
@@ -98,7 +98,7 @@ func initializeDropsonde(logger lager.Logger) {
 	}
 }
 
-func initializeHandler(logger lager.Logger, noaaClient *noaa.Consumer, maxInFlight int, apiClient receptor.Client) http.Handler {
+func initializeHandler(logger lager.Logger, noaaClient *noaa.Consumer, maxInFlight int, apiClient bbs.Client) http.Handler {
 	apiHandler, err := handler.New(apiClient, noaaClient, maxInFlight, logger)
 	if err != nil {
 		logger.Fatal("initialize-handler.failed", err)

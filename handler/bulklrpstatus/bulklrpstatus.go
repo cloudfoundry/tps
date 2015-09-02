@@ -7,7 +7,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/cloudfoundry-incubator/receptor"
+	"github.com/cloudfoundry-incubator/bbs"
+	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
 	"github.com/cloudfoundry/gunk/workpool"
@@ -20,13 +21,13 @@ const MAX_STAT_WORKPOOL_SIZE = 15
 var processGuidPattern = regexp.MustCompile(`^([a-zA-Z0-9_-]+,)*[a-zA-Z0-9_-]+$`)
 
 type handler struct {
-	receptorClient receptor.Client
-	clock          clock.Clock
-	logger         lager.Logger
+	bbsClient bbs.Client
+	clock     clock.Clock
+	logger    lager.Logger
 }
 
-func NewHandler(receptorClient receptor.Client, clk clock.Clock, logger lager.Logger) http.Handler {
-	return &handler{receptorClient: receptorClient, clock: clk, logger: logger}
+func NewHandler(bbsClient bbs.Client, clk clock.Clock, logger lager.Logger) http.Handler {
+	return &handler{bbsClient: bbsClient, clock: clk, logger: logger}
 }
 
 func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -67,14 +68,14 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (handler *handler) getStatusForLRPWorkFunction(processGuid string, statusLock *sync.Mutex, statusBundle map[string][]cc_messages.LRPInstance) func() {
 	return func() {
-		actualLRPs, err := handler.receptorClient.ActualLRPsByProcessGuid(processGuid)
+		actualLRPGroups, err := handler.bbsClient.ActualLRPGroupsByProcessGuid(processGuid)
 		if err != nil {
 			handler.logger.Error("fetching-actual-lrps-info-failed", err, lager.Data{"ProcessGuid": processGuid})
 			return
 		}
 
-		instances := lrpstatus.LRPInstances(actualLRPs,
-			func(instance *cc_messages.LRPInstance, actual *receptor.ActualLRPResponse) {
+		instances := lrpstatus.LRPInstances(actualLRPGroups,
+			func(instance *cc_messages.LRPInstance, actual *models.ActualLRP) {
 				instance.Details = actual.PlacementError
 			},
 			handler.clock,
