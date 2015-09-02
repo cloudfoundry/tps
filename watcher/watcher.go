@@ -5,7 +5,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/cloudfoundry-incubator/receptor"
+	"github.com/cloudfoundry-incubator/bbs"
+	"github.com/cloudfoundry-incubator/bbs/events"
+	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/tps/cc_client"
 	"github.com/cloudfoundry/gunk/workpool"
@@ -13,16 +15,16 @@ import (
 )
 
 type Watcher struct {
-	receptorClient receptor.Client
-	ccClient       cc_client.CcClient
-	logger         lager.Logger
+	bbsClient bbs.Client
+	ccClient  cc_client.CcClient
+	logger    lager.Logger
 
 	pool *workpool.WorkPool
 }
 
 func NewWatcher(
 	logger lager.Logger,
-	receptorClient receptor.Client,
+	bbsClient bbs.Client,
 	ccClient cc_client.CcClient,
 ) (*Watcher, error) {
 	workPool, err := workpool.NewWorkPool(500)
@@ -31,9 +33,9 @@ func NewWatcher(
 	}
 
 	return &Watcher{
-		receptorClient: receptorClient,
-		ccClient:       ccClient,
-		logger:         logger.Session("watcher"),
+		bbsClient: bbsClient,
+		ccClient:  ccClient,
+		logger:    logger.Session("watcher"),
 
 		pool: workPool,
 	}, nil
@@ -46,21 +48,21 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 	watcher.logger.Info("started")
 	defer watcher.logger.Info("finished")
 
-	eventChan := make(chan receptor.Event)
+	eventChan := make(chan models.Event)
 
 	var eventSource atomic.Value
 	var stopEventSource int32
 
 	go func() {
 		var err error
-		var es receptor.EventSource
+		var es events.EventSource
 
 		for {
 			if atomic.LoadInt32(&stopEventSource) == 1 {
 				return
 			}
 
-			es, err = watcher.receptorClient.SubscribeToEvents()
+			es, err = watcher.bbsClient.SubscribeToEvents()
 			if err != nil {
 				watcher.logger.Error("failed-subscribing-to-events", err)
 				continue
@@ -68,7 +70,7 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 
 			eventSource.Store(es)
 
-			var event receptor.Event
+			var event models.Event
 			for {
 				event, err = es.Next()
 				if err != nil {
@@ -94,7 +96,7 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 			watcher.logger.Info("stopping")
 			atomic.StoreInt32(&stopEventSource, 1)
 			if es := eventSource.Load(); es != nil {
-				err := es.(receptor.EventSource).Close()
+				err := es.(events.EventSource).Close()
 				if err != nil {
 					watcher.logger.Error("failed-closing-event-source", err)
 				}
@@ -104,23 +106,27 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 	}
 }
 
-func (watcher *Watcher) handleEvent(logger lager.Logger, event receptor.Event) {
-	if changed, ok := event.(receptor.ActualLRPChangedEvent); ok {
-		if changed.After.Domain == cc_messages.AppLRPDomain {
-			if changed.After.CrashCount > changed.Before.CrashCount {
+func (watcher *Watcher) handleEvent(logger lager.Logger, event models.Event) {
+	if changed, ok := event.(*models.ActualLRPChangedEvent); ok {
+		after, _ := changed.After.Resolve()
+
+		if after.Domain == cc_messages.AppLRPDomain {
+			before, _ := changed.Before.Resolve()
+
+			if after.CrashCount > before.CrashCount {
 				logger.Info("app-crashed", lager.Data{
-					"process-guid": changed.After.ProcessGuid,
-					"index":        changed.After.Index,
+					"process-guid": after.ProcessGuid,
+					"index":        after.Index,
 				})
 
-				guid := changed.After.ProcessGuid
+				guid := after.ProcessGuid
 				appCrashed := cc_messages.AppCrashedRequest{
-					Instance:        changed.Before.InstanceGuid,
-					Index:           changed.After.Index,
+					Instance:        before.InstanceGuid,
+					Index:           int(after.Index),
 					Reason:          "CRASHED",
-					ExitDescription: changed.After.CrashReason,
-					CrashCount:      changed.After.CrashCount,
-					CrashTimestamp:  changed.After.Since,
+					ExitDescription: after.CrashReason,
+					CrashCount:      int(after.CrashCount),
+					CrashTimestamp:  after.Since,
 				}
 
 				watcher.pool.Submit(func() {
@@ -128,7 +134,7 @@ func (watcher *Watcher) handleEvent(logger lager.Logger, event receptor.Event) {
 					if err != nil {
 						logger.Info("failed-app-crashed", lager.Data{
 							"process-guid": guid,
-							"index":        changed.After.Index,
+							"index":        after.Index,
 							"error":        err,
 						})
 					}

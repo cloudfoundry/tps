@@ -20,12 +20,12 @@ func NewListener(bin, listenAddr, bbsAddress, trafficControllerURL string) *gink
 	})
 }
 
-func NewWatcher(bin, diegoAPIURL, ccBaseURL, consulCluster string) *ginkgomon.Runner {
+func NewWatcher(bin, bbsAddress, ccBaseURL, consulCluster string) *ginkgomon.Runner {
 	return ginkgomon.New(ginkgomon.Config{
 		Name: "tps-watcher",
 		Command: exec.Command(
 			bin,
-			"-diegoAPIURL", diegoAPIURL,
+			"-bbsAddress", bbsAddress,
 			"-ccBaseURL", ccBaseURL,
 			"-lockRetryInterval", "1s",
 			"-consulCluster", consulCluster,

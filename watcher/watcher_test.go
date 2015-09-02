@@ -6,8 +6,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/cloudfoundry-incubator/receptor"
-	"github.com/cloudfoundry-incubator/receptor/fake_receptor"
+	"github.com/cloudfoundry-incubator/bbs/events"
+	"github.com/cloudfoundry-incubator/bbs/events/eventfakes"
+	"github.com/cloudfoundry-incubator/bbs/fake_bbs"
+	"github.com/cloudfoundry-incubator/bbs/models"
+	"github.com/cloudfoundry-incubator/bbs/models/test/model_helpers"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/tps/cc_client/fakes"
 	"github.com/cloudfoundry-incubator/tps/watcher"
@@ -20,7 +23,7 @@ import (
 )
 
 type EventHolder struct {
-	event receptor.Event
+	event models.Event
 }
 
 var nilEventHolder = EventHolder{}
@@ -28,11 +31,11 @@ var nilEventHolder = EventHolder{}
 var _ = Describe("Watcher", func() {
 
 	var (
-		eventSource    *fake_receptor.FakeEventSource
-		receptorClient *fake_receptor.FakeClient
-		ccClient       *fakes.FakeCcClient
-		watcherRunner  *watcher.Watcher
-		process        ifrit.Process
+		eventSource   *eventfakes.FakeEventSource
+		bbsClient     *fake_bbs.FakeClient
+		ccClient      *fakes.FakeCcClient
+		watcherRunner *watcher.Watcher
+		process       ifrit.Process
 
 		logger *lagertest.TestLogger
 
@@ -41,15 +44,15 @@ var _ = Describe("Watcher", func() {
 	)
 
 	BeforeEach(func() {
-		eventSource = new(fake_receptor.FakeEventSource)
-		receptorClient = new(fake_receptor.FakeClient)
-		receptorClient.SubscribeToEventsReturns(eventSource, nil)
+		eventSource = new(eventfakes.FakeEventSource)
+		bbsClient = new(fake_bbs.FakeClient)
+		bbsClient.SubscribeToEventsReturns(eventSource, nil)
 
 		logger = lagertest.NewTestLogger("test")
 		ccClient = new(fakes.FakeCcClient)
 
 		var err error
-		watcherRunner, err = watcher.NewWatcher(logger, receptorClient, ccClient)
+		watcherRunner, err = watcher.NewWatcher(logger, bbsClient, ccClient)
 		Expect(err).NotTo(HaveOccurred())
 
 		nextErr = atomic.Value{}
@@ -61,7 +64,7 @@ var _ = Describe("Watcher", func() {
 			return nil
 		}
 
-		eventSource.NextStub = func() (receptor.Event, error) {
+		eventSource.NextStub = func() (models.Event, error) {
 			time.Sleep(10 * time.Millisecond)
 			if eventHolder := nextEvent.Load(); eventHolder != nilEventHolder {
 				nextEvent.Store(nilEventHolder)
@@ -90,23 +93,23 @@ var _ = Describe("Watcher", func() {
 	})
 
 	Describe("Actual LRP changes", func() {
-		var before receptor.ActualLRPResponse
-		var after receptor.ActualLRPResponse
+		var before *models.ActualLRPGroup
+		var after *models.ActualLRPGroup
 
 		BeforeEach(func() {
-			before = receptor.ActualLRPResponse{ProcessGuid: "process-guid", InstanceGuid: "instance-guid", Index: 1, Since: 2, CrashCount: 0, Domain: cc_messages.AppLRPDomain}
-			after = receptor.ActualLRPResponse{ProcessGuid: "process-guid", InstanceGuid: "instance-guid", Index: 1, Since: 3, CrashCount: 0, Domain: cc_messages.AppLRPDomain}
+			before = makeActualLRPGroup("process-guid", "instance-guid", 1, 2, 0, cc_messages.AppLRPDomain)
+			after = makeActualLRPGroup("process-guid", "instance-guid", 1, 3, 0, cc_messages.AppLRPDomain)
 		})
 
 		JustBeforeEach(func() {
-			nextEvent.Store(EventHolder{receptor.NewActualLRPChangedEvent(before, after)})
+			nextEvent.Store(EventHolder{models.NewActualLRPChangedEvent(before, after)})
 		})
 
 		Context("when the crash count changes", func() {
 			Context("and after > before", func() {
 				BeforeEach(func() {
-					after.CrashCount = 1
-					after.CrashReason = "out of memory"
+					after.Instance.CrashCount = 1
+					after.Instance.CrashReason = "out of memory"
 				})
 
 				Context("and the application has the cc-app Domain", func() {
@@ -128,18 +131,18 @@ var _ = Describe("Watcher", func() {
 				})
 
 				Context("and the application does not have the cc-app Domain", func() {
-					var otherBefore receptor.ActualLRPResponse
-					var otherAfter receptor.ActualLRPResponse
+					var otherBefore *models.ActualLRPGroup
+					var otherAfter *models.ActualLRPGroup
 
 					BeforeEach(func() {
-						otherBefore = receptor.ActualLRPResponse{ProcessGuid: "other-process-guid", InstanceGuid: "instance-guid", Index: 1, Since: 2, CrashCount: 0}
-						otherAfter = receptor.ActualLRPResponse{ProcessGuid: "other-process-guid", InstanceGuid: "instance-guid", Index: 1, Since: 3, CrashCount: 1}
+						otherBefore = makeActualLRPGroup("other-process-guid", "instance-guid", 1, 2, 0, "")
+						otherAfter = makeActualLRPGroup("other-process-guid", "instance-guid", 1, 3, 1, "")
 
-						event := EventHolder{receptor.NewActualLRPChangedEvent(before, after)}
-						otherEvent := EventHolder{receptor.NewActualLRPChangedEvent(otherBefore, otherAfter)}
+						event := EventHolder{models.NewActualLRPChangedEvent(before, after)}
+						otherEvent := EventHolder{models.NewActualLRPChangedEvent(otherBefore, otherAfter)}
 						events := []EventHolder{otherEvent, event}
 
-						eventSource.NextStub = func() (receptor.Event, error) {
+						eventSource.NextStub = func() (models.Event, error) {
 							var e EventHolder
 							time.Sleep(10 * time.Millisecond)
 							if len(events) == 0 {
@@ -161,7 +164,7 @@ var _ = Describe("Watcher", func() {
 
 			Context("and after < before", func() {
 				BeforeEach(func() {
-					before.CrashCount = 1
+					before.Instance.CrashCount = 1
 				})
 
 				It("does not call AppCrashed", func() {
@@ -181,7 +184,7 @@ var _ = Describe("Watcher", func() {
 		Context("when its not ActualLRPChanged event", func() {
 
 			BeforeEach(func() {
-				nextEvent.Store(EventHolder{receptor.ActualLRPCreatedEvent{}})
+				nextEvent.Store(EventHolder{&models.ActualLRPCreatedEvent{}})
 			})
 
 			It("does not emit any more messages", func() {
@@ -194,22 +197,22 @@ var _ = Describe("Watcher", func() {
 		var subscribeErr error
 
 		BeforeEach(func() {
-			subscribeErr = errors.New("subscribe-error")
+			subscribeErr = models.ErrUnknownError
 
-			receptorClient.SubscribeToEventsStub = func() (receptor.EventSource, error) {
-				if receptorClient.SubscribeToEventsCallCount() == 1 {
+			bbsClient.SubscribeToEventsStub = func() (events.EventSource, error) {
+				if bbsClient.SubscribeToEventsCallCount() == 1 {
 					return eventSource, nil
 				}
 				return nil, subscribeErr
 			}
 
-			eventSource.NextStub = func() (receptor.Event, error) {
+			eventSource.NextStub = func() (models.Event, error) {
 				return nil, errors.New("next-error")
 			}
 		})
 
 		It("re-subscribes", func() {
-			Eventually(receptorClient.SubscribeToEventsCallCount, 2*time.Second).Should(BeNumerically(">", 1))
+			Eventually(bbsClient.SubscribeToEventsCallCount, 2*time.Second).Should(BeNumerically(">", 1))
 		})
 
 		Context("when re-subscribing fails", func() {
@@ -227,3 +230,13 @@ var _ = Describe("Watcher", func() {
 	})
 
 })
+
+func makeActualLRPGroup(processGuid, instanceGuid string, index, since, crashCount int32, domain string) *models.ActualLRPGroup {
+	lrp := model_helpers.NewValidActualLRP(processGuid, index)
+	lrp.InstanceGuid = instanceGuid
+	lrp.Since = int64(since)
+	lrp.CrashCount = crashCount
+	lrp.Domain = domain
+
+	return &models.ActualLRPGroup{Instance: lrp}
+}

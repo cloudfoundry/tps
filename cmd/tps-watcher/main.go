@@ -4,11 +4,11 @@ import (
 	"flag"
 	"os"
 
+	"github.com/cloudfoundry-incubator/bbs"
 	"github.com/cloudfoundry-incubator/cf-debug-server"
 	"github.com/cloudfoundry-incubator/cf-lager"
 	"github.com/cloudfoundry-incubator/consuladapter"
-	"github.com/cloudfoundry-incubator/receptor"
-	"github.com/cloudfoundry-incubator/runtime-schema/bbs"
+	legacybbs "github.com/cloudfoundry-incubator/runtime-schema/bbs"
 	"github.com/cloudfoundry-incubator/runtime-schema/bbs/lock_bbs"
 	"github.com/cloudfoundry-incubator/tps/cc_client"
 	"github.com/cloudfoundry-incubator/tps/watcher"
@@ -21,10 +21,10 @@ import (
 	"github.com/tedsuo/ifrit/sigmon"
 )
 
-var diegoAPIURL = flag.String(
-	"diegoAPIURL",
+var bbsAddress = flag.String(
+	"bbsAddress",
 	"",
-	"URL of diego API",
+	"Address to the BBS Server",
 )
 
 var consulCluster = flag.String(
@@ -82,13 +82,13 @@ func main() {
 	logger, reconfigurableSink := cf_lager.New("tps-watcher")
 	initializeDropsonde(logger)
 
-	receptorClient := receptor.NewClient(*diegoAPIURL)
+	bbsClient := bbs.NewClient(*bbsAddress)
 	lockMaintainer := initializeLockMaintainer(logger)
 
 	ccClient := cc_client.NewCcClient(*ccBaseURL, *ccUsername, *ccPassword, *skipCertVerify)
 
 	watcher := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
-		w, err := watcher.NewWatcher(logger, receptorClient, ccClient)
+		w, err := watcher.NewWatcher(logger, bbsClient, ccClient)
 		if err != nil {
 			return err
 		}
@@ -129,7 +129,7 @@ func initializeDropsonde(logger lager.Logger) {
 	}
 }
 
-func initializeTPSBBS(logger lager.Logger) bbs.TpsBBS {
+func initializeTPSBBS(logger lager.Logger) legacybbs.TpsBBS {
 	client, err := consuladapter.NewClient(*consulCluster)
 	if err != nil {
 		logger.Fatal("new-client-failed", err)
@@ -141,7 +141,7 @@ func initializeTPSBBS(logger lager.Logger) bbs.TpsBBS {
 		logger.Fatal("consul-session-failed", err)
 	}
 
-	return bbs.NewTpsBBS(consulSession, clock.NewClock(), logger)
+	return legacybbs.NewTpsBBS(consulSession, clock.NewClock(), logger)
 }
 
 func initializeLockMaintainer(logger lager.Logger) ifrit.Runner {

@@ -15,7 +15,6 @@ import (
 
 	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/consuladapter"
-	"github.com/cloudfoundry-incubator/receptor"
 	"github.com/cloudfoundry-incubator/runtime-schema/bbs/shared"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 )
@@ -75,13 +74,13 @@ var _ = Describe("TPS", func() {
 			watcher, _ = startWatcher(true)
 			domain = cc_messages.AppLRPDomain
 
-			desiredLRP := receptor.DesiredLRPCreateRequest{
+			desiredLRP := &models.DesiredLRP{
 				Domain:      domain,
 				ProcessGuid: "some-process-guid",
 				Instances:   3,
-				RootFS:      "some:rootfs",
-				MemoryMB:    1024,
-				DiskMB:      512,
+				RootFs:      "some:rootfs",
+				MemoryMb:    1024,
+				DiskMb:      512,
 				LogGuid:     "some-log-guid",
 				Action: models.WrapAction(&models.RunAction{
 					User: "me",
@@ -89,7 +88,7 @@ var _ = Describe("TPS", func() {
 				}),
 			}
 
-			err := receptorClient.CreateDesiredLRP(desiredLRP)
+			err := bbsClient.DesireLRP(desiredLRP)
 			Expect(err).NotTo(HaveOccurred())
 
 			lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, domain)
