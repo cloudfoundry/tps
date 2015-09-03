@@ -104,7 +104,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func getDefaultPort(mappings []*models.PortMapping) uint16 {
 	for _, mapping := range mappings {
-		if uint16(mapping.ContainerPort) == recipebuilder.DefaultPort {
+		if mapping.ContainerPort == recipebuilder.DefaultPort {
 			return uint16(mapping.HostPort)
 		}
 	}
