@@ -104,5 +104,5 @@ func initializeHandler(logger lager.Logger, noaaClient *noaa.Consumer, maxInFlig
 		logger.Fatal("initialize-handler.failed", err)
 	}
 
-	return dropsonde.InstrumentedHandler(apiHandler)
+	return apiHandler
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/cloudfoundry-incubator/tps/handler/bulklrpstatus"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstats"
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstatus"
-	"github.com/cloudfoundry/dropsonde"
 	"github.com/pivotal-golang/clock"
 	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/rata"
@@ -57,8 +56,6 @@ func (handler tpsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func logWrap(handler http.Handler, logger lager.Logger) http.HandlerFunc {
-	handler = dropsonde.InstrumentedHandler(handler)
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		requestLog := logger.Session("request", lager.Data{
 			"method":  r.Method,
