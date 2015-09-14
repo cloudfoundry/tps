@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"net/url"
 	"os"
 
 	"github.com/cloudfoundry-incubator/bbs"
@@ -68,6 +69,24 @@ var skipCertVerify = flag.Bool(
 	"skip SSL certificate verification",
 )
 
+var bbsCACert = flag.String(
+	"bbsCACert",
+	"",
+	"path to certificate authority cert used for mutually authenticated TLS BBS communication",
+)
+
+var bbsClientCert = flag.String(
+	"bbsClientCert",
+	"",
+	"path to client cert used for mutually authenticated TLS BBS communication",
+)
+
+var bbsClientKey = flag.String(
+	"bbsClientKey",
+	"",
+	"path to client key used for mutually authenticated TLS BBS communication",
+)
+
 const (
 	dropsondeOrigin      = "tps_watcher"
 	dropsondeDestination = "localhost:3457"
@@ -81,13 +100,12 @@ func main() {
 	logger, reconfigurableSink := cf_lager.New("tps-watcher")
 	initializeDropsonde(logger)
 
-	bbsClient := bbs.NewClient(*bbsAddress)
 	lockMaintainer := initializeLockMaintainer(logger)
 
 	ccClient := cc_client.NewCcClient(*ccBaseURL, *ccUsername, *ccPassword, *skipCertVerify)
 
 	watcher := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
-		w, err := watcher.NewWatcher(logger, bbsClient, ccClient)
+		w, err := watcher.NewWatcher(logger, initializeBBSClient(logger), ccClient)
 		if err != nil {
 			return err
 		}
@@ -152,4 +170,21 @@ func initializeLockMaintainer(logger lager.Logger) ifrit.Runner {
 	}
 
 	return locketClient.NewTpsWatcherLock(uuid.String(), *lockRetryInterval)
+}
+
+func initializeBBSClient(logger lager.Logger) bbs.Client {
+	bbsURL, err := url.Parse(*bbsAddress)
+	if err != nil {
+		logger.Fatal("Invalid BBS URL", err)
+	}
+
+	if bbsURL.Scheme != "https" {
+		return bbs.NewClient(*bbsAddress)
+	}
+
+	bbsClient, err := bbs.NewSecureClient(*bbsAddress, *bbsCACert, *bbsClientCert, *bbsClientKey)
+	if err != nil {
+		logger.Fatal("Failed to configure secure BBS client", err)
+	}
+	return bbsClient
 }
