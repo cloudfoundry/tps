@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/cloudfoundry-incubator/bbs"
@@ -49,6 +50,24 @@ var maxInFlightRequests = flag.Int(
 	"number of requests to handle at a time; any more will receive 503",
 )
 
+var bbsCACert = flag.String(
+	"bbsCACert",
+	"",
+	"path to certificate authority cert used for mutually authenticated TLS BBS communication",
+)
+
+var bbsClientCert = flag.String(
+	"bbsClientCert",
+	"",
+	"path to client cert used for mutually authenticated TLS BBS communication",
+)
+
+var bbsClientKey = flag.String(
+	"bbsClientKey",
+	"",
+	"path to client key used for mutually authenticated TLS BBS communication",
+)
+
 const (
 	dropsondeDestination = "localhost:3457"
 	dropsondeOrigin      = "tps_listener"
@@ -61,10 +80,9 @@ func main() {
 
 	logger, reconfigurableSink := cf_lager.New("tps-listener")
 	initializeDropsonde(logger)
-	bbsClient := bbs.NewClient(*bbsAddress)
 	noaaClient := noaa.NewConsumer(*trafficControllerURL, &tls.Config{InsecureSkipVerify: *skipSSLVerification}, nil)
 	defer noaaClient.Close()
-	apiHandler := initializeHandler(logger, noaaClient, *maxInFlightRequests, bbsClient)
+	apiHandler := initializeHandler(logger, noaaClient, *maxInFlightRequests, initializeBBSClient(logger))
 
 	members := grouper.Members{
 		{"api", http_server.New(*listenAddr, apiHandler)},
@@ -105,4 +123,21 @@ func initializeHandler(logger lager.Logger, noaaClient *noaa.Consumer, maxInFlig
 	}
 
 	return apiHandler
+}
+
+func initializeBBSClient(logger lager.Logger) bbs.Client {
+	bbsURL, err := url.Parse(*bbsAddress)
+	if err != nil {
+		logger.Fatal("Invalid BBS URL", err)
+	}
+
+	if bbsURL.Scheme != "https" {
+		return bbs.NewClient(*bbsAddress)
+	}
+
+	bbsClient, err := bbs.NewSecureClient(*bbsAddress, *bbsCACert, *bbsClientCert, *bbsClientKey)
+	if err != nil {
+		logger.Fatal("Failed to configure secure BBS client", err)
+	}
+	return bbsClient
 }
