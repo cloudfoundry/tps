@@ -15,7 +15,7 @@ import (
 
 	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/consuladapter"
-	"github.com/cloudfoundry-incubator/runtime-schema/bbs/shared"
+	"github.com/cloudfoundry-incubator/locket"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 )
 
@@ -133,7 +133,7 @@ var _ = Describe("TPS", func() {
 
 		BeforeEach(func() {
 			otherSession = consulRunner.NewSession("other-Session")
-			err := otherSession.AcquireLock(shared.LockSchemaPath(watcherLockName), []byte("something-else"))
+			err := otherSession.AcquireLock(locket.LockSchemaPath(watcherLockName), []byte("something-else"))
 			Expect(err).NotTo(HaveOccurred())
 		})
 
