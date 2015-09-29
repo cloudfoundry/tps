@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry-incubator/cf-lager"
 	"github.com/cloudfoundry-incubator/consuladapter"
 	"github.com/cloudfoundry-incubator/locket"
+	"github.com/cloudfoundry-incubator/tps"
 	"github.com/cloudfoundry-incubator/tps/cc_client"
 	"github.com/cloudfoundry-incubator/tps/watcher"
 	"github.com/cloudfoundry/dropsonde"
@@ -158,7 +159,7 @@ func initializeDropsonde(logger lager.Logger) {
 	}
 }
 
-func initializeLocket(logger lager.Logger) locket.Client {
+func initializeServiceClient(logger lager.Logger) tps.ServiceClient {
 	client, err := consuladapter.NewClient(*consulCluster)
 	if err != nil {
 		logger.Fatal("new-client-failed", err)
@@ -170,18 +171,18 @@ func initializeLocket(logger lager.Logger) locket.Client {
 		logger.Fatal("consul-session-failed", err)
 	}
 
-	return locket.NewClient(consulSession, clock.NewClock(), logger)
+	return tps.NewServiceClient(consulSession, clock.NewClock())
 }
 
 func initializeLockMaintainer(logger lager.Logger) ifrit.Runner {
-	locketClient := initializeLocket(logger)
+	serviceClient := initializeServiceClient(logger)
 
 	uuid, err := uuid.NewV4()
 	if err != nil {
 		logger.Fatal("Couldn't generate uuid", err)
 	}
 
-	return locketClient.NewTpsWatcherLock(uuid.String(), *lockRetryInterval)
+	return serviceClient.NewTPSWatcherLockRunner(logger, uuid.String(), *lockRetryInterval)
 }
 
 func initializeBBSClient(logger lager.Logger) bbs.Client {
