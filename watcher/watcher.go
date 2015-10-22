@@ -35,18 +35,19 @@ func NewWatcher(
 	return &Watcher{
 		bbsClient: bbsClient,
 		ccClient:  ccClient,
-		logger:    logger.Session("watcher"),
+		logger:    logger,
 
 		pool: workPool,
 	}, nil
 }
 
 func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) error {
-	watcher.logger.Info("starting")
+	logger := watcher.logger.Session("watcher")
+	logger.Info("starting")
 
 	close(ready)
-	watcher.logger.Info("started")
-	defer watcher.logger.Info("finished")
+	logger.Info("started")
+	defer logger.Info("finished")
 
 	eventChan := make(chan models.Event)
 
@@ -62,9 +63,10 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 				return
 			}
 
+			logger.Info("subscribing-to-events")
 			es, err = watcher.bbsClient.SubscribeToEvents()
 			if err != nil {
-				watcher.logger.Error("failed-subscribing-to-events", err)
+				logger.Error("failed-subscribing-to-events", err)
 				continue
 			}
 
@@ -74,7 +76,7 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 			for {
 				event, err = es.Next()
 				if err != nil {
-					watcher.logger.Error("failed-getting-next-event", err)
+					logger.Error("failed-getting-next-event", err)
 					// wait a bit before retrying
 					time.Sleep(time.Second)
 					break
@@ -90,15 +92,15 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 	for {
 		select {
 		case event := <-eventChan:
-			watcher.handleEvent(watcher.logger, event)
+			watcher.handleEvent(logger, event)
 
 		case <-signals:
-			watcher.logger.Info("stopping")
+			logger.Info("stopping")
 			atomic.StoreInt32(&stopEventSource, 1)
 			if es := eventSource.Load(); es != nil {
 				err := es.(events.EventSource).Close()
 				if err != nil {
-					watcher.logger.Error("failed-closing-event-source", err)
+					logger.Error("failed-closing-event-source", err)
 				}
 			}
 			return nil
@@ -130,13 +132,14 @@ func (watcher *Watcher) handleEvent(logger lager.Logger, event models.Event) {
 				}
 
 				watcher.pool.Submit(func() {
+					logger := logger.WithData(lager.Data{
+						"process-guid": guid,
+						"index":        appCrashed.Index,
+					})
+					logger.Info("recording-app-crashed")
 					err := watcher.ccClient.AppCrashed(guid, appCrashed, logger)
 					if err != nil {
-						logger.Info("failed-app-crashed", lager.Data{
-							"process-guid": guid,
-							"index":        after.Index,
-							"error":        err,
-						})
+						logger.Error("failed-recording-app-crashed", err)
 					}
 				})
 			}

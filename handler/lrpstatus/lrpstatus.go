@@ -28,13 +28,14 @@ func NewHandler(apiClient bbs.Client, clk clock.Clock, logger lager.Logger) http
 }
 
 func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	lrpLogger := handler.logger.Session("lrp-handler")
 
 	guid := r.FormValue(":guid")
+	logger := handler.logger.Session("lrp-status", lager.Data{"process-guid": guid})
 
+	logger.Info("fetching-lrp-info")
 	actualLRPGroups, err := handler.apiClient.ActualLRPGroupsByProcessGuid(guid)
 	if err != nil {
-		lrpLogger.Error("failed-retrieving-lrp-info", err)
+		logger.Error("failed-fetching-lrp-info", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -48,7 +49,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(instances)
 	if err != nil {
-		lrpLogger.Error("stream-response-failed", err, lager.Data{"guid": guid})
+		logger.Error("stream-response-failed", err)
 	}
 }
 

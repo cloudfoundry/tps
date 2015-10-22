@@ -44,9 +44,12 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logger := handler.logger.Session("lrp-stats", lager.Data{"process-guid": guid})
+
+	logger.Info("fetching-desired-lrp")
 	desiredLRP, err := handler.bbsClient.DesiredLRPByProcessGuid(guid)
 	if err != nil {
-		handler.logger.Error("fetching-desired-lrp-failed", err, lager.Data{"ProcessGuid": guid})
+		logger.Error("fetching-desired-lrp-failed", err)
 		switch models.ConvertError(err).Type {
 		case models.Error_ResourceNotFound:
 			w.WriteHeader(http.StatusNotFound)
@@ -56,18 +59,19 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logger.Info("fetching-actual-lrp-info")
 	actualLRPs, err := handler.bbsClient.ActualLRPGroupsByProcessGuid(guid)
 	if err != nil {
-		handler.logger.Error("fetching-actual-lrp-info-failed", err, lager.Data{"ProcessGuid": guid})
+		logger.Error("fetching-actual-lrp-info-failed", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	logger.Info("fetching-container-metrics")
 	metrics, err := handler.noaaClient.ContainerMetrics(desiredLRP.LogGuid, authorization)
 	if err != nil {
-		handler.logger.Error("container-metrics-failed", err, lager.Data{
-			"ProcessGuid": guid,
-			"LogGuid":     desiredLRP.LogGuid,
+		handler.logger.Error("fetching-container-metrics-failed", err, lager.Data{
+			"LogGuid": desiredLRP.LogGuid,
 		})
 	}
 

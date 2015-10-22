@@ -68,9 +68,12 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (handler *handler) getStatusForLRPWorkFunction(processGuid string, statusLock *sync.Mutex, statusBundle map[string][]cc_messages.LRPInstance) func() {
 	return func() {
+		logger := handler.logger.Session("fetch-lrp-instances", lager.Data{"process-guid": processGuid})
+		logger.Info("start")
+		defer logger.Info("complete")
 		actualLRPGroups, err := handler.bbsClient.ActualLRPGroupsByProcessGuid(processGuid)
 		if err != nil {
-			handler.logger.Error("fetching-actual-lrps-info-failed", err, lager.Data{"ProcessGuid": processGuid})
+			logger.Error("fetching-actual-lrps-info-failed", err)
 			return
 		}
 
