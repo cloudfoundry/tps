@@ -2,7 +2,6 @@ package watcher
 
 import (
 	"os"
-	"sync/atomic"
 	"time"
 
 	"github.com/cloudfoundry-incubator/bbs"
@@ -44,64 +43,38 @@ func NewWatcher(
 func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) error {
 	logger := watcher.logger.Session("watcher")
 	logger.Info("starting")
+	defer logger.Info("finished")
+
+	var subscription events.EventSource
+	subscriptionChan := make(chan events.EventSource, 1)
+	eventChan := make(chan models.Event, 1)
+
+	go subscribeToEvents(logger, watcher.bbsClient, subscriptionChan)
 
 	close(ready)
 	logger.Info("started")
-	defer logger.Info("finished")
-
-	eventChan := make(chan models.Event)
-
-	var eventSource atomic.Value
-	var stopEventSource int32
-
-	go func() {
-		var err error
-		var es events.EventSource
-
-		for {
-			if atomic.LoadInt32(&stopEventSource) == 1 {
-				return
-			}
-
-			logger.Info("subscribing-to-events")
-			es, err = watcher.bbsClient.SubscribeToEvents()
-			if err != nil {
-				logger.Error("failed-subscribing-to-events", err)
-				continue
-			}
-
-			eventSource.Store(es)
-
-			var event models.Event
-			for {
-				event, err = es.Next()
-				if err != nil {
-					logger.Error("failed-getting-next-event", err)
-					// wait a bit before retrying
-					time.Sleep(time.Second)
-					break
-				}
-
-				if event != nil {
-					eventChan <- event
-				}
-			}
-		}
-	}()
 
 	for {
 		select {
+		case subscription = <-subscriptionChan:
+			if subscription != nil {
+				go nextEvent(logger, subscription, eventChan)
+				subscriptionChan = nil
+			} else {
+				go subscribeToEvents(logger, watcher.bbsClient, subscriptionChan)
+			}
+
 		case event := <-eventChan:
-			watcher.handleEvent(logger, event)
+			if event != nil {
+				watcher.handleEvent(logger, event)
+			}
+			go nextEvent(logger, subscription, eventChan)
 
 		case <-signals:
 			logger.Info("stopping")
-			atomic.StoreInt32(&stopEventSource, 1)
-			if es := eventSource.Load(); es != nil {
-				err := es.(events.EventSource).Close()
-				if err != nil {
-					logger.Error("failed-closing-event-source", err)
-				}
+			err := subscription.Close()
+			if err != nil {
+				logger.Error("failed-closing-event-source", err)
 			}
 			return nil
 		}
@@ -144,5 +117,35 @@ func (watcher *Watcher) handleEvent(logger lager.Logger, event models.Event) {
 				})
 			}
 		}
+	}
+}
+
+func subscribeToEvents(logger lager.Logger, bbsClient bbs.Client, subscriptionChan chan<- events.EventSource) {
+	logger.Info("subscribing-to-events")
+	eventSource, err := bbsClient.SubscribeToEvents()
+	if err != nil {
+		logger.Error("failed-subscribing-to-events", err)
+		subscriptionChan <- nil
+	} else {
+		logger.Info("subscribed-to-events")
+		subscriptionChan <- eventSource
+	}
+}
+
+func nextEvent(logger lager.Logger, es events.EventSource, eventChan chan<- models.Event) {
+	event, err := es.Next()
+
+	switch err {
+	case nil:
+		eventChan <- event
+
+	case events.ErrSourceClosed:
+		return
+
+	default:
+		logger.Error("failed-getting-next-event", err)
+		// wait a bit before retrying
+		time.Sleep(time.Second)
+		eventChan <- nil
 	}
 }

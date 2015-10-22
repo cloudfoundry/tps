@@ -200,7 +200,7 @@ var _ = Describe("Watcher", func() {
 			subscribeErr = models.ErrUnknownError
 
 			bbsClient.SubscribeToEventsStub = func() (events.EventSource, error) {
-				if bbsClient.SubscribeToEventsCallCount() == 1 {
+				if bbsClient.SubscribeToEventsCallCount() > 1 {
 					return eventSource, nil
 				}
 				return nil, subscribeErr
