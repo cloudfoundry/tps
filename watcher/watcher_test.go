@@ -52,7 +52,7 @@ var _ = Describe("Watcher", func() {
 		ccClient = new(fakes.FakeCcClient)
 
 		var err error
-		watcherRunner, err = watcher.NewWatcher(logger, bbsClient, ccClient)
+		watcherRunner, err = watcher.NewWatcher(logger, 500, bbsClient, ccClient)
 		Expect(err).NotTo(HaveOccurred())
 
 		nextErr = atomic.Value{}

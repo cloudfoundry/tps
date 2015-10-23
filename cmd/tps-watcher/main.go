@@ -100,6 +100,12 @@ var bbsMaxIdleConnsPerHost = flag.Int(
 	"Controls the maximum number of idle (keep-alive) connctions per host. If zero, golang's default will be used",
 )
 
+var eventHandlingWorkers = flag.Int(
+	"eventHandlingWorkers",
+	500,
+	"Max concurrency for handling lrp events",
+)
+
 const (
 	dropsondeOrigin      = "tps_watcher"
 	dropsondeDestination = "localhost:3457"
@@ -118,7 +124,7 @@ func main() {
 	ccClient := cc_client.NewCcClient(*ccBaseURL, *ccUsername, *ccPassword, *skipCertVerify)
 
 	watcher := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
-		w, err := watcher.NewWatcher(logger, initializeBBSClient(logger), ccClient)
+		w, err := watcher.NewWatcher(logger, *eventHandlingWorkers, initializeBBSClient(logger), ccClient)
 		if err != nil {
 			return err
 		}

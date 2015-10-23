@@ -23,10 +23,11 @@ type Watcher struct {
 
 func NewWatcher(
 	logger lager.Logger,
+	workPoolSize int,
 	bbsClient bbs.Client,
 	ccClient cc_client.CcClient,
 ) (*Watcher, error) {
-	workPool, err := workpool.NewWorkPool(500)
+	workPool, err := workpool.NewWorkPool(workPoolSize)
 	if err != nil {
 		return nil, err
 	}
