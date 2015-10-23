@@ -80,6 +80,12 @@ var bbsMaxIdleConnsPerHost = flag.Int(
 	"Controls the maximum number of idle (keep-alive) connctions per host. If zero, golang's default will be used",
 )
 
+var bulkLRPStatusWorkers = flag.Int(
+	"bulkLRPStatusWorkers",
+	15,
+	"Max concurrency for fetching bulk lrps",
+)
+
 const (
 	dropsondeDestination = "localhost:3457"
 	dropsondeOrigin      = "tps_listener"
@@ -129,7 +135,7 @@ func initializeDropsonde(logger lager.Logger) {
 }
 
 func initializeHandler(logger lager.Logger, noaaClient *noaa.Consumer, maxInFlight int, apiClient bbs.Client) http.Handler {
-	apiHandler, err := handler.New(apiClient, noaaClient, maxInFlight, logger)
+	apiHandler, err := handler.New(apiClient, noaaClient, maxInFlight, *bulkLRPStatusWorkers, logger)
 	if err != nil {
 		logger.Fatal("initialize-handler.failed", err)
 	}

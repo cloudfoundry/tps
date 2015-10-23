@@ -42,7 +42,7 @@ var _ = Describe("Handler", func() {
 			bbsClient = new(fake_bbs.FakeClient)
 			noaaClient = &fakes.FakeNoaaClient{}
 
-			httpHandler, err = handler.New(bbsClient, noaaClient, 2, logger)
+			httpHandler, err = handler.New(bbsClient, noaaClient, 2, 15, logger)
 			Expect(err).NotTo(HaveOccurred())
 
 			server = httptest.NewServer(httpHandler)

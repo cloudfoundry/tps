@@ -13,7 +13,7 @@ import (
 	"github.com/tedsuo/rata"
 )
 
-func New(apiClient bbs.Client, noaaClient lrpstats.NoaaClient, maxInFlight int, logger lager.Logger) (http.Handler, error) {
+func New(apiClient bbs.Client, noaaClient lrpstats.NoaaClient, maxInFlight, bulkLRPStatusWorkers int, logger lager.Logger) (http.Handler, error) {
 	semaphore := make(chan struct{}, maxInFlight)
 	clock := clock.NewClock()
 
@@ -28,7 +28,7 @@ func New(apiClient bbs.Client, noaaClient lrpstats.NoaaClient, maxInFlight int, 
 		},
 		tps.BulkLRPStatus: tpsHandler{
 			semaphore:       semaphore,
-			delegateHandler: bulklrpstatus.NewHandler(apiClient, clock, logger),
+			delegateHandler: LogWrap(bulklrpstatus.NewHandler(apiClient, clock, bulkLRPStatusWorkers, logger), logger),
 		},
 	}
 

@@ -16,18 +16,22 @@ import (
 	"github.com/pivotal-golang/lager"
 )
 
-const MAX_STAT_WORKPOOL_SIZE = 15
-
 var processGuidPattern = regexp.MustCompile(`^([a-zA-Z0-9_-]+,)*[a-zA-Z0-9_-]+$`)
 
 type handler struct {
-	bbsClient bbs.Client
-	clock     clock.Clock
-	logger    lager.Logger
+	bbsClient                 bbs.Client
+	clock                     clock.Clock
+	logger                    lager.Logger
+	bulkLRPStatusWorkPoolSize int
 }
 
-func NewHandler(bbsClient bbs.Client, clk clock.Clock, logger lager.Logger) http.Handler {
-	return &handler{bbsClient: bbsClient, clock: clk, logger: logger}
+func NewHandler(bbsClient bbs.Client, clk clock.Clock, bulkLRPStatusWorkPoolSize int, logger lager.Logger) http.Handler {
+	return &handler{
+		bbsClient: bbsClient,
+		clock:     clk,
+		bulkLRPStatusWorkPoolSize: bulkLRPStatusWorkPoolSize,
+		logger: logger,
+	}
 }
 
 func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -48,9 +52,9 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		works = append(works, handler.getStatusForLRPWorkFunction(processGuid, &statusLock, statusBundle))
 	}
 
-	throttler, err := workpool.NewThrottler(MAX_STAT_WORKPOOL_SIZE, works)
+	throttler, err := workpool.NewThrottler(handler.bulkLRPStatusWorkPoolSize, works)
 	if err != nil {
-		handler.logger.Error("failed-constructing-throttler", err, lager.Data{"max-workers": MAX_STAT_WORKPOOL_SIZE, "num-works": len(works)})
+		handler.logger.Error("failed-constructing-throttler", err, lager.Data{"max-workers": handler.bulkLRPStatusWorkPoolSize, "num-works": len(works)})
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
