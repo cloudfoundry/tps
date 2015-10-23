@@ -67,11 +67,13 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger.Info("fetching-container-metrics")
+	logger.Info("fetching-container-metrics", lager.Data{
+		"log-guid": desiredLRP.LogGuid,
+	})
 	metrics, err := handler.noaaClient.ContainerMetrics(desiredLRP.LogGuid, authorization)
 	if err != nil {
 		handler.logger.Error("fetching-container-metrics-failed", err, lager.Data{
-			"LogGuid": desiredLRP.LogGuid,
+			"log-guid": desiredLRP.LogGuid,
 		})
 	}
 

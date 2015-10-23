@@ -35,9 +35,11 @@ func NewHandler(bbsClient bbs.Client, clk clock.Clock, bulkLRPStatusWorkPoolSize
 }
 
 func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	logger := handler.logger.Session("bulk-lrp-status")
+
 	guidParameter := r.FormValue("guids")
 	if !processGuidPattern.Match([]byte(guidParameter)) {
-		handler.logger.Error("failed-parsing-guids", nil, lager.Data{"guid-parameter": guidParameter})
+		logger.Error("failed-parsing-guids", nil, lager.Data{"guid-parameter": guidParameter})
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -49,12 +51,12 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	statusLock := sync.Mutex{}
 
 	for _, processGuid := range guids {
-		works = append(works, handler.getStatusForLRPWorkFunction(processGuid, &statusLock, statusBundle))
+		works = append(works, handler.getStatusForLRPWorkFunction(logger, processGuid, &statusLock, statusBundle))
 	}
 
 	throttler, err := workpool.NewThrottler(handler.bulkLRPStatusWorkPoolSize, works)
 	if err != nil {
-		handler.logger.Error("failed-constructing-throttler", err, lager.Data{"max-workers": handler.bulkLRPStatusWorkPoolSize, "num-works": len(works)})
+		logger.Error("failed-constructing-throttler", err, lager.Data{"max-workers": handler.bulkLRPStatusWorkPoolSize, "num-works": len(works)})
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -66,13 +68,13 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(statusBundle)
 	if err != nil {
-		handler.logger.Error("stream-response-failed", err, nil)
+		logger.Error("stream-response-failed", err, nil)
 	}
 }
 
-func (handler *handler) getStatusForLRPWorkFunction(processGuid string, statusLock *sync.Mutex, statusBundle map[string][]cc_messages.LRPInstance) func() {
+func (handler *handler) getStatusForLRPWorkFunction(logger lager.Logger, processGuid string, statusLock *sync.Mutex, statusBundle map[string][]cc_messages.LRPInstance) func() {
 	return func() {
-		logger := handler.logger.Session("fetch-lrp-instances", lager.Data{"process-guid": processGuid})
+		logger = logger.Session("fetching-actual-lrps-info", lager.Data{"process-guid": processGuid})
 		logger.Info("start")
 		defer logger.Info("complete")
 		actualLRPGroups, err := handler.bbsClient.ActualLRPGroupsByProcessGuid(processGuid)
