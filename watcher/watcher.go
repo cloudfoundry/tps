@@ -48,9 +48,10 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 
 	var subscription events.EventSource
 	subscriptionChan := make(chan events.EventSource, 1)
-	eventChan := make(chan models.Event, 1)
-
 	go subscribeToEvents(logger, watcher.bbsClient, subscriptionChan)
+
+	eventChan := make(chan models.Event, 1)
+	nextErrCount := 0
 
 	close(ready)
 	logger.Info("started")
@@ -60,7 +61,6 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 		case subscription = <-subscriptionChan:
 			if subscription != nil {
 				go nextEvent(logger, subscription, eventChan)
-				subscriptionChan = nil
 			} else {
 				go subscribeToEvents(logger, watcher.bbsClient, subscriptionChan)
 			}
@@ -68,6 +68,14 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 		case event := <-eventChan:
 			if event != nil {
 				watcher.handleEvent(logger, event)
+				go nextEvent(logger, subscription, eventChan)
+			} else {
+				nextErrCount += 1
+				if nextErrCount > 2 {
+					nextErrCount = 0
+					go subscribeToEvents(logger, watcher.bbsClient, subscriptionChan)
+					break
+				}
 			}
 			go nextEvent(logger, subscription, eventChan)
 

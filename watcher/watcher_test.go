@@ -193,7 +193,7 @@ var _ = Describe("Watcher", func() {
 		})
 	})
 
-	Context("when the event source returns an error", func() {
+	Context("when the event source returns an error on subscribe", func() {
 		var subscribeErr error
 
 		BeforeEach(func() {
@@ -219,6 +219,19 @@ var _ = Describe("Watcher", func() {
 			It("retries", func() {
 				Consistently(process.Wait()).ShouldNot(Receive())
 			})
+		})
+	})
+
+	Context("when the event source returns an error on next", func() {
+		BeforeEach(func() {
+			eventSource.NextStub = func() (models.Event, error) {
+				return nil, errors.New("next-error")
+			}
+		})
+
+		It("retries 3 times and then re-subscribes", func() {
+			Eventually(bbsClient.SubscribeToEventsCallCount, 5*time.Second).Should(BeNumerically(">", 1))
+			Expect(eventSource.NextCallCount()).To(BeNumerically(">=", 3))
 		})
 	})
 
