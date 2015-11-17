@@ -68,7 +68,6 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 		case event := <-eventChan:
 			if event != nil {
 				watcher.handleEvent(logger, event)
-				go nextEvent(logger, subscription, eventChan)
 			} else {
 				nextErrCount += 1
 				if nextErrCount > 2 {
