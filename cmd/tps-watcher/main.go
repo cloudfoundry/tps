@@ -124,7 +124,12 @@ func main() {
 	ccClient := cc_client.NewCcClient(*ccBaseURL, *ccUsername, *ccPassword, *skipCertVerify)
 
 	watcher := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
-		w, err := watcher.NewWatcher(logger, *eventHandlingWorkers, initializeBBSClient(logger), ccClient)
+
+		w, err := watcher.NewWatcher(logger,
+			*eventHandlingWorkers,
+			watcher.DefaultRetryPauseInterval,
+			initializeBBSClient(logger), ccClient)
+
 		if err != nil {
 			return err
 		}

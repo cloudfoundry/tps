@@ -13,10 +13,13 @@ import (
 	"github.com/pivotal-golang/lager"
 )
 
+const DefaultRetryPauseInterval = time.Second
+
 type Watcher struct {
-	bbsClient bbs.Client
-	ccClient  cc_client.CcClient
-	logger    lager.Logger
+	bbsClient          bbs.Client
+	ccClient           cc_client.CcClient
+	logger             lager.Logger
+	retryPauseInterval time.Duration
 
 	pool *workpool.WorkPool
 }
@@ -24,6 +27,7 @@ type Watcher struct {
 func NewWatcher(
 	logger lager.Logger,
 	workPoolSize int,
+	retryPauseInterval time.Duration,
 	bbsClient bbs.Client,
 	ccClient cc_client.CcClient,
 ) (*Watcher, error) {
@@ -33,11 +37,11 @@ func NewWatcher(
 	}
 
 	return &Watcher{
-		bbsClient: bbsClient,
-		ccClient:  ccClient,
-		logger:    logger,
-
-		pool: workPool,
+		bbsClient:          bbsClient,
+		ccClient:           ccClient,
+		logger:             logger,
+		retryPauseInterval: retryPauseInterval,
+		pool:               workPool,
 	}, nil
 }
 
@@ -60,7 +64,7 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 		select {
 		case subscription = <-subscriptionChan:
 			if subscription != nil {
-				go nextEvent(logger, subscription, eventChan)
+				go nextEvent(logger, subscription, eventChan, watcher.retryPauseInterval)
 			} else {
 				go subscribeToEvents(logger, watcher.bbsClient, subscriptionChan)
 			}
@@ -76,7 +80,7 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 					break
 				}
 			}
-			go nextEvent(logger, subscription, eventChan)
+			go nextEvent(logger, subscription, eventChan, watcher.retryPauseInterval)
 
 		case <-signals:
 			logger.Info("stopping")
@@ -140,7 +144,7 @@ func subscribeToEvents(logger lager.Logger, bbsClient bbs.Client, subscriptionCh
 	}
 }
 
-func nextEvent(logger lager.Logger, es events.EventSource, eventChan chan<- models.Event) {
+func nextEvent(logger lager.Logger, es events.EventSource, eventChan chan<- models.Event, retryPauseInterval time.Duration) {
 	event, err := es.Next()
 
 	switch err {
@@ -153,7 +157,7 @@ func nextEvent(logger lager.Logger, es events.EventSource, eventChan chan<- mode
 	default:
 		logger.Error("failed-getting-next-event", err)
 		// wait a bit before retrying
-		time.Sleep(time.Second)
+		time.Sleep(retryPauseInterval)
 		eventChan <- nil
 	}
 }

@@ -52,7 +52,7 @@ var _ = Describe("Watcher", func() {
 		ccClient = new(fakes.FakeCcClient)
 
 		var err error
-		watcherRunner, err = watcher.NewWatcher(logger, 500, bbsClient, ccClient)
+		watcherRunner, err = watcher.NewWatcher(logger, 500, 10*time.Millisecond, bbsClient, ccClient)
 		Expect(err).NotTo(HaveOccurred())
 
 		nextErr = atomic.Value{}
@@ -231,7 +231,7 @@ var _ = Describe("Watcher", func() {
 
 		It("retries 3 times and then re-subscribes", func() {
 			Eventually(bbsClient.SubscribeToEventsCallCount, 5*time.Second).Should(BeNumerically(">", 1))
-			Expect(eventSource.NextCallCount()).To(BeNumerically(">=", 3))
+			Expect(eventSource.NextCallCount()).To(Equal(4))
 		})
 	})
 
