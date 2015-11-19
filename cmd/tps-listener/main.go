@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"flag"
+	"fmt"
 	"net/http"
 	"net/url"
 	"os"
@@ -30,6 +31,12 @@ var bbsAddress = flag.String(
 	"bbsAddress",
 	"",
 	"Address to the BBS Server",
+)
+
+var dropsondePort = flag.Int(
+	"dropsondePort",
+	3457,
+	"port the local metron agent is listening on",
 )
 
 var trafficControllerURL = flag.String(
@@ -87,8 +94,7 @@ var bulkLRPStatusWorkers = flag.Int(
 )
 
 const (
-	dropsondeDestination = "localhost:3457"
-	dropsondeOrigin      = "tps_listener"
+	dropsondeOrigin = "tps_listener"
 )
 
 func main() {
@@ -128,6 +134,7 @@ func main() {
 }
 
 func initializeDropsonde(logger lager.Logger) {
+	dropsondeDestination := fmt.Sprint("localhost:", *dropsondePort)
 	err := dropsonde.Initialize(dropsondeDestination, dropsondeOrigin)
 	if err != nil {
 		logger.Error("failed to initialize dropsonde: %v", err)
