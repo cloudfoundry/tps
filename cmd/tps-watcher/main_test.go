@@ -97,10 +97,6 @@ var _ = Describe("TPS", func() {
 			err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
 			Expect(err).NotTo(HaveOccurred())
 
-			// work around the fact that the event source has to sleep
-			// see github.com/cloudfoundry/storeadapter/etcdstoreadapter/etcd_store_adapter.go
-			time.Sleep(150 * time.Millisecond)
-
 			bbsClient.CrashActualLRP(&lrpKey1, &instanceKey1, "out of memory")
 		})
 

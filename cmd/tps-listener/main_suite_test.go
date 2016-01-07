@@ -11,7 +11,6 @@ import (
 	bbstestrunner "github.com/cloudfoundry-incubator/bbs/cmd/bbs/testrunner"
 	"github.com/cloudfoundry-incubator/consuladapter/consulrunner"
 	"github.com/cloudfoundry-incubator/tps/cmd/tpsrunner"
-	"github.com/cloudfoundry/storeadapter"
 	"github.com/cloudfoundry/storeadapter/storerunner/etcdstorerunner"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/config"
@@ -43,7 +42,6 @@ var (
 
 	fakeCC     *ghttp.Server
 	etcdRunner *etcdstorerunner.ETCDClusterRunner
-	store      storeadapter.StoreAdapter
 
 	bbsClient bbs.Client
 	logger    *lagertest.TestLogger
@@ -91,7 +89,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1, nil)
 
 	listenerPath = string(binaries["listener"])
-	store = etcdRunner.Adapter(nil)
 
 	consulRunner = consulrunner.NewClusterRunner(
 		9001+config.GinkgoConfig.ParallelNode*consulrunner.PortOffsetLength,
