@@ -29,7 +29,6 @@ type EventHolder struct {
 var nilEventHolder = EventHolder{}
 
 var _ = Describe("Watcher", func() {
-
 	var (
 		eventSource   *eventfakes.FakeEventSource
 		bbsClient     *fake_bbs.FakeClient

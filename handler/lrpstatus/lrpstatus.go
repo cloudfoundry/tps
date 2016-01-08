@@ -28,7 +28,6 @@ func NewHandler(apiClient bbs.Client, clk clock.Clock, logger lager.Logger) http
 }
 
 func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
 	guid := r.FormValue(":guid")
 	logger := handler.logger.Session("lrp-status", lager.Data{"process-guid": guid})
 
@@ -68,7 +67,7 @@ func LRPInstances(
 			Index:        uint(actual.Index),
 			Since:        actual.Since / 1e9,
 			Uptime:       (clk.Now().UnixNano() - actual.Since) / 1e9,
-			State:        cc_conv.StateFor(actual.State),
+			State:        cc_conv.StateFor(actual.State, actual.PlacementError),
 		}
 
 		if addInfo != nil {

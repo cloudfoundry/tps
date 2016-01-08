@@ -5,10 +5,13 @@ import (
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 )
 
-func StateFor(state string) cc_messages.LRPInstanceState {
+func StateFor(state, placementError string) cc_messages.LRPInstanceState {
 	switch state {
 	case models.ActualLRPStateUnclaimed:
-		return cc_messages.LRPInstanceStateStarting
+		if placementError == "" {
+			return cc_messages.LRPInstanceStateStarting
+		}
+		return cc_messages.LRPInstanceStateDown
 	case models.ActualLRPStateClaimed:
 		return cc_messages.LRPInstanceStateStarting
 	case models.ActualLRPStateRunning:

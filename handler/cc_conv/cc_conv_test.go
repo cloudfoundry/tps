@@ -8,13 +8,30 @@ import (
 )
 
 var _ = Describe("CC Conversion Tools", func() {
+	var placementError string
 	Describe("StateFor", func() {
-		It("converts state from ActualLRPState to cc_messages LRPInstanceState", func() {
-			Expect(StateFor(models.ActualLRPStateUnclaimed)).To(Equal(cc_messages.LRPInstanceStateStarting))
-			Expect(StateFor(models.ActualLRPStateClaimed)).To(Equal(cc_messages.LRPInstanceStateStarting))
-			Expect(StateFor(models.ActualLRPStateRunning)).To(Equal(cc_messages.LRPInstanceStateRunning))
-			Expect(StateFor(models.ActualLRPStateCrashed)).To(Equal(cc_messages.LRPInstanceStateCrashed))
-			Expect(StateFor("foobar")).To(Equal(cc_messages.LRPInstanceStateUnknown))
+		Context("without a placement error", func() {
+			It("converts state from ActualLRPState to cc_messages LRPInstanceState", func() {
+				Expect(StateFor(models.ActualLRPStateUnclaimed, placementError)).To(Equal(cc_messages.LRPInstanceStateStarting))
+				Expect(StateFor(models.ActualLRPStateClaimed, placementError)).To(Equal(cc_messages.LRPInstanceStateStarting))
+				Expect(StateFor(models.ActualLRPStateRunning, placementError)).To(Equal(cc_messages.LRPInstanceStateRunning))
+				Expect(StateFor(models.ActualLRPStateCrashed, placementError)).To(Equal(cc_messages.LRPInstanceStateCrashed))
+				Expect(StateFor("foobar", placementError)).To(Equal(cc_messages.LRPInstanceStateUnknown))
+			})
+		})
+
+		Context("with a placement error", func() {
+			BeforeEach(func() {
+				placementError = "error"
+			})
+
+			It("converts state from ActualLRPState to cc_messages LRPInstanceState", func() {
+				Expect(StateFor(models.ActualLRPStateUnclaimed, placementError)).To(Equal(cc_messages.LRPInstanceStateDown))
+				Expect(StateFor(models.ActualLRPStateClaimed, placementError)).To(Equal(cc_messages.LRPInstanceStateStarting))
+				Expect(StateFor(models.ActualLRPStateRunning, placementError)).To(Equal(cc_messages.LRPInstanceStateRunning))
+				Expect(StateFor(models.ActualLRPStateCrashed, placementError)).To(Equal(cc_messages.LRPInstanceStateCrashed))
+				Expect(StateFor("foobar", placementError)).To(Equal(cc_messages.LRPInstanceStateUnknown))
+			})
 		})
 	})
 })
