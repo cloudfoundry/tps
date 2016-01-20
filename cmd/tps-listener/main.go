@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -11,9 +12,13 @@ import (
 	"github.com/cloudfoundry-incubator/bbs"
 	"github.com/cloudfoundry-incubator/cf-debug-server"
 	"github.com/cloudfoundry-incubator/cf-lager"
+	"github.com/cloudfoundry-incubator/consuladapter"
+	"github.com/cloudfoundry-incubator/locket"
 	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry/dropsonde"
 	"github.com/cloudfoundry/noaa"
+	"github.com/hashicorp/consul/api"
+	"github.com/pivotal-golang/clock"
 	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/grouper"
@@ -93,6 +98,12 @@ var bulkLRPStatusWorkers = flag.Int(
 	"Max concurrency for fetching bulk lrps",
 )
 
+var consulCluster = flag.String(
+	"consulCluster",
+	"",
+	"Consul Agent URL",
+)
+
 const (
 	dropsondeOrigin = "tps_listener"
 )
@@ -108,8 +119,16 @@ func main() {
 	defer noaaClient.Close()
 	apiHandler := initializeHandler(logger, noaaClient, *maxInFlightRequests, initializeBBSClient(logger))
 
+	consulClient, err := consuladapter.NewClient(*consulCluster)
+	if err != nil {
+		logger.Fatal("new-client-failed", err)
+	}
+
+	registrationRunner := initializeRegistrationRunner(logger, consulClient, *listenAddr, clock.NewClock())
+
 	members := grouper.Members{
 		{"api", http_server.New(*listenAddr, apiHandler)},
+		{"registration-runner", registrationRunner},
 	}
 
 	if dbgAddr := cf_debug_server.DebugAddress(flag.CommandLine); dbgAddr != "" {
@@ -124,7 +143,7 @@ func main() {
 
 	logger.Info("started")
 
-	err := <-monitor.Wait()
+	err = <-monitor.Wait()
 	if err != nil {
 		logger.Error("exited-with-failure", err)
 		os.Exit(1)
@@ -165,4 +184,25 @@ func initializeBBSClient(logger lager.Logger) bbs.Client {
 		logger.Fatal("Failed to configure secure BBS client", err)
 	}
 	return bbsClient
+}
+
+func initializeRegistrationRunner(logger lager.Logger, consulClient *api.Client, listenAddress string, clock clock.Clock) ifrit.Runner {
+	_, portString, err := net.SplitHostPort(listenAddress)
+	if err != nil {
+		logger.Fatal("failed-invalid-listen-address", err)
+	}
+	portNum, err := net.LookupPort("tcp", portString)
+	if err != nil {
+		logger.Fatal("failed-invalid-listen-port", err)
+	}
+
+	registration := &api.AgentServiceRegistration{
+		Name: "tps",
+		Port: portNum,
+		Check: &api.AgentServiceCheck{
+			TTL: "3s",
+		},
+	}
+
+	return locket.NewRegistrationRunner(logger, registration, consuladapter.NewConsulClient(consulClient), clock)
 }

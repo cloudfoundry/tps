@@ -10,6 +10,7 @@ import (
 
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
+	"github.com/hashicorp/consul/api"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/tedsuo/ifrit"
@@ -64,6 +65,33 @@ var _ = Describe("TPS-Listener", func() {
 			listener.Signal(os.Kill)
 			Eventually(listener.Wait()).Should(Receive())
 		}
+	})
+
+	Describe("Initialization", func() {
+		It("registers itself with consul", func() {
+			services, err := consulRunner.NewConsulClient().Agent().Services()
+			Expect(err).NotTo(HaveOccurred())
+			Expect(services).Should(HaveKeyWithValue("tps",
+				&api.AgentService{
+					Service: "tps",
+					ID:      "tps",
+					Port:    listenerPort,
+				}))
+		})
+
+		It("registers a TTL healthcheck", func() {
+			checks, err := consulRunner.NewConsulClient().Agent().Checks()
+			Expect(err).NotTo(HaveOccurred())
+			Expect(checks).Should(HaveKeyWithValue("service:tps",
+				&api.AgentCheck{
+					Node:        "0",
+					CheckID:     "service:tps",
+					Name:        "Service 'tps' check",
+					Status:      "passing",
+					ServiceID:   "tps",
+					ServiceName: "tps",
+				}))
+		})
 	})
 
 	Describe("GET /v1/actual_lrps/:guid", func() {

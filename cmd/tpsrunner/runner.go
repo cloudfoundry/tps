@@ -6,7 +6,7 @@ import (
 	"github.com/tedsuo/ifrit/ginkgomon"
 )
 
-func NewListener(bin, listenAddr, bbsAddress, trafficControllerURL string) *ginkgomon.Runner {
+func NewListener(bin, listenAddr, bbsAddress, trafficControllerURL, consulCluster string) *ginkgomon.Runner {
 	return ginkgomon.New(ginkgomon.Config{
 		Name: "tps-listener",
 		Command: exec.Command(
@@ -14,7 +14,8 @@ func NewListener(bin, listenAddr, bbsAddress, trafficControllerURL string) *gink
 			"-bbsAddress", bbsAddress,
 			"-listenAddr", listenAddr,
 			"-trafficControllerURL", trafficControllerURL,
-			"-skipSSLVerification", "true",
+			"-skipSSLVerification",
+			"-consulCluster", consulCluster,
 		),
 		StartCheck: "tps-listener.started",
 	})

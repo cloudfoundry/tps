@@ -141,6 +141,7 @@ var _ = BeforeEach(func() {
 		listenerAddr,
 		bbsURL.String(),
 		trafficControllerURL,
+		consulRunner.URL(),
 	)
 })
 
