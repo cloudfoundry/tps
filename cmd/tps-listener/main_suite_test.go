@@ -47,12 +47,12 @@ var (
 	logger    *lagertest.TestLogger
 	bbsPath   string
 	bbsURL    *url.URL
-)
 
-var bbsArgs bbstestrunner.Args
-var bbsRunner *ginkgomon.Runner
-var bbsProcess ifrit.Process
-var auctioneerServer *ghttp.Server
+	bbsArgs          bbstestrunner.Args
+	bbsRunner        *ginkgomon.Runner
+	bbsProcess       ifrit.Process
+	auctioneerServer *ghttp.Server
+)
 
 func TestTPS(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -122,12 +122,15 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		EncryptionKeys: []string{"label:key"},
 		ActiveKeyLabel: "label",
 	}
-})
 
-var _ = BeforeEach(func() {
 	etcdRunner.Start()
 	consulRunner.Start()
 	consulRunner.WaitUntilReady()
+})
+
+var _ = BeforeEach(func() {
+	etcdRunner.Reset()
+	consulRunner.Reset()
 
 	bbsRunner = bbstestrunner.New(bbsPath, bbsArgs)
 	bbsProcess = ginkgomon.Invoke(bbsRunner)
@@ -148,11 +151,11 @@ var _ = BeforeEach(func() {
 var _ = AfterEach(func() {
 	ginkgomon.Kill(bbsProcess)
 	fakeCC.Close()
-	etcdRunner.Stop()
-	consulRunner.Stop()
 })
 
 var _ = SynchronizedAfterSuite(func() {
+	etcdRunner.Stop()
+	consulRunner.Stop()
 	auctioneerServer.Close()
 }, func() {
 	gexec.CleanupBuildArtifacts()

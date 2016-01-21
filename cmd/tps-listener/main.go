@@ -204,5 +204,5 @@ func initializeRegistrationRunner(logger lager.Logger, consulClient *api.Client,
 		},
 	}
 
-	return locket.NewRegistrationRunner(logger, registration, consuladapter.NewConsulClient(consulClient), clock)
+	return locket.NewRegistrationRunner(logger, registration, consuladapter.NewConsulClient(consulClient), locket.RetryInterval, clock)
 }
