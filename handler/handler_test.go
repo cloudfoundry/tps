@@ -3,6 +3,7 @@ package handler_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"sync"
 
 	"github.com/cloudfoundry-incubator/bbs/fake_bbs"
 	"github.com/cloudfoundry-incubator/bbs/models"
@@ -81,10 +82,13 @@ var _ = Describe("Handler", func() {
 
 		It("returns 503 if the limit is exceeded", func() {
 			// hit both status and stats endpoints once, make fake bbs hang
+			var wg sync.WaitGroup
 
 			defer close(fakeActualLRPResponses)
 
+			wg.Add(1)
 			go func() {
+				defer wg.Done()
 				defer GinkgoRecover()
 
 				res, err := httpClient.Do(statusRequest)
@@ -92,7 +96,9 @@ var _ = Describe("Handler", func() {
 				Expect(res.StatusCode).To(Equal(http.StatusOK))
 			}()
 
+			wg.Add(1)
 			go func() {
+				defer wg.Done()
 				defer GinkgoRecover()
 
 				res, err := httpClient.Do(statsRequest)
@@ -103,18 +109,33 @@ var _ = Describe("Handler", func() {
 			Eventually(bbsClient.ActualLRPGroupsByProcessGuidCallCount).Should(Equal(2))
 
 			// hit it again, assert we get a 503
-			resp, err := httpClient.Do(statusRequest)
+			res, err := httpClient.Do(statusRequest)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(resp.StatusCode).To(Equal(http.StatusServiceUnavailable))
+			Expect(res.StatusCode).To(Equal(http.StatusServiceUnavailable))
 
-			resp, err = httpClient.Do(statsRequest)
+			res, err = httpClient.Do(statsRequest)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(resp.StatusCode).To(Equal(http.StatusServiceUnavailable))
+			Expect(res.StatusCode).To(Equal(http.StatusServiceUnavailable))
 
-			// un-hang one http call
+			// un-hang http calls
 			fakeActualLRPResponses <- []*models.ActualLRPGroup{}
+			fakeActualLRPResponses <- []*models.ActualLRPGroup{}
+			wg.Wait()
 
+			// confirm we can request again
+			wg.Add(1)
 			go func() {
+				defer wg.Done()
+				defer GinkgoRecover()
+
+				res, err := httpClient.Do(statusRequest)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(res.StatusCode).To(Equal(http.StatusOK))
+			}()
+
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
 				defer GinkgoRecover()
 
 				res, err := httpClient.Do(statsRequest)
@@ -124,6 +145,7 @@ var _ = Describe("Handler", func() {
 
 			fakeActualLRPResponses <- []*models.ActualLRPGroup{}
 			fakeActualLRPResponses <- []*models.ActualLRPGroup{}
+			wg.Wait()
 
 		})
 	})
