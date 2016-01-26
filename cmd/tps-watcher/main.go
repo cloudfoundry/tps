@@ -183,8 +183,7 @@ func initializeServiceClient(logger lager.Logger) tps.ServiceClient {
 		logger.Fatal("new-client-failed", err)
 	}
 
-	sessionMgr := consuladapter.NewSessionManager(client)
-	consulSession, err := consuladapter.NewSession("tps-watcher", *lockTTL, client, sessionMgr)
+	consulSession, err := consuladapter.NewSession("tps-watcher", *lockTTL, consuladapter.NewConsulClient(client))
 	if err != nil {
 		logger.Fatal("consul-session-failed", err)
 	}
