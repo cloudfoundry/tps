@@ -17,18 +17,21 @@ func TPSWatcherLockSchemaPath() string {
 }
 
 type ServiceClient interface {
-	NewTPSWatcherLockRunner(logger lager.Logger, bulkerID string, retryInterval time.Duration) ifrit.Runner
+	NewTPSWatcherLockRunner(logger lager.Logger, bulkerID string, retryInterval, lockTTL time.Duration) ifrit.Runner
 }
 
 type serviceClient struct {
-	session *consuladapter.Session
-	clock   clock.Clock
+	consulClient consuladapter.Client
+	clock        clock.Clock
 }
 
-func NewServiceClient(session *consuladapter.Session, clock clock.Clock) ServiceClient {
-	return serviceClient{session, clock}
+func NewServiceClient(consulClient consuladapter.Client, clock clock.Clock) ServiceClient {
+	return serviceClient{
+		consulClient: consulClient,
+		clock:        clock,
+	}
 }
 
-func (c serviceClient) NewTPSWatcherLockRunner(logger lager.Logger, emitterID string, retryInterval time.Duration) ifrit.Runner {
-	return locket.NewLock(c.session, TPSWatcherLockSchemaPath(), []byte(emitterID), c.clock, retryInterval, logger)
+func (c serviceClient) NewTPSWatcherLockRunner(logger lager.Logger, emitterID string, retryInterval, lockTTL time.Duration) ifrit.Runner {
+	return locket.NewLock(logger, c.consulClient, TPSWatcherLockSchemaPath(), []byte(emitterID), c.clock, retryInterval, lockTTL)
 }

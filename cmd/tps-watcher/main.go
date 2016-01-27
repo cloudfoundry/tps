@@ -183,12 +183,9 @@ func initializeServiceClient(logger lager.Logger) tps.ServiceClient {
 		logger.Fatal("new-client-failed", err)
 	}
 
-	consulSession, err := consuladapter.NewSession("tps-watcher", *lockTTL, consuladapter.NewConsulClient(client))
-	if err != nil {
-		logger.Fatal("consul-session-failed", err)
-	}
+	consulClient := consuladapter.NewConsulClient(client)
 
-	return tps.NewServiceClient(consulSession, clock.NewClock())
+	return tps.NewServiceClient(consulClient, clock.NewClock())
 }
 
 func initializeLockMaintainer(logger lager.Logger) ifrit.Runner {
@@ -199,7 +196,7 @@ func initializeLockMaintainer(logger lager.Logger) ifrit.Runner {
 		logger.Fatal("Couldn't generate uuid", err)
 	}
 
-	return serviceClient.NewTPSWatcherLockRunner(logger, uuid.String(), *lockRetryInterval)
+	return serviceClient.NewTPSWatcherLockRunner(logger, uuid.String(), *lockRetryInterval, *lockTTL)
 }
 
 func initializeBBSClient(logger lager.Logger) bbs.Client {
