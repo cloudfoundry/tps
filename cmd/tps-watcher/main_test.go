@@ -10,11 +10,11 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
+	"github.com/pivotal-golang/clock"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/ginkgomon"
 
 	"github.com/cloudfoundry-incubator/bbs/models"
-	"github.com/cloudfoundry-incubator/consuladapter"
 	"github.com/cloudfoundry-incubator/locket"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 )
@@ -125,12 +125,11 @@ var _ = Describe("TPS", func() {
 
 	Context("when the watcher initially does not have the lock", func() {
 		var runner *ginkgomon.Runner
-		var otherSession *consuladapter.Session
+		var competingWatcherProcess ifrit.Process
 
 		BeforeEach(func() {
-			otherSession = consulRunner.NewSession("other-Session")
-			err := otherSession.AcquireLock(locket.LockSchemaPath(watcherLockName), []byte("something-else"))
-			Expect(err).NotTo(HaveOccurred())
+			competingWatcher := locket.NewLock(logger, consulRunner.NewConsulClient(), locket.LockSchemaPath(watcherLockName), []byte("something-else"), clock.NewClock(), locket.RetryInterval, locket.LockTTL)
+			competingWatcherProcess = ifrit.Invoke(competingWatcher)
 		})
 
 		JustBeforeEach(func() {
@@ -139,6 +138,7 @@ var _ = Describe("TPS", func() {
 
 		AfterEach(func() {
 			ginkgomon.Interrupt(watcher, 5)
+			ginkgomon.Kill(competingWatcherProcess)
 		})
 
 		It("does not start", func() {
@@ -147,7 +147,7 @@ var _ = Describe("TPS", func() {
 
 		Context("when the lock becomes available", func() {
 			BeforeEach(func() {
-				otherSession.Destroy()
+				ginkgomon.Kill(competingWatcherProcess)
 			})
 
 			It("is updated", func() {
