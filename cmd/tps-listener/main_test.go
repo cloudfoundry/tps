@@ -69,7 +69,7 @@ var _ = Describe("TPS-Listener", func() {
 
 	Describe("Initialization", func() {
 		It("registers itself with consul", func() {
-			services, err := consulRunner.NewConsulClient().Agent().Services()
+			services, err := consulRunner.NewClient().Agent().Services()
 			Expect(err).NotTo(HaveOccurred())
 			Expect(services).Should(HaveKeyWithValue("tps",
 				&api.AgentService{
@@ -80,7 +80,7 @@ var _ = Describe("TPS-Listener", func() {
 		})
 
 		It("registers a TTL healthcheck", func() {
-			checks, err := consulRunner.NewConsulClient().Agent().Checks()
+			checks, err := consulRunner.NewClient().Agent().Checks()
 			Expect(err).NotTo(HaveOccurred())
 			Expect(checks).Should(HaveKeyWithValue("service:tps",
 				&api.AgentCheck{

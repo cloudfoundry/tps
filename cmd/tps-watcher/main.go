@@ -178,12 +178,10 @@ func initializeDropsonde(logger lager.Logger) {
 }
 
 func initializeServiceClient(logger lager.Logger) tps.ServiceClient {
-	client, err := consuladapter.NewClient(*consulCluster)
+	consulClient, err := consuladapter.NewClientFromUrl(*consulCluster)
 	if err != nil {
 		logger.Fatal("new-client-failed", err)
 	}
-
-	consulClient := consuladapter.NewConsulClient(client)
 
 	return tps.NewServiceClient(consulClient, clock.NewClock())
 }

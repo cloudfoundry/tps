@@ -119,7 +119,7 @@ func main() {
 	defer noaaClient.Close()
 	apiHandler := initializeHandler(logger, noaaClient, *maxInFlightRequests, initializeBBSClient(logger))
 
-	consulClient, err := consuladapter.NewClient(*consulCluster)
+	consulClient, err := consuladapter.NewClientFromUrl(*consulCluster)
 	if err != nil {
 		logger.Fatal("new-client-failed", err)
 	}
@@ -186,7 +186,7 @@ func initializeBBSClient(logger lager.Logger) bbs.Client {
 	return bbsClient
 }
 
-func initializeRegistrationRunner(logger lager.Logger, consulClient *api.Client, listenAddress string, clock clock.Clock) ifrit.Runner {
+func initializeRegistrationRunner(logger lager.Logger, consulClient consuladapter.Client, listenAddress string, clock clock.Clock) ifrit.Runner {
 	_, portString, err := net.SplitHostPort(listenAddress)
 	if err != nil {
 		logger.Fatal("failed-invalid-listen-address", err)
@@ -204,5 +204,5 @@ func initializeRegistrationRunner(logger lager.Logger, consulClient *api.Client,
 		},
 	}
 
-	return locket.NewRegistrationRunner(logger, registration, consuladapter.NewConsulClient(consulClient), locket.RetryInterval, clock)
+	return locket.NewRegistrationRunner(logger, registration, consulClient, locket.RetryInterval, clock)
 }

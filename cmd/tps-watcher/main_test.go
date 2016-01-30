@@ -128,7 +128,7 @@ var _ = Describe("TPS", func() {
 		var competingWatcherProcess ifrit.Process
 
 		BeforeEach(func() {
-			competingWatcher := locket.NewLock(logger, consulRunner.NewConsulClient(), locket.LockSchemaPath(watcherLockName), []byte("something-else"), clock.NewClock(), locket.RetryInterval, locket.LockTTL)
+			competingWatcher := locket.NewLock(logger, consulRunner.NewClient(), locket.LockSchemaPath(watcherLockName), []byte("something-else"), clock.NewClock(), locket.RetryInterval, locket.LockTTL)
 			competingWatcherProcess = ifrit.Invoke(competingWatcher)
 		})
 
