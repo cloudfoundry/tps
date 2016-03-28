@@ -3,15 +3,9 @@ package main_test
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"net/url"
-	"strings"
 
-	"github.com/cloudfoundry-incubator/bbs"
-	bbstestrunner "github.com/cloudfoundry-incubator/bbs/cmd/bbs/testrunner"
 	"github.com/cloudfoundry-incubator/consuladapter/consulrunner"
 	"github.com/cloudfoundry-incubator/tps/cmd/tpsrunner"
-	"github.com/cloudfoundry/storeadapter/storerunner/etcdstorerunner"
 	"github.com/pivotal-golang/lager/lagertest"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/ginkgomon"
@@ -26,8 +20,6 @@ import (
 )
 
 var (
-	etcdPort int
-
 	consulRunner *consulrunner.ClusterRunner
 
 	watcher ifrit.Process
@@ -35,18 +27,10 @@ var (
 
 	watcherPath string
 
-	fakeCC     *ghttp.Server
-	etcdRunner *etcdstorerunner.ETCDClusterRunner
-	bbsClient  bbs.Client
-	logger     *lagertest.TestLogger
-	bbsPath    string
-	bbsURL     *url.URL
+	fakeCC  *ghttp.Server
+	fakeBBS *ghttp.Server
+	logger  *lagertest.TestLogger
 )
-
-var bbsArgs bbstestrunner.Args
-var bbsRunner *ginkgomon.Runner
-var bbsProcess ifrit.Process
-var auctioneerServer *ghttp.Server
 
 func TestTPS(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -57,12 +41,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	tps, err := gexec.Build("github.com/cloudfoundry-incubator/tps/cmd/tps-watcher", "-race")
 	Expect(err).NotTo(HaveOccurred())
 
-	bbs, err := gexec.Build("github.com/cloudfoundry-incubator/bbs/cmd/bbs", "-race")
-	Expect(err).NotTo(HaveOccurred())
-
 	payload, err := json.Marshal(map[string]string{
 		"watcher": tps,
-		"bbs":     bbs,
 	})
 	Expect(err).NotTo(HaveOccurred())
 
@@ -73,9 +53,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	err := json.Unmarshal(payload, &binaries)
 	Expect(err).NotTo(HaveOccurred())
 
-	etcdPort = 5001 + GinkgoParallelNode()
-	etcdRunner = etcdstorerunner.NewETCDClusterRunner(etcdPort, 1, nil)
-
 	watcherPath = string(binaries["watcher"])
 
 	consulRunner = consulrunner.NewClusterRunner(
@@ -85,61 +62,30 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	)
 
 	logger = lagertest.NewTestLogger("test")
-
-	bbsPath = string(binaries["bbs"])
-	bbsAddress := fmt.Sprintf("127.0.0.1:%d", 13000+GinkgoParallelNode())
-
-	bbsURL = &url.URL{
-		Scheme: "http",
-		Host:   bbsAddress,
-	}
-
-	auctioneerServer = ghttp.NewServer()
-	auctioneerServer.UnhandledRequestStatusCode = http.StatusAccepted
-	auctioneerServer.AllowUnhandledRequests = true
-
-	bbsArgs = bbstestrunner.Args{
-		Address:           bbsAddress,
-		AdvertiseURL:      bbsURL.String(),
-		AuctioneerAddress: auctioneerServer.URL(),
-		EtcdCluster:       strings.Join(etcdRunner.NodeURLS(), ","),
-		ConsulCluster:     consulRunner.ConsulCluster(),
-
-		EncryptionKeys: []string{"label:key"},
-		ActiveKeyLabel: "label",
-	}
 })
 
 var _ = BeforeEach(func() {
-	etcdRunner.Start()
-
 	consulRunner.Start()
 	consulRunner.WaitUntilReady()
 
-	bbsRunner = bbstestrunner.New(bbsPath, bbsArgs)
-	bbsProcess = ginkgomon.Invoke(bbsRunner)
-
-	bbsClient = bbs.NewClient(bbsURL.String())
-
 	fakeCC = ghttp.NewServer()
+	fakeBBS = ghttp.NewServer()
 
 	runner = tpsrunner.NewWatcher(
 		string(watcherPath),
-		bbsURL.String(),
+		fakeBBS.URL(),
 		fmt.Sprintf(fakeCC.URL()),
 		consulRunner.ConsulCluster(),
 	)
 })
 
 var _ = AfterEach(func() {
-	ginkgomon.Kill(bbsProcess)
 	fakeCC.Close()
-	etcdRunner.Stop()
+	fakeBBS.Close()
 	consulRunner.Stop()
 })
 
 var _ = SynchronizedAfterSuite(func() {
-	auctioneerServer.Close()
 }, func() {
 	gexec.CleanupBuildArtifacts()
 })

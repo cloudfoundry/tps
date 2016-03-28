@@ -3,7 +3,9 @@ package main_test
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"time"
@@ -13,10 +15,8 @@ import (
 	"github.com/hashicorp/consul/api"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/tedsuo/ifrit"
+	"github.com/onsi/gomega/ghttp"
 	"github.com/tedsuo/ifrit/ginkgomon"
-	"github.com/tedsuo/ifrit/http_server"
-	"github.com/tedsuo/ifrit/sigmon"
 	"github.com/tedsuo/rata"
 
 	"github.com/cloudfoundry-incubator/bbs/models"
@@ -37,10 +37,6 @@ var _ = Describe("TPS-Listener", func() {
 		httpClient = &http.Client{
 			Transport: &http.Transport{},
 		}
-	})
-
-	JustBeforeEach(func() {
-		listener = ginkgomon.Invoke(runner)
 
 		desiredLRP = &models.DesiredLRP{
 			Domain:      "some-domain",
@@ -49,15 +45,16 @@ var _ = Describe("TPS-Listener", func() {
 			RootFs:      "some:rootfs",
 			MemoryMb:    1024,
 			DiskMb:      512,
-			LogGuid:     "some-log-guid",
+			LogGuid:     "some-process-guid",
 			Action: models.WrapAction(&models.RunAction{
 				User: "me",
 				Path: "ls",
 			}),
 		}
+	})
 
-		err := bbsClient.DesireLRP(desiredLRP)
-		Expect(err).NotTo(HaveOccurred())
+	JustBeforeEach(func() {
+		listener = ginkgomon.Invoke(runner)
 	})
 
 	AfterEach(func() {
@@ -97,16 +94,15 @@ var _ = Describe("TPS-Listener", func() {
 	Describe("GET /v1/actual_lrps/:guid", func() {
 		Context("when the bbs is running", func() {
 			JustBeforeEach(func() {
-				instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
-
-				err := bbsClient.ClaimActualLRP("some-process-guid", 0, &instanceKey0)
-				Expect(err).NotTo(HaveOccurred())
-
-				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
-				instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-				netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
-				err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
-				Expect(err).NotTo(HaveOccurred())
+				fakeBBS.RouteToHandler("POST", "/v1/actual_lrp_groups/list_by_process_guid",
+					ghttp.RespondWithProto(200, &models.ActualLRPGroupsResponse{
+						ActualLrpGroups: []*models.ActualLRPGroup{
+							{Instance: &models.ActualLRP{ActualLRPKey: models.ActualLRPKey{ProcessGuid: "some-process-guid", Index: 0}, ActualLRPInstanceKey: models.ActualLRPInstanceKey{InstanceGuid: "some-instance-guid-0"}, State: models.ActualLRPStateClaimed}},
+							{Instance: &models.ActualLRP{ActualLRPKey: models.ActualLRPKey{ProcessGuid: "some-process-guid", Index: 1}, ActualLRPInstanceKey: models.ActualLRPInstanceKey{InstanceGuid: "some-instance-guid-1"}, State: models.ActualLRPStateRunning}},
+							{Instance: &models.ActualLRP{ActualLRPKey: models.ActualLRPKey{ProcessGuid: "some-process-guid", Index: 2}, State: models.ActualLRPStateUnclaimed}},
+						},
+					}),
+				)
 			})
 
 			It("reports the state of the given process guid's instances", func() {
@@ -158,7 +154,7 @@ var _ = Describe("TPS-Listener", func() {
 
 		Context("when the bbs is not running", func() {
 			JustBeforeEach(func() {
-				ginkgomon.Kill(bbsProcess, 5)
+				fakeBBS.HTTPTestServer.Close()
 			})
 
 			It("returns 500", func() {
@@ -179,22 +175,29 @@ var _ = Describe("TPS-Listener", func() {
 
 	Describe("GET /v1/actual_lrps/:guid/stats", func() {
 		Context("when the bbs is running", func() {
-			var trafficControllerProcess ifrit.Process
-
 			JustBeforeEach(func() {
-				instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
-
-				err := bbsClient.ClaimActualLRP("some-process-guid", 0, &instanceKey0)
-				Expect(err).NotTo(HaveOccurred())
-
-				lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, "some-domain")
-				instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
 				netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
-				err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
-				Expect(err).NotTo(HaveOccurred())
+
+				fakeBBS.RouteToHandler("POST", "/v1/actual_lrp_groups/list_by_process_guid",
+					ghttp.RespondWithProto(200, &models.ActualLRPGroupsResponse{
+						ActualLrpGroups: []*models.ActualLRPGroup{
+							{Instance: &models.ActualLRP{ActualLRPKey: models.ActualLRPKey{ProcessGuid: "some-process-guid", Index: 0}, ActualLRPInstanceKey: models.ActualLRPInstanceKey{InstanceGuid: "some-instance-guid-0"}, State: models.ActualLRPStateClaimed}},
+							{Instance: &models.ActualLRP{ActualLRPKey: models.ActualLRPKey{ProcessGuid: "some-process-guid", Index: 1}, ActualLRPInstanceKey: models.ActualLRPInstanceKey{InstanceGuid: "some-instance-guid-1"}, State: models.ActualLRPStateRunning, ActualLRPNetInfo: netInfo}},
+							{Instance: &models.ActualLRP{ActualLRPKey: models.ActualLRPKey{ProcessGuid: "some-process-guid", Index: 2}, State: models.ActualLRPStateUnclaimed}},
+						},
+					}),
+				)
 			})
 
 			Context("when a DesiredLRP is not found", func() {
+				BeforeEach(func() {
+					fakeBBS.RouteToHandler("POST", "/v1/desired_lrps/get_by_process_guid.r1",
+						ghttp.RespondWithProto(200, &models.DesiredLRPResponse{
+							Error: models.ErrResourceNotFound,
+						}),
+					)
+				})
+
 				It("returns a NotFound", func() {
 					getLRPStats, err := requestGenerator.CreateRequest(
 						tps.LRPStats,
@@ -217,16 +220,31 @@ var _ = Describe("TPS-Listener", func() {
 					message3 := marshalMessage(createContainerMetric("some-process-guid", 2, 5.0, 1024, 2048, 0))
 
 					messages := map[string][][]byte{}
-					messages["some-log-guid"] = [][]byte{message1, message2, message3}
+					messages["some-process-guid"] = [][]byte{message1, message2, message3}
+					fakeTrafficController.RouteToHandler("GET", "/apps/some-process-guid/containermetrics",
+						func(rw http.ResponseWriter, r *http.Request) {
+							mp := multipart.NewWriter(rw)
+							defer mp.Close()
 
-					handler := NewHttpHandler(messages)
-					httpServer := http_server.New(trafficControllerAddress, handler)
-					trafficControllerProcess = ifrit.Invoke(sigmon.New(httpServer))
-					Expect(trafficControllerProcess.Ready()).To(BeClosed())
-				})
+							guid := "some-process-guid"
 
-				AfterEach(func() {
-					ginkgomon.Interrupt(trafficControllerProcess)
+							rw.Header().Set("Content-Type", `multipart/x-protobuf; boundary=`+mp.Boundary())
+
+							for _, msg := range messages[guid] {
+								partWriter, _ := mp.CreatePart(nil)
+								partWriter.Write(msg)
+							}
+						},
+					)
+
+					fakeBBS.RouteToHandler("POST", "/v1/desired_lrps/get_by_process_guid.r1",
+						ghttp.CombineHandlers(
+							ghttp.VerifyProtoRepresenting(&models.DesiredLRPByProcessGuidRequest{ProcessGuid: "some-process-guid"}),
+							ghttp.RespondWithProto(200, &models.DesiredLRPResponse{
+								DesiredLrp: desiredLRP,
+							}),
+						),
+					)
 				})
 
 				It("reports the state of the given process guid's instances", func() {
@@ -303,6 +321,18 @@ var _ = Describe("TPS-Listener", func() {
 			})
 
 			Context("when the traffic controller is not running", func() {
+				BeforeEach(func() {
+					fakeBBS.RouteToHandler("POST", "/v1/desired_lrps/get_by_process_guid.r1",
+						ghttp.CombineHandlers(
+							ghttp.VerifyProtoRepresenting(&models.DesiredLRPByProcessGuidRequest{ProcessGuid: "some-process-guid"}),
+							ghttp.RespondWithProto(200, &models.DesiredLRPResponse{
+								DesiredLrp: desiredLRP,
+							}),
+						),
+					)
+					fakeTrafficController.HTTPTestServer.Close()
+				})
+
 				It("reports the status with nil stats", func() {
 					getLRPStats, err := requestGenerator.CreateRequest(
 						tps.LRPStats,
@@ -331,7 +361,7 @@ var _ = Describe("TPS-Listener", func() {
 
 		Context("when the bbs is not running", func() {
 			JustBeforeEach(func() {
-				ginkgomon.Kill(bbsProcess, 5)
+				fakeBBS.HTTPTestServer.Close()
 			})
 
 			It("returns internal server error", func() {
@@ -352,20 +382,6 @@ var _ = Describe("TPS-Listener", func() {
 	})
 
 	Describe("GET /v1/bulk_actual_lrp_status", func() {
-		startActualLRP := func(processGuid string) {
-			instanceKey0 := models.NewActualLRPInstanceKey("some-instance-guid-0", "cell-id")
-
-			err := bbsClient.ClaimActualLRP(processGuid, 0, &instanceKey0)
-			Expect(err).NotTo(HaveOccurred())
-
-			lrpKey1 := models.NewActualLRPKey(processGuid, 1, "some-domain")
-			instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-			netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
-
-			err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
-			Expect(err).NotTo(HaveOccurred())
-		}
-
 		JustBeforeEach(func() {
 			desiredLRP2 = &models.DesiredLRP{
 				Domain:      "some-domain",
@@ -381,11 +397,59 @@ var _ = Describe("TPS-Listener", func() {
 				}),
 			}
 
-			err := bbsClient.DesireLRP(desiredLRP2)
-			Expect(err).NotTo(HaveOccurred())
+			fakeBBS.RouteToHandler("POST", "/v1/desired_lrps/get_by_process_guid.r1",
+				func(w http.ResponseWriter, r *http.Request) {
+					body, err := ioutil.ReadAll(r.Body)
+					Expect(err).NotTo(HaveOccurred())
+					r.Body.Close()
 
-			startActualLRP(desiredLRP.ProcessGuid)
-			startActualLRP(desiredLRP2.ProcessGuid)
+					req := &models.DesiredLRPByProcessGuidRequest{}
+					err = proto.Unmarshal(body, req)
+					Expect(err).NotTo(HaveOccurred(), "Failed to unmarshal protobuf")
+
+					if req.ProcessGuid == "some-process-guid" {
+						ghttp.RespondWithProto(200, &models.DesiredLRPResponse{
+							DesiredLrp: desiredLRP,
+						})(w, nil)
+					} else if req.ProcessGuid == "some-other-process-guid" {
+						ghttp.RespondWithProto(200, &models.DesiredLRPResponse{
+							DesiredLrp: desiredLRP2,
+						})(w, nil)
+					}
+				},
+			)
+
+			netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
+
+			fakeBBS.RouteToHandler("POST", "/v1/actual_lrp_groups/list_by_process_guid",
+				func(w http.ResponseWriter, r *http.Request) {
+					body, err := ioutil.ReadAll(r.Body)
+					Expect(err).NotTo(HaveOccurred())
+					r.Body.Close()
+
+					req := &models.ActualLRPGroupsByProcessGuidRequest{}
+					err = proto.Unmarshal(body, req)
+					Expect(err).NotTo(HaveOccurred(), "Failed to unmarshal protobuf")
+
+					if req.ProcessGuid == "some-process-guid" {
+						ghttp.RespondWithProto(200, &models.ActualLRPGroupsResponse{
+							ActualLrpGroups: []*models.ActualLRPGroup{
+								{Instance: &models.ActualLRP{ActualLRPKey: models.ActualLRPKey{ProcessGuid: "some-process-guid", Index: 0}, ActualLRPInstanceKey: models.ActualLRPInstanceKey{InstanceGuid: "some-instance-guid-0"}, State: models.ActualLRPStateClaimed}},
+								{Instance: &models.ActualLRP{ActualLRPKey: models.ActualLRPKey{ProcessGuid: "some-process-guid", Index: 1}, ActualLRPInstanceKey: models.ActualLRPInstanceKey{InstanceGuid: "some-instance-guid-1"}, State: models.ActualLRPStateRunning, ActualLRPNetInfo: netInfo}},
+								{Instance: &models.ActualLRP{ActualLRPKey: models.ActualLRPKey{ProcessGuid: "some-process-guid", Index: 2}, State: models.ActualLRPStateUnclaimed}},
+							},
+						})(w, nil)
+					} else if req.ProcessGuid == "some-other-process-guid" {
+						ghttp.RespondWithProto(200, &models.ActualLRPGroupsResponse{
+							ActualLrpGroups: []*models.ActualLRPGroup{
+								{Instance: &models.ActualLRP{ActualLRPKey: models.ActualLRPKey{ProcessGuid: "some-other-process-guid", Index: 0}, ActualLRPInstanceKey: models.ActualLRPInstanceKey{InstanceGuid: "some-instance-guid-0"}, State: models.ActualLRPStateClaimed}},
+								{Instance: &models.ActualLRP{ActualLRPKey: models.ActualLRPKey{ProcessGuid: "some-other-process-guid", Index: 1}, ActualLRPInstanceKey: models.ActualLRPInstanceKey{InstanceGuid: "some-instance-guid-1"}, State: models.ActualLRPStateRunning, ActualLRPNetInfo: netInfo}},
+								{Instance: &models.ActualLRP{ActualLRPKey: models.ActualLRPKey{ProcessGuid: "some-other-process-guid", Index: 2}, State: models.ActualLRPStateUnclaimed}},
+							},
+						})(w, nil)
+					}
+				},
+			)
 		})
 
 		It("reports the status for all the process guids supplied", func() {

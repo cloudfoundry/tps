@@ -14,6 +14,7 @@ import (
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/ginkgomon"
 
+	"github.com/cloudfoundry-incubator/bbs/events"
 	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/locket"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
@@ -30,6 +31,14 @@ var _ = Describe("TPS", func() {
 		return ginkgomon.Invoke(runner), runner
 	}
 
+	var (
+		domain string
+	)
+
+	BeforeEach(func() {
+		domain = cc_messages.AppLRPDomain
+	})
+
 	AfterEach(func() {
 		if watcher != nil {
 			watcher.Signal(os.Kill)
@@ -39,8 +48,7 @@ var _ = Describe("TPS", func() {
 
 	Describe("Crashed Apps", func() {
 		var (
-			ready  chan struct{}
-			domain string
+			ready chan struct{}
 		)
 
 		BeforeEach(func() {
@@ -68,36 +76,47 @@ var _ = Describe("TPS", func() {
 
 				close(ready)
 			})
+
+			lrpKey := models.NewActualLRPKey("some-process-guid", 1, domain)
+			instanceKey := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
+			netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
+			beforeActualLRP := *models.NewRunningActualLRP(lrpKey, instanceKey, netInfo, 0)
+			before := models.ActualLRPGroup{Instance: &beforeActualLRP}
+			afterActualLRP := beforeActualLRP
+			afterActualLRP.State = models.ActualLRPStateCrashed
+			afterActualLRP.Since = int64(1)
+			afterActualLRP.CrashCount = 1
+			afterActualLRP.CrashReason = "out of memory"
+			after := models.ActualLRPGroup{Instance: &afterActualLRP}
+
+			fakeBBS.RouteToHandler("GET", "/v1/events",
+				func(w http.ResponseWriter, _ *http.Request) {
+					w.Header().Add("Content-Type", "text/event-stream; charset=utf-8")
+					w.Header().Add("Cache-Control", "no-cache, no-store, must-revalidate")
+					w.Header().Add("Connection", "keep-alive")
+
+					w.WriteHeader(http.StatusOK)
+
+					flusher := w.(http.Flusher)
+					flusher.Flush()
+					closeNotifier := w.(http.CloseNotifier).CloseNotify()
+					event := models.NewActualLRPChangedEvent(&before, &after)
+
+					sseEvent, err := events.NewEventFromModelEvent(0, event)
+					Expect(err).NotTo(HaveOccurred())
+
+					err = sseEvent.Write(w)
+					Expect(err).NotTo(HaveOccurred())
+
+					flusher.Flush()
+
+					<-closeNotifier
+				},
+			)
 		})
 
 		JustBeforeEach(func() {
 			watcher, _ = startWatcher(true)
-			domain = cc_messages.AppLRPDomain
-
-			desiredLRP := &models.DesiredLRP{
-				Domain:      domain,
-				ProcessGuid: "some-process-guid",
-				Instances:   3,
-				RootFs:      "some:rootfs",
-				MemoryMb:    1024,
-				DiskMb:      512,
-				LogGuid:     "some-log-guid",
-				Action: models.WrapAction(&models.RunAction{
-					User: "me",
-					Path: "ls",
-				}),
-			}
-
-			err := bbsClient.DesireLRP(desiredLRP)
-			Expect(err).NotTo(HaveOccurred())
-
-			lrpKey1 := models.NewActualLRPKey("some-process-guid", 1, domain)
-			instanceKey1 := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-			netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
-			err = bbsClient.StartActualLRP(&lrpKey1, &instanceKey1, &netInfo)
-			Expect(err).NotTo(HaveOccurred())
-
-			bbsClient.CrashActualLRP(&lrpKey1, &instanceKey1, "out of memory")
 		})
 
 		It("POSTs to the CC that the application has crashed", func() {
@@ -107,6 +126,20 @@ var _ = Describe("TPS", func() {
 
 	Context("when the watcher loses the lock", func() {
 		BeforeEach(func() {
+			fakeBBS.RouteToHandler("GET", "/v1/events",
+				func(w http.ResponseWriter, _ *http.Request) {
+					w.Header().Add("Content-Type", "text/event-stream; charset=utf-8")
+					w.Header().Add("Cache-Control", "no-cache, no-store, must-revalidate")
+					w.Header().Add("Connection", "keep-alive")
+
+					w.WriteHeader(http.StatusOK)
+
+					closeNotifier := w.(http.CloseNotifier).CloseNotify()
+
+					<-closeNotifier
+				},
+			)
+
 			watcher, _ = startWatcher(true)
 		})
 
@@ -128,6 +161,20 @@ var _ = Describe("TPS", func() {
 		var competingWatcherProcess ifrit.Process
 
 		BeforeEach(func() {
+			fakeBBS.RouteToHandler("GET", "/v1/events",
+				func(w http.ResponseWriter, _ *http.Request) {
+					w.Header().Add("Content-Type", "text/event-stream; charset=utf-8")
+					w.Header().Add("Cache-Control", "no-cache, no-store, must-revalidate")
+					w.Header().Add("Connection", "keep-alive")
+
+					w.WriteHeader(http.StatusOK)
+
+					closeNotifier := w.(http.CloseNotifier).CloseNotify()
+
+					<-closeNotifier
+				},
+			)
+
 			competingWatcher := locket.NewLock(logger, consulRunner.NewClient(), locket.LockSchemaPath(watcherLockName), []byte("something-else"), clock.NewClock(), locket.RetryInterval, locket.LockTTL)
 			competingWatcherProcess = ifrit.Invoke(competingWatcher)
 		})
