@@ -16,7 +16,7 @@ import (
 	"github.com/cloudfoundry-incubator/locket"
 	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry/dropsonde"
-	"github.com/cloudfoundry/noaa"
+	"github.com/cloudfoundry/noaa/consumer"
 	"github.com/hashicorp/consul/api"
 	"github.com/pivotal-golang/clock"
 	"github.com/pivotal-golang/lager"
@@ -115,7 +115,7 @@ func main() {
 
 	logger, reconfigurableSink := cf_lager.New("tps-listener")
 	initializeDropsonde(logger)
-	noaaClient := noaa.NewConsumer(*trafficControllerURL, &tls.Config{InsecureSkipVerify: *skipSSLVerification}, nil)
+	noaaClient := consumer.New(*trafficControllerURL, &tls.Config{InsecureSkipVerify: *skipSSLVerification}, nil)
 	defer noaaClient.Close()
 	apiHandler := initializeHandler(logger, noaaClient, *maxInFlightRequests, initializeBBSClient(logger))
 
@@ -160,7 +160,7 @@ func initializeDropsonde(logger lager.Logger) {
 	}
 }
 
-func initializeHandler(logger lager.Logger, noaaClient *noaa.Consumer, maxInFlight int, apiClient bbs.Client) http.Handler {
+func initializeHandler(logger lager.Logger, noaaClient *consumer.Consumer, maxInFlight int, apiClient bbs.Client) http.Handler {
 	apiHandler, err := handler.New(apiClient, noaaClient, maxInFlight, *bulkLRPStatusWorkers, logger)
 	if err != nil {
 		logger.Fatal("initialize-handler.failed", err)
