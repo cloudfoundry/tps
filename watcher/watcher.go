@@ -152,6 +152,7 @@ func nextEvent(logger lager.Logger, es events.EventSource, eventChan chan<- mode
 		eventChan <- event
 
 	case events.ErrSourceClosed:
+		logger.Error("failed-getting-next-event", err)
 		return
 
 	default:
