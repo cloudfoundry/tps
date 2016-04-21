@@ -79,12 +79,26 @@ var _ = Describe("Bulk Status", func() {
 	})
 
 	Describe("retrieves instance state for lrps specified", func() {
-		var expectedSinceTime, actualSinceTime int64
+		var (
+			expectedSinceTime, actualSinceTime int64
+			netInfo1, netInfo2                 models.ActualLRPNetInfo
+		)
 
 		BeforeEach(func() {
 			expectedSinceTime = fakeClock.Now().Unix()
 			actualSinceTime = fakeClock.Now().UnixNano()
 			fakeClock.Increment(5 * time.Second)
+
+			netInfo1 = models.NewActualLRPNetInfo(
+				"host",
+				models.NewPortMapping(5432, 7890),
+				models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
+			)
+			netInfo2 = models.NewActualLRPNetInfo(
+				"host2",
+				models.NewPortMapping(5432, 7890),
+				models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
+			)
 
 			request.Header.Set("Authorization", authorization)
 
@@ -99,13 +113,9 @@ var _ = Describe("Bulk Status", func() {
 					actualLRP := &models.ActualLRP{
 						ActualLRPKey:         models.NewActualLRPKey(processGuid, 5, "some-domain"),
 						ActualLRPInstanceKey: models.NewActualLRPInstanceKey("instanceId", "some-cell"),
-						ActualLRPNetInfo: models.NewActualLRPNetInfo(
-							"host",
-							models.NewPortMapping(5432, 7890),
-							models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
-						),
-						State: models.ActualLRPStateRunning,
-						Since: actualSinceTime,
+						ActualLRPNetInfo:     netInfo1,
+						State:                models.ActualLRPStateRunning,
+						Since:                actualSinceTime,
 					}
 					return []*models.ActualLRPGroup{{Instance: actualLRP}}, nil
 
@@ -113,13 +123,9 @@ var _ = Describe("Bulk Status", func() {
 					actualLRP := &models.ActualLRP{
 						ActualLRPKey:         models.NewActualLRPKey(processGuid, 6, "some-domain"),
 						ActualLRPInstanceKey: models.NewActualLRPInstanceKey("instanceId", "some-cell"),
-						ActualLRPNetInfo: models.NewActualLRPNetInfo(
-							"host2",
-							models.NewPortMapping(5432, 7890),
-							models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
-						),
-						State: models.ActualLRPStateRunning,
-						Since: actualSinceTime,
+						ActualLRPNetInfo:     netInfo2,
+						State:                models.ActualLRPStateRunning,
+						Since:                actualSinceTime,
 					}
 					return []*models.ActualLRPGroup{{Instance: actualLRP}}, nil
 
@@ -134,6 +140,7 @@ var _ = Describe("Bulk Status", func() {
 				expectedLRPInstance1 := cc_messages.LRPInstance{
 					ProcessGuid:  guid1,
 					InstanceGuid: "instanceId",
+					NetInfo:      netInfo1,
 					Index:        5,
 					State:        cc_messages.LRPInstanceStateRunning,
 					Since:        expectedSinceTime,
@@ -142,6 +149,7 @@ var _ = Describe("Bulk Status", func() {
 				expectedLRPInstance2 := cc_messages.LRPInstance{
 					ProcessGuid:  guid2,
 					InstanceGuid: "instanceId",
+					NetInfo:      netInfo2,
 					Index:        6,
 					State:        cc_messages.LRPInstanceStateRunning,
 					Since:        expectedSinceTime,

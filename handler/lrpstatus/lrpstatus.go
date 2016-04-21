@@ -68,6 +68,7 @@ func LRPInstances(
 			Since:        actual.Since / 1e9,
 			Uptime:       (clk.Now().UnixNano() - actual.Since) / 1e9,
 			State:        cc_conv.StateFor(actual.State, actual.PlacementError),
+			NetInfo:      actual.ActualLRPNetInfo,
 		}
 
 		if addInfo != nil {

@@ -73,6 +73,8 @@ var _ = Describe("Stats", func() {
 	})
 
 	Describe("retrieve container metrics", func() {
+		var netInfo models.ActualLRPNetInfo
+
 		BeforeEach(func() {
 			request.Header.Set("Authorization", authorization)
 			request.Form = url.Values{}
@@ -93,16 +95,18 @@ var _ = Describe("Stats", func() {
 				ProcessGuid: guid,
 			}, nil)
 
+			netInfo = models.NewActualLRPNetInfo(
+				"host",
+				models.NewPortMapping(5432, 7890),
+				models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
+			)
+
 			actualLRP := &models.ActualLRP{
 				ActualLRPKey:         models.NewActualLRPKey(guid, 5, "some-domain"),
 				ActualLRPInstanceKey: models.NewActualLRPInstanceKey("instanceId", "some-cell"),
-				ActualLRPNetInfo: models.NewActualLRPNetInfo(
-					"host",
-					models.NewPortMapping(5432, 7890),
-					models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
-				),
-				State: models.ActualLRPStateRunning,
-				Since: fakeClock.Now().UnixNano(),
+				ActualLRPNetInfo:     netInfo,
+				State:                models.ActualLRPStateRunning,
+				Since:                fakeClock.Now().UnixNano(),
 			}
 
 			bbsClient.ActualLRPGroupsByProcessGuidReturns([]*models.ActualLRPGroup{{
@@ -126,6 +130,7 @@ var _ = Describe("Stats", func() {
 					State:        cc_messages.LRPInstanceStateRunning,
 					Host:         "host",
 					Port:         1234,
+					NetInfo:      netInfo,
 					Since:        expectedSinceTime,
 					Uptime:       5,
 					Stats: &cc_messages.LRPInstanceStats{
@@ -167,6 +172,7 @@ var _ = Describe("Stats", func() {
 					State:        cc_messages.LRPInstanceStateRunning,
 					Host:         "host",
 					Port:         1234,
+					NetInfo:      netInfo,
 					Since:        fakeClock.Now().Unix(),
 					Uptime:       0,
 					Stats:        nil,

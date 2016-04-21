@@ -175,8 +175,10 @@ var _ = Describe("TPS-Listener", func() {
 
 	Describe("GET /v1/actual_lrps/:guid/stats", func() {
 		Context("when the bbs is running", func() {
+			var netInfo models.ActualLRPNetInfo
+
 			JustBeforeEach(func() {
-				netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
+				netInfo = models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
 
 				fakeBBS.RouteToHandler("POST", "/v1/actual_lrp_groups/list_by_process_guid",
 					ghttp.RespondWithProto(200, &models.ActualLRPGroupsResponse{
@@ -297,6 +299,7 @@ var _ = Describe("TPS-Listener", func() {
 						State:        cc_messages.LRPInstanceStateRunning,
 						Host:         "1.2.3.4",
 						Port:         65100,
+						NetInfo:      netInfo,
 						Stats: &cc_messages.LRPInstanceStats{
 							Time:          zeroTime,
 							CpuPercentage: 0.04,
@@ -382,6 +385,8 @@ var _ = Describe("TPS-Listener", func() {
 	})
 
 	Describe("GET /v1/bulk_actual_lrp_status", func() {
+		var netInfo models.ActualLRPNetInfo
+
 		JustBeforeEach(func() {
 			desiredLRP2 = &models.DesiredLRP{
 				Domain:      "some-domain",
@@ -419,7 +424,7 @@ var _ = Describe("TPS-Listener", func() {
 				},
 			)
 
-			netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
+			netInfo = models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
 
 			fakeBBS.RouteToHandler("POST", "/v1/actual_lrp_groups/list_by_process_guid",
 				func(w http.ResponseWriter, r *http.Request) {
@@ -494,6 +499,7 @@ var _ = Describe("TPS-Listener", func() {
 					ProcessGuid:  guid,
 					InstanceGuid: "some-instance-guid-1",
 					Index:        1,
+					NetInfo:      netInfo,
 					State:        cc_messages.LRPInstanceStateRunning,
 				}))
 
