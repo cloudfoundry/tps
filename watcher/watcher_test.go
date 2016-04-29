@@ -31,7 +31,7 @@ var nilEventHolder = EventHolder{}
 var _ = Describe("Watcher", func() {
 	var (
 		eventSource   *eventfakes.FakeEventSource
-		bbsClient     *fake_bbs.FakeClient
+		bbsClient     *fake_bbs.FakeInternalClient
 		ccClient      *fakes.FakeCcClient
 		watcherRunner *watcher.Watcher
 		process       ifrit.Process
@@ -44,7 +44,7 @@ var _ = Describe("Watcher", func() {
 
 	BeforeEach(func() {
 		eventSource = new(eventfakes.FakeEventSource)
-		bbsClient = new(fake_bbs.FakeClient)
+		bbsClient = new(fake_bbs.FakeInternalClient)
 		bbsClient.SubscribeToEventsReturns(eventSource, nil)
 
 		logger = lagertest.NewTestLogger("test")
@@ -91,24 +91,22 @@ var _ = Describe("Watcher", func() {
 		Eventually(process.Wait()).Should(Receive())
 	})
 
-	Describe("Actual LRP changes", func() {
-		var before *models.ActualLRPGroup
-		var after *models.ActualLRPGroup
+	Describe("Actual LRP crashes", func() {
+		var actual *models.ActualLRP
 
 		BeforeEach(func() {
-			before = makeActualLRPGroup("process-guid", "instance-guid", 1, 2, 0, cc_messages.AppLRPDomain)
-			after = makeActualLRPGroup("process-guid", "instance-guid", 1, 3, 0, cc_messages.AppLRPDomain)
+			actual = makeActualLRP("process-guid", "instance-guid", 1, 3, 0, cc_messages.AppLRPDomain)
 		})
 
 		JustBeforeEach(func() {
-			nextEvent.Store(EventHolder{models.NewActualLRPChangedEvent(before, after)})
+			nextEvent.Store(EventHolder{models.NewActualLRPCrashedEvent(actual)})
 		})
 
 		Context("when the crash count changes", func() {
 			Context("and after > before", func() {
 				BeforeEach(func() {
-					after.Instance.CrashCount = 1
-					after.Instance.CrashReason = "out of memory"
+					actual.CrashCount = 1
+					actual.CrashReason = "out of memory"
 				})
 
 				Context("and the application has the cc-app Domain", func() {
@@ -130,15 +128,13 @@ var _ = Describe("Watcher", func() {
 				})
 
 				Context("and the application does not have the cc-app Domain", func() {
-					var otherBefore *models.ActualLRPGroup
-					var otherAfter *models.ActualLRPGroup
+					var otherActual *models.ActualLRP
 
 					BeforeEach(func() {
-						otherBefore = makeActualLRPGroup("other-process-guid", "instance-guid", 1, 2, 0, "")
-						otherAfter = makeActualLRPGroup("other-process-guid", "instance-guid", 1, 3, 1, "")
+						otherActual = makeActualLRP("other-process-guid", "instance-guid", 1, 3, 1, "")
 
-						event := EventHolder{models.NewActualLRPChangedEvent(before, after)}
-						otherEvent := EventHolder{models.NewActualLRPChangedEvent(otherBefore, otherAfter)}
+						event := EventHolder{models.NewActualLRPCrashedEvent(actual)}
+						otherEvent := EventHolder{models.NewActualLRPCrashedEvent(otherActual)}
 						events := []EventHolder{otherEvent, event}
 
 						eventSource.NextStub = func() (models.Event, error) {
@@ -160,27 +156,11 @@ var _ = Describe("Watcher", func() {
 					})
 				})
 			})
-
-			Context("and after < before", func() {
-				BeforeEach(func() {
-					before.Instance.CrashCount = 1
-				})
-
-				It("does not call AppCrashed", func() {
-					Consistently(ccClient.AppCrashedCallCount).Should(Equal(0))
-				})
-			})
-		})
-
-		Context("when the crash count does not change", func() {
-			It("does not call AppCrashed", func() {
-				Consistently(ccClient.AppCrashedCallCount).Should(Equal(0))
-			})
 		})
 	})
 
 	Describe("Unrecognized events", func() {
-		Context("when its not ActualLRPChanged event", func() {
+		Context("when its not ActualLRPCrashed event", func() {
 
 			BeforeEach(func() {
 				nextEvent.Store(EventHolder{&models.ActualLRPCreatedEvent{}})
@@ -236,12 +216,12 @@ var _ = Describe("Watcher", func() {
 
 })
 
-func makeActualLRPGroup(processGuid, instanceGuid string, index, since, crashCount int32, domain string) *models.ActualLRPGroup {
+func makeActualLRP(processGuid, instanceGuid string, index, since, crashCount int32, domain string) *models.ActualLRP {
 	lrp := model_helpers.NewValidActualLRP(processGuid, index)
 	lrp.InstanceGuid = instanceGuid
 	lrp.Since = int64(since)
 	lrp.CrashCount = crashCount
 	lrp.Domain = domain
 
-	return &models.ActualLRPGroup{Instance: lrp}
+	return lrp
 }
