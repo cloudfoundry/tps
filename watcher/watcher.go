@@ -106,40 +106,34 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 }
 
 func (watcher *Watcher) handleEvent(logger lager.Logger, event models.Event) {
-	if changed, ok := event.(*models.ActualLRPChangedEvent); ok {
-		after, _ := changed.After.Resolve()
+	if crashed, ok := event.(*models.ActualLRPCrashedEvent); ok {
+		if crashed.ActualLRPKey.Domain == cc_messages.AppLRPDomain {
+			logger.Info("app-crashed", lager.Data{
+				"process-guid": crashed.ActualLRPKey.ProcessGuid,
+				"index":        crashed.ActualLRPKey.Index,
+			})
 
-		if after.Domain == cc_messages.AppLRPDomain {
-			before, _ := changed.Before.Resolve()
-
-			if after.CrashCount > before.CrashCount {
-				logger.Info("app-crashed", lager.Data{
-					"process-guid": after.ProcessGuid,
-					"index":        after.Index,
-				})
-
-				guid := after.ProcessGuid
-				appCrashed := cc_messages.AppCrashedRequest{
-					Instance:        before.InstanceGuid,
-					Index:           int(after.Index),
-					Reason:          "CRASHED",
-					ExitDescription: after.CrashReason,
-					CrashCount:      int(after.CrashCount),
-					CrashTimestamp:  after.Since,
-				}
-
-				watcher.pool.Submit(func() {
-					logger := logger.WithData(lager.Data{
-						"process-guid": guid,
-						"index":        appCrashed.Index,
-					})
-					logger.Info("recording-app-crashed")
-					err := watcher.ccClient.AppCrashed(guid, appCrashed, logger)
-					if err != nil {
-						logger.Error("failed-recording-app-crashed", err)
-					}
-				})
+			guid := crashed.ActualLRPKey.ProcessGuid
+			appCrashed := cc_messages.AppCrashedRequest{
+				Instance:        crashed.ActualLRPInstanceKey.InstanceGuid,
+				Index:           int(crashed.ActualLRPKey.Index),
+				Reason:          "CRASHED",
+				ExitDescription: crashed.CrashReason,
+				CrashCount:      int(crashed.CrashCount),
+				CrashTimestamp:  crashed.Since,
 			}
+
+			watcher.pool.Submit(func() {
+				logger := logger.WithData(lager.Data{
+					"process-guid": guid,
+					"index":        appCrashed.Index,
+				})
+				logger.Info("recording-app-crashed")
+				err := watcher.ccClient.AppCrashed(guid, appCrashed, logger)
+				if err != nil {
+					logger.Error("failed-recording-app-crashed", err)
+				}
+			})
 		}
 	}
 }
