@@ -55,6 +55,7 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 	go subscribeToEvents(logger, watcher.bbsClient, subscriptionChan)
 
 	eventChan := make(chan models.Event, 1)
+	errorChan := make(chan error, 1)
 	nextErrCount := 0
 
 	close(ready)
@@ -64,7 +65,7 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 		select {
 		case subscription = <-subscriptionChan:
 			if subscription != nil {
-				go nextEvent(logger, subscription, eventChan, watcher.retryPauseInterval)
+				go nextEvent(logger, subscription, eventChan, errorChan, watcher.retryPauseInterval)
 			} else {
 				go subscribeToEvents(logger, watcher.bbsClient, subscriptionChan)
 			}
@@ -80,7 +81,18 @@ func (watcher *Watcher) Run(signals <-chan os.Signal, ready chan<- struct{}) err
 					break
 				}
 			}
-			go nextEvent(logger, subscription, eventChan, watcher.retryPauseInterval)
+			go nextEvent(logger, subscription, eventChan, errorChan, watcher.retryPauseInterval)
+
+		case err := <-errorChan:
+			switch err {
+			case events.ErrSourceClosed:
+				logger.Debug("event-source-closed-resubscribe")
+				go subscribeToEvents(logger, watcher.bbsClient, subscriptionChan)
+
+			case events.ErrUnrecognizedEventType:
+				logger.Debug("received-unexpected-event-type")
+				go nextEvent(logger, subscription, eventChan, errorChan, watcher.retryPauseInterval)
+			}
 
 		case <-signals:
 			logger.Info("stopping")
@@ -144,7 +156,7 @@ func subscribeToEvents(logger lager.Logger, bbsClient bbs.Client, subscriptionCh
 	}
 }
 
-func nextEvent(logger lager.Logger, es events.EventSource, eventChan chan<- models.Event, retryPauseInterval time.Duration) {
+func nextEvent(logger lager.Logger, es events.EventSource, eventChan chan<- models.Event, errorChan chan<- error, retryPauseInterval time.Duration) {
 	event, err := es.Next()
 
 	switch err {
@@ -153,7 +165,11 @@ func nextEvent(logger lager.Logger, es events.EventSource, eventChan chan<- mode
 
 	case events.ErrSourceClosed:
 		logger.Error("failed-getting-next-event", err)
-		return
+		errorChan <- err
+
+	case events.ErrUnrecognizedEventType:
+		logger.Error("failed-getting-next-event", err)
+		errorChan <- err
 
 	default:
 		logger.Error("failed-getting-next-event", err)

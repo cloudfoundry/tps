@@ -234,6 +234,43 @@ var _ = Describe("Watcher", func() {
 		})
 	})
 
+	Context("when the event source returns a source closed error on next", func() {
+		BeforeEach(func() {
+			eventSource.NextStub = func() (models.Event, error) {
+				return nil, events.ErrSourceClosed
+			}
+		})
+
+		It("should re-subscribe", func() {
+			Eventually(bbsClient.SubscribeToEventsCallCount).Should(BeNumerically(">", 1))
+		})
+	})
+
+	Context("when the event source returns an unrecognized event type on next", func() {
+		var before *models.ActualLRPGroup
+		var after *models.ActualLRPGroup
+
+		BeforeEach(func() {
+			before = makeActualLRPGroup("process-guid", "instance-guid", 1, 2, 0, cc_messages.AppLRPDomain)
+			after = makeActualLRPGroup("process-guid", "instance-guid", 1, 3, 0, cc_messages.AppLRPDomain)
+			after.Instance.CrashCount = 1
+			after.Instance.CrashReason = "out of memory"
+			eventSource.NextStub = func() (models.Event, error) {
+				if eventSource.NextCallCount() == 1 {
+					return nil, events.ErrUnrecognizedEventType
+				}
+				time.Sleep(10 * time.Millisecond)
+				return &models.ActualLRPChangedEvent{Before: before, After: after}, nil
+			}
+		})
+
+		It("handles subsequent events", func() {
+			Eventually(eventSource.NextCallCount).Should(Equal(2))
+			Eventually(ccClient.AppCrashedCallCount).Should(Equal(1))
+		})
+
+	})
+
 })
 
 func makeActualLRPGroup(processGuid, instanceGuid string, index, since, crashCount int32, domain string) *models.ActualLRPGroup {
