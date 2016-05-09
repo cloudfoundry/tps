@@ -255,8 +255,10 @@ var _ = Describe("Watcher", func() {
 			after = makeActualLRPGroup("process-guid", "instance-guid", 1, 3, 0, cc_messages.AppLRPDomain)
 			after.Instance.CrashCount = 1
 			after.Instance.CrashReason = "out of memory"
+			callCount := 0
 			eventSource.NextStub = func() (models.Event, error) {
-				if eventSource.NextCallCount() == 1 {
+				callCount += 1
+				if callCount == 1 {
 					return nil, events.ErrUnrecognizedEventType
 				}
 				time.Sleep(10 * time.Millisecond)
