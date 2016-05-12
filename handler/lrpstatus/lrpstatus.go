@@ -32,7 +32,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	logger := handler.logger.Session("lrp-status", lager.Data{"process-guid": guid})
 
 	logger.Info("fetching-actual-lrp-info")
-	actualLRPGroups, err := handler.apiClient.ActualLRPGroupsByProcessGuid(guid)
+	actualLRPGroups, err := handler.apiClient.ActualLRPGroupsByProcessGuid(logger, guid)
 	if err != nil {
 		logger.Error("failed-fetching-actual-lrp-info", err)
 		w.WriteHeader(http.StatusInternalServerError)

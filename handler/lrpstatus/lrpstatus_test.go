@@ -15,6 +15,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-golang/clock/fakeclock"
+	"github.com/pivotal-golang/lager"
 	"github.com/pivotal-golang/lager/lagertest"
 )
 
@@ -39,7 +40,7 @@ var _ = Describe("LRPStatus", func() {
 
 	Describe("Instance state", func() {
 		BeforeEach(func() {
-			fakeClient.ActualLRPGroupsByProcessGuidStub = func(string) ([]*models.ActualLRPGroup, error) {
+			fakeClient.ActualLRPGroupsByProcessGuidStub = func(lager.Logger, string) ([]*models.ActualLRPGroup, error) {
 				return []*models.ActualLRPGroup{
 					makeActualLRPGroup(1, models.ActualLRPStateUnclaimed, ""),
 					makeActualLRPGroup(2, models.ActualLRPStateClaimed, ""),

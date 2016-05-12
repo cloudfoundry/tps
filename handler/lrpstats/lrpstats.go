@@ -47,7 +47,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	logger := handler.logger.Session("lrp-stats", lager.Data{"process-guid": guid})
 
 	logger.Info("fetching-desired-lrp")
-	desiredLRP, err := handler.bbsClient.DesiredLRPByProcessGuid(guid)
+	desiredLRP, err := handler.bbsClient.DesiredLRPByProcessGuid(logger, guid)
 	if err != nil {
 		logger.Error("fetching-desired-lrp-failed", err)
 		switch models.ConvertError(err).Type {
@@ -60,7 +60,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Info("fetching-actual-lrp-info")
-	actualLRPs, err := handler.bbsClient.ActualLRPGroupsByProcessGuid(guid)
+	actualLRPs, err := handler.bbsClient.ActualLRPGroupsByProcessGuid(logger, guid)
 	if err != nil {
 		logger.Error("fetching-actual-lrp-info-failed", err)
 		w.WriteHeader(http.StatusInternalServerError)

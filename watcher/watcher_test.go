@@ -14,6 +14,7 @@ import (
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/tps/cc_client/fakes"
 	"github.com/cloudfoundry-incubator/tps/watcher"
+	"github.com/pivotal-golang/lager"
 	"github.com/pivotal-golang/lager/lagertest"
 	"github.com/tedsuo/ifrit"
 
@@ -95,66 +96,57 @@ var _ = Describe("Watcher", func() {
 		var actual *models.ActualLRP
 
 		BeforeEach(func() {
-			actual = makeActualLRP("process-guid", "instance-guid", 1, 3, 0, cc_messages.AppLRPDomain)
+			actual = makeActualLRP("process-guid", "instance-guid", 1, 3, 1, cc_messages.AppLRPDomain, "out of memory")
 		})
 
 		JustBeforeEach(func() {
 			nextEvent.Store(EventHolder{models.NewActualLRPCrashedEvent(actual)})
 		})
 
-		Context("when the crash count changes", func() {
-			Context("and after > before", func() {
-				BeforeEach(func() {
-					actual.CrashCount = 1
-					actual.CrashReason = "out of memory"
-				})
+		Context("and the application has the cc-app Domain", func() {
+			It("calls AppCrashed", func() {
+				Eventually(ccClient.AppCrashedCallCount).Should(Equal(1))
+				guid, crashed, _ := ccClient.AppCrashedArgsForCall(0)
+				Expect(guid).To(Equal("process-guid"))
+				Expect(crashed).To(Equal(cc_messages.AppCrashedRequest{
+					Instance:        "instance-guid",
+					Index:           1,
+					Reason:          "CRASHED",
+					ExitDescription: "out of memory",
+					CrashCount:      1,
+					CrashTimestamp:  3,
+				}))
 
-				Context("and the application has the cc-app Domain", func() {
-					It("calls AppCrashed", func() {
-						Eventually(ccClient.AppCrashedCallCount).Should(Equal(1))
-						guid, crashed, _ := ccClient.AppCrashedArgsForCall(0)
-						Expect(guid).To(Equal("process-guid"))
-						Expect(crashed).To(Equal(cc_messages.AppCrashedRequest{
-							Instance:        "instance-guid",
-							Index:           1,
-							Reason:          "CRASHED",
-							ExitDescription: "out of memory",
-							CrashCount:      1,
-							CrashTimestamp:  3,
-						}))
+				Expect(logger).To(Say("app-crashed"))
+			})
+		})
 
-						Expect(logger).To(Say("app-crashed"))
-					})
-				})
+		Context("and the application does not have the cc-app Domain", func() {
+			var otherActual *models.ActualLRP
 
-				Context("and the application does not have the cc-app Domain", func() {
-					var otherActual *models.ActualLRP
+			BeforeEach(func() {
+				otherActual = makeActualLRP("other-process-guid", "instance-guid", 1, 3, 1, "", "")
 
-					BeforeEach(func() {
-						otherActual = makeActualLRP("other-process-guid", "instance-guid", 1, 3, 1, "")
+				event := EventHolder{models.NewActualLRPCrashedEvent(actual)}
+				otherEvent := EventHolder{models.NewActualLRPCrashedEvent(otherActual)}
+				events := []EventHolder{otherEvent, event}
 
-						event := EventHolder{models.NewActualLRPCrashedEvent(actual)}
-						otherEvent := EventHolder{models.NewActualLRPCrashedEvent(otherActual)}
-						events := []EventHolder{otherEvent, event}
+				eventSource.NextStub = func() (models.Event, error) {
+					var e EventHolder
+					time.Sleep(10 * time.Millisecond)
+					if len(events) == 0 {
+						return nil, nil
+					}
+					e, events = events[0], events[1:]
+					return e.event, nil
+				}
+			})
 
-						eventSource.NextStub = func() (models.Event, error) {
-							var e EventHolder
-							time.Sleep(10 * time.Millisecond)
-							if len(events) == 0 {
-								return nil, nil
-							}
-							e, events = events[0], events[1:]
-							return e.event, nil
-						}
-					})
-
-					It("does not call AppCrashed", func() {
-						Eventually(ccClient.AppCrashedCallCount).Should(Equal(1))
-						buffer := logger.Buffer()
-						Expect(buffer).To(Say("process-guid"))
-						Expect(buffer).NotTo(Say("other-process-guid"))
-					})
-				})
+			It("does not call AppCrashed", func() {
+				Eventually(ccClient.AppCrashedCallCount).Should(Equal(1))
+				buffer := logger.Buffer()
+				Expect(buffer).To(Say("process-guid"))
+				Expect(buffer).NotTo(Say("other-process-guid"))
 			})
 		})
 	})
@@ -178,7 +170,7 @@ var _ = Describe("Watcher", func() {
 		BeforeEach(func() {
 			subscribeErr = models.ErrUnknownError
 
-			bbsClient.SubscribeToEventsStub = func() (events.EventSource, error) {
+			bbsClient.SubscribeToEventsStub = func(logger lager.Logger) (events.EventSource, error) {
 				if bbsClient.SubscribeToEventsCallCount() > 1 {
 					return eventSource, nil
 				}
@@ -214,53 +206,15 @@ var _ = Describe("Watcher", func() {
 		})
 	})
 
-	Context("when the event source returns a source closed error on next", func() {
-		BeforeEach(func() {
-			eventSource.NextStub = func() (models.Event, error) {
-				return nil, events.ErrSourceClosed
-			}
-		})
-
-		It("should re-subscribe", func() {
-			Eventually(bbsClient.SubscribeToEventsCallCount).Should(BeNumerically(">", 1))
-		})
-	})
-
-	Context("when the event source returns an unrecognized event type on next", func() {
-		var before *models.ActualLRPGroup
-		var after *models.ActualLRPGroup
-
-		BeforeEach(func() {
-			before = makeActualLRPGroup("process-guid", "instance-guid", 1, 2, 0, cc_messages.AppLRPDomain)
-			after = makeActualLRPGroup("process-guid", "instance-guid", 1, 3, 0, cc_messages.AppLRPDomain)
-			after.Instance.CrashCount = 1
-			after.Instance.CrashReason = "out of memory"
-			callCount := 0
-			eventSource.NextStub = func() (models.Event, error) {
-				callCount += 1
-				if callCount == 1 {
-					return nil, events.ErrUnrecognizedEventType
-				}
-				time.Sleep(10 * time.Millisecond)
-				return &models.ActualLRPChangedEvent{Before: before, After: after}, nil
-			}
-		})
-
-		It("handles subsequent events", func() {
-			Eventually(eventSource.NextCallCount).Should(Equal(2))
-			Eventually(ccClient.AppCrashedCallCount).Should(Equal(1))
-		})
-
-	})
-
 })
 
-func makeActualLRP(processGuid, instanceGuid string, index, since, crashCount int32, domain string) *models.ActualLRP {
+func makeActualLRP(processGuid, instanceGuid string, index, since, crashCount int32, domain, reason string) *models.ActualLRP {
 	lrp := model_helpers.NewValidActualLRP(processGuid, index)
 	lrp.InstanceGuid = instanceGuid
 	lrp.Since = int64(since)
 	lrp.CrashCount = crashCount
 	lrp.Domain = domain
+	lrp.CrashReason = reason
 
 	return lrp
 }

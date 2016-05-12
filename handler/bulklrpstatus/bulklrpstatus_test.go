@@ -14,6 +14,7 @@ import (
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry-incubator/tps/handler/bulklrpstatus"
 	"github.com/pivotal-golang/clock/fakeclock"
+	"github.com/pivotal-golang/lager"
 	"github.com/pivotal-golang/lager/lagertest"
 
 	. "github.com/onsi/ginkgo"
@@ -106,7 +107,7 @@ var _ = Describe("Bulk Status", func() {
 			query.Set("guids", fmt.Sprintf("%s,%s", guid1, guid2))
 			request.URL.RawQuery = query.Encode()
 
-			bbsClient.ActualLRPGroupsByProcessGuidStub = func(processGuid string) ([]*models.ActualLRPGroup, error) {
+			bbsClient.ActualLRPGroupsByProcessGuidStub = func(logger lager.Logger, processGuid string) ([]*models.ActualLRPGroup, error) {
 				switch processGuid {
 
 				case guid1:
@@ -171,7 +172,7 @@ var _ = Describe("Bulk Status", func() {
 
 		Context("when fetching one of the actualLRPs fails", func() {
 			BeforeEach(func() {
-				bbsClient.ActualLRPGroupsByProcessGuidStub = func(processGuid string) ([]*models.ActualLRPGroup, error) {
+				bbsClient.ActualLRPGroupsByProcessGuidStub = func(logger lager.Logger, processGuid string) ([]*models.ActualLRPGroup, error) {
 					switch processGuid {
 
 					case guid1:

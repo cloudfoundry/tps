@@ -81,13 +81,11 @@ var _ = Describe("TPS", func() {
 			instanceKey := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
 			netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
 			beforeActualLRP := *models.NewRunningActualLRP(lrpKey, instanceKey, netInfo, 0)
-			before := models.ActualLRPGroup{Instance: &beforeActualLRP}
 			afterActualLRP := beforeActualLRP
 			afterActualLRP.State = models.ActualLRPStateCrashed
 			afterActualLRP.Since = int64(1)
 			afterActualLRP.CrashCount = 1
 			afterActualLRP.CrashReason = "out of memory"
-			after := models.ActualLRPGroup{Instance: &afterActualLRP}
 
 			fakeBBS.RouteToHandler("GET", "/v1/events",
 				func(w http.ResponseWriter, _ *http.Request) {
@@ -100,7 +98,7 @@ var _ = Describe("TPS", func() {
 					flusher := w.(http.Flusher)
 					flusher.Flush()
 					closeNotifier := w.(http.CloseNotifier).CloseNotify()
-					event := models.NewActualLRPChangedEvent(&before, &after)
+					event := models.NewActualLRPCrashedEvent(&afterActualLRP)
 
 					sseEvent, err := events.NewEventFromModelEvent(0, event)
 					Expect(err).NotTo(HaveOccurred())

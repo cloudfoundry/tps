@@ -11,6 +11,7 @@ import (
 	"github.com/cloudfoundry-incubator/tps/handler/lrpstats/fakes"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
+	"github.com/pivotal-golang/lager"
 	"github.com/pivotal-golang/lager/lagertest"
 
 	. "github.com/onsi/ginkgo"
@@ -50,11 +51,11 @@ var _ = Describe("Handler", func() {
 
 			fakeActualLRPResponses = make(chan []*models.ActualLRPGroup, 2)
 
-			bbsClient.DesiredLRPByProcessGuidStub = func(string) (*models.DesiredLRP, error) {
+			bbsClient.DesiredLRPByProcessGuidStub = func(lager.Logger, string) (*models.DesiredLRP, error) {
 				return &models.DesiredLRP{}, nil
 			}
 
-			bbsClient.ActualLRPGroupsByProcessGuidStub = func(string) ([]*models.ActualLRPGroup, error) {
+			bbsClient.ActualLRPGroupsByProcessGuidStub = func(lager.Logger, string) ([]*models.ActualLRPGroup, error) {
 				return <-fakeActualLRPResponses, nil
 			}
 

@@ -77,7 +77,7 @@ func (handler *handler) getStatusForLRPWorkFunction(logger lager.Logger, process
 		logger = logger.Session("fetching-actual-lrps-info", lager.Data{"process-guid": processGuid})
 		logger.Info("start")
 		defer logger.Info("complete")
-		actualLRPGroups, err := handler.bbsClient.ActualLRPGroupsByProcessGuid(processGuid)
+		actualLRPGroups, err := handler.bbsClient.ActualLRPGroupsByProcessGuid(logger, processGuid)
 		if err != nil {
 			logger.Error("fetching-actual-lrps-info-failed", err)
 			return
