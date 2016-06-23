@@ -99,6 +99,15 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		handler.clock,
 	)
 
+	for i, instance := range instances {
+		if instance.State == cc_messages.LRPInstanceStateCrashed {
+			instances[i].Uptime = 0
+			instances[i].Stats.CpuPercentage = 0
+			instances[i].Stats.MemoryBytes = 0
+			instances[i].Stats.DiskBytes = 0
+		}
+	}
+
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 

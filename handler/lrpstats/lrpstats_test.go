@@ -74,6 +74,7 @@ var _ = Describe("Stats", func() {
 
 	Describe("retrieve container metrics", func() {
 		var netInfo models.ActualLRPNetInfo
+		var actualLRP *models.ActualLRP
 
 		BeforeEach(func() {
 			request.Header.Set("Authorization", authorization)
@@ -101,7 +102,7 @@ var _ = Describe("Stats", func() {
 				models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
 			)
 
-			actualLRP := &models.ActualLRP{
+			actualLRP = &models.ActualLRP{
 				ActualLRPKey:         models.NewActualLRPKey(guid, 5, "some-domain"),
 				ActualLRPInstanceKey: models.NewActualLRPInstanceKey("instanceId", "some-cell"),
 				ActualLRPNetInfo:     netInfo,
@@ -112,6 +113,45 @@ var _ = Describe("Stats", func() {
 			bbsClient.ActualLRPGroupsByProcessGuidReturns([]*models.ActualLRPGroup{{
 				Instance: actualLRP},
 			}, nil)
+		})
+
+		Context("when the LRP has crashed", func() {
+			var expectedSinceTime int64
+
+			BeforeEach(func() {
+				expectedSinceTime = fakeClock.Now().Unix()
+				fakeClock.Increment(5 * time.Second)
+				actualLRP.State = models.ActualLRPStateCrashed
+			})
+
+			It("returns a map of stats & status per index in the correct units", func() {
+				expectedLRPInstance := cc_messages.LRPInstance{
+					ProcessGuid:  guid,
+					InstanceGuid: "instanceId",
+					Index:        5,
+					State:        cc_messages.LRPInstanceStateCrashed,
+					Host:         "host",
+					Port:         1234,
+					NetInfo:      netInfo,
+					Since:        expectedSinceTime,
+					Uptime:       0,
+					Stats: &cc_messages.LRPInstanceStats{
+						Time:          time.Unix(0, 0),
+						CpuPercentage: 0,
+						MemoryBytes:   0,
+						DiskBytes:     0,
+					},
+				}
+				var stats []cc_messages.LRPInstance
+
+				Expect(response.Code).To(Equal(http.StatusOK))
+				Expect(response.Header().Get("Content-Type")).To(Equal("application/json"))
+				err := json.Unmarshal(response.Body.Bytes(), &stats)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(stats[0].Stats.Time).NotTo(BeZero())
+				expectedLRPInstance.Stats.Time = stats[0].Stats.Time
+				Expect(stats).To(ConsistOf(expectedLRPInstance))
+			})
 		})
 
 		Context("when the LRP has been running for a while", func() {
