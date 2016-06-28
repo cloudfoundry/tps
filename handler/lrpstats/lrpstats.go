@@ -102,9 +102,11 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for i, instance := range instances {
 		if instance.State == cc_messages.LRPInstanceStateCrashed {
 			instances[i].Uptime = 0
-			instances[i].Stats.CpuPercentage = 0
-			instances[i].Stats.MemoryBytes = 0
-			instances[i].Stats.DiskBytes = 0
+			if instances[i].Stats != nil {
+				instances[i].Stats.CpuPercentage = 0
+				instances[i].Stats.MemoryBytes = 0
+				instances[i].Stats.DiskBytes = 0
+			}
 		}
 	}
 

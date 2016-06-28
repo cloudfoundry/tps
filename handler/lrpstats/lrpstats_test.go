@@ -200,12 +200,10 @@ var _ = Describe("Stats", func() {
 		})
 
 		Context("when ContainerMetrics fails", func() {
+			var expectedLRPInstance cc_messages.LRPInstance
 			BeforeEach(func() {
 				noaaClient.ContainerMetricsReturns(nil, errors.New("bad stuff happened"))
-			})
-
-			It("responds with empty stats", func() {
-				expectedLRPInstance := cc_messages.LRPInstance{
+				expectedLRPInstance = cc_messages.LRPInstance{
 					ProcessGuid:  guid,
 					InstanceGuid: "instanceId",
 					Index:        5,
@@ -217,7 +215,9 @@ var _ = Describe("Stats", func() {
 					Uptime:       0,
 					Stats:        nil,
 				}
+			})
 
+			It("responds with empty stats", func() {
 				var stats []cc_messages.LRPInstance
 				Expect(response.Code).To(Equal(http.StatusOK))
 				Expect(response.Header().Get("Content-Type")).To(Equal("application/json"))
@@ -228,6 +228,22 @@ var _ = Describe("Stats", func() {
 
 			It("logs the failure", func() {
 				Expect(logger).To(Say("container-metrics-failed"))
+			})
+
+			Context("when the instance is crashing", func() {
+				BeforeEach(func() {
+					actualLRP.State = models.ActualLRPStateCrashed
+					expectedLRPInstance.State = models.ActualLRPStateCrashed
+				})
+
+				It("response with empty stats", func() {
+					var stats []cc_messages.LRPInstance
+					Expect(response.Code).To(Equal(http.StatusOK))
+					Expect(response.Header().Get("Content-Type")).To(Equal("application/json"))
+					err := json.Unmarshal(response.Body.Bytes(), &stats)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(stats).To(ConsistOf(expectedLRPInstance))
+				})
 			})
 		})
 
