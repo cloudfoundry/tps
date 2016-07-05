@@ -8,11 +8,11 @@ import (
 	"net/url"
 	"time"
 
+	"code.cloudfoundry.org/nsync/recipebuilder"
 	"code.cloudfoundry.org/tps/handler/lrpstats"
 	"code.cloudfoundry.org/tps/handler/lrpstats/fakes"
 	"github.com/cloudfoundry-incubator/bbs/fake_bbs"
 	"github.com/cloudfoundry-incubator/bbs/models"
-	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"

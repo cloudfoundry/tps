@@ -8,10 +8,10 @@ import (
 	"net/http/httptest"
 	"time"
 
+	"code.cloudfoundry.org/nsync/recipebuilder"
 	"code.cloudfoundry.org/tps/handler/bulklrpstatus"
 	"github.com/cloudfoundry-incubator/bbs/fake_bbs"
 	"github.com/cloudfoundry-incubator/bbs/models"
-	"github.com/cloudfoundry-incubator/nsync/recipebuilder"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/pivotal-golang/clock/fakeclock"
 	"github.com/pivotal-golang/lager"
