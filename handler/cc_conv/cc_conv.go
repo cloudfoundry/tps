@@ -1,8 +1,8 @@
 package cc_conv
 
 import (
-	"github.com/cloudfoundry-incubator/bbs/models"
-	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
+	"code.cloudfoundry.org/bbs/models"
+	"code.cloudfoundry.org/runtimeschema/cc_messages"
 )
 
 func StateFor(state, placementError string) cc_messages.LRPInstanceState {

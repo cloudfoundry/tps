@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
+	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/runtimeschema/cc_messages"
 	"github.com/cloudfoundry/gunk/urljoiner"
-	"github.com/pivotal-golang/lager"
 )
 
 const (

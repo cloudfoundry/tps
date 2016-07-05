@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"net/url"
 
+	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/runtimeschema/cc_messages"
 	"code.cloudfoundry.org/tps/cc_client"
-	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
-	"github.com/pivotal-golang/lager"
 )
 
 var _ = Describe("CC Client", func() {

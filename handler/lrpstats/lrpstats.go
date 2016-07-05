@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"code.cloudfoundry.org/bbs"
+	"code.cloudfoundry.org/bbs/models"
+	"code.cloudfoundry.org/clock"
+	"code.cloudfoundry.org/lager"
 	"code.cloudfoundry.org/nsync/recipebuilder"
+	"code.cloudfoundry.org/runtimeschema/cc_messages"
 	"code.cloudfoundry.org/tps/handler/lrpstatus"
-	"github.com/cloudfoundry-incubator/bbs"
-	"github.com/cloudfoundry-incubator/bbs/models"
-	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry/sonde-go/events"
-	"github.com/pivotal-golang/clock"
-	"github.com/pivotal-golang/lager"
 )
 
 //go:generate counterfeiter -o fakes/fake_noaaclient.go . NoaaClient

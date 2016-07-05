@@ -5,14 +5,14 @@ import (
 	"net/http/httptest"
 	"sync"
 
+	"code.cloudfoundry.org/bbs/fake_bbs"
+	"code.cloudfoundry.org/bbs/models"
+	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/lager/lagertest"
 	"code.cloudfoundry.org/tps/handler"
 	"code.cloudfoundry.org/tps/handler/lrpstats/fakes"
-	"github.com/cloudfoundry-incubator/bbs/fake_bbs"
-	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
-	"github.com/pivotal-golang/lager"
-	"github.com/pivotal-golang/lager/lagertest"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -9,17 +9,17 @@ import (
 	"net/url"
 	"os"
 
+	"code.cloudfoundry.org/bbs"
+	"code.cloudfoundry.org/cflager"
+	"code.cloudfoundry.org/clock"
+	"code.cloudfoundry.org/consuladapter"
+	"code.cloudfoundry.org/debugserver"
+	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/locket"
 	"code.cloudfoundry.org/tps/handler"
-	"github.com/cloudfoundry-incubator/bbs"
-	"github.com/cloudfoundry-incubator/cf-debug-server"
-	"github.com/cloudfoundry-incubator/cf-lager"
-	"github.com/cloudfoundry-incubator/consuladapter"
-	"github.com/cloudfoundry-incubator/locket"
 	"github.com/cloudfoundry/dropsonde"
 	"github.com/cloudfoundry/noaa/consumer"
 	"github.com/hashicorp/consul/api"
-	"github.com/pivotal-golang/clock"
-	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/grouper"
 	"github.com/tedsuo/ifrit/http_server"
@@ -109,11 +109,11 @@ const (
 )
 
 func main() {
-	cf_debug_server.AddFlags(flag.CommandLine)
-	cf_lager.AddFlags(flag.CommandLine)
+	debugserver.AddFlags(flag.CommandLine)
+	cflager.AddFlags(flag.CommandLine)
 	flag.Parse()
 
-	logger, reconfigurableSink := cf_lager.New("tps-listener")
+	logger, reconfigurableSink := cflager.New("tps-listener")
 	initializeDropsonde(logger)
 	noaaClient := consumer.New(*trafficControllerURL, &tls.Config{InsecureSkipVerify: *skipSSLVerification}, nil)
 	defer noaaClient.Close()
@@ -131,9 +131,9 @@ func main() {
 		{"registration-runner", registrationRunner},
 	}
 
-	if dbgAddr := cf_debug_server.DebugAddress(flag.CommandLine); dbgAddr != "" {
+	if dbgAddr := debugserver.DebugAddress(flag.CommandLine); dbgAddr != "" {
 		members = append(grouper.Members{
-			{"debug-server", cf_debug_server.Runner(dbgAddr, reconfigurableSink)},
+			{"debug-server", debugserver.Runner(dbgAddr, reconfigurableSink)},
 		}, members...)
 	}
 

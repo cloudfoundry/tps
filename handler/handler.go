@@ -3,13 +3,13 @@ package handler
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/bbs"
+	"code.cloudfoundry.org/clock"
+	"code.cloudfoundry.org/lager"
 	"code.cloudfoundry.org/tps"
 	"code.cloudfoundry.org/tps/handler/bulklrpstatus"
 	"code.cloudfoundry.org/tps/handler/lrpstats"
 	"code.cloudfoundry.org/tps/handler/lrpstatus"
-	"github.com/cloudfoundry-incubator/bbs"
-	"github.com/pivotal-golang/clock"
-	"github.com/pivotal-golang/lager"
 	"github.com/tedsuo/rata"
 )
 

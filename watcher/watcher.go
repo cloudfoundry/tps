@@ -4,13 +4,13 @@ import (
 	"os"
 	"time"
 
+	"code.cloudfoundry.org/bbs"
+	"code.cloudfoundry.org/bbs/events"
+	"code.cloudfoundry.org/bbs/models"
+	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/runtimeschema/cc_messages"
 	"code.cloudfoundry.org/tps/cc_client"
-	"github.com/cloudfoundry-incubator/bbs"
-	"github.com/cloudfoundry-incubator/bbs/events"
-	"github.com/cloudfoundry-incubator/bbs/models"
-	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	"github.com/cloudfoundry/gunk/workpool"
-	"github.com/pivotal-golang/lager"
 )
 
 const DefaultRetryPauseInterval = time.Second

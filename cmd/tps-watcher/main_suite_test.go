@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"code.cloudfoundry.org/consuladapter/consulrunner"
+	"code.cloudfoundry.org/lager/lagertest"
 	"code.cloudfoundry.org/tps/cmd/tpsrunner"
-	"github.com/cloudfoundry-incubator/consuladapter/consulrunner"
-	"github.com/pivotal-golang/lager/lagertest"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/ginkgomon"
 

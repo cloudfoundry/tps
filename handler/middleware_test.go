@@ -4,13 +4,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/lager/lagertest"
 	"code.cloudfoundry.org/tps/handler"
 	"code.cloudfoundry.org/tps/handler/handler_fakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
-	"github.com/pivotal-golang/lager"
-	"github.com/pivotal-golang/lager/lagertest"
 )
 
 var _ = Describe("Middleware", func() {

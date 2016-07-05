@@ -10,14 +10,14 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
-	"github.com/pivotal-golang/clock"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/ginkgomon"
 
-	"github.com/cloudfoundry-incubator/bbs/events"
-	"github.com/cloudfoundry-incubator/bbs/models"
-	"github.com/cloudfoundry-incubator/locket"
-	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
+	"code.cloudfoundry.org/bbs/events"
+	"code.cloudfoundry.org/bbs/models"
+	"code.cloudfoundry.org/clock"
+	"code.cloudfoundry.org/locket"
+	"code.cloudfoundry.org/runtimeschema/cc_messages"
 )
 
 const watcherLockName = "tps_watcher_lock"

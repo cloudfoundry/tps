@@ -6,17 +6,17 @@ import (
 	"net/http/httptest"
 	"time"
 
+	"code.cloudfoundry.org/bbs/fake_bbs"
+	"code.cloudfoundry.org/bbs/models"
+	"code.cloudfoundry.org/bbs/models/test/model_helpers"
+	"code.cloudfoundry.org/clock/fakeclock"
+	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/lager/lagertest"
+	"code.cloudfoundry.org/runtimeschema/cc_messages"
 	"code.cloudfoundry.org/stager/diego_errors"
 	"code.cloudfoundry.org/tps/handler/lrpstatus"
-	"github.com/cloudfoundry-incubator/bbs/fake_bbs"
-	"github.com/cloudfoundry-incubator/bbs/models"
-	"github.com/cloudfoundry-incubator/bbs/models/test/model_helpers"
-	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-golang/clock/fakeclock"
-	"github.com/pivotal-golang/lager"
-	"github.com/pivotal-golang/lager/lagertest"
 )
 
 var _ = Describe("LRPStatus", func() {

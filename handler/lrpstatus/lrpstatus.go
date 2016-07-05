@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"code.cloudfoundry.org/bbs"
+	"code.cloudfoundry.org/bbs/models"
+	"code.cloudfoundry.org/clock"
+	"code.cloudfoundry.org/lager"
 	"code.cloudfoundry.org/tps/handler/cc_conv"
-	"github.com/cloudfoundry-incubator/bbs"
-	"github.com/cloudfoundry-incubator/bbs/models"
-	"github.com/pivotal-golang/clock"
-	"github.com/pivotal-golang/lager"
 
-	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
+	"code.cloudfoundry.org/runtimeschema/cc_messages"
 )
 
 type handler struct {

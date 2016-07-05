@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"code.cloudfoundry.org/consuladapter/consulrunner"
+	"code.cloudfoundry.org/lager/lagertest"
 	"code.cloudfoundry.org/tps/cmd/tpsrunner"
-	"github.com/cloudfoundry-incubator/consuladapter/consulrunner"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/config"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 	"github.com/onsi/gomega/ghttp"
-	"github.com/pivotal-golang/lager/lagertest"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/ginkgomon"
 

@@ -4,9 +4,9 @@ package fakes
 import (
 	"sync"
 
+	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/runtimeschema/cc_messages"
 	"code.cloudfoundry.org/tps/cc_client"
-	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
-	"github.com/pivotal-golang/lager"
 )
 
 type FakeCcClient struct {
