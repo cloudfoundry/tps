@@ -6,12 +6,12 @@ import (
 	"net/http/httptest"
 	"time"
 
+	"code.cloudfoundry.org/stager/diego_errors"
 	"code.cloudfoundry.org/tps/handler/lrpstatus"
 	"github.com/cloudfoundry-incubator/bbs/fake_bbs"
 	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/bbs/models/test/model_helpers"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
-	"github.com/cloudfoundry-incubator/stager/diego_errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-golang/clock/fakeclock"
