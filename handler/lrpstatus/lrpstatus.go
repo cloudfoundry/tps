@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"code.cloudfoundry.org/tps/handler/cc_conv"
 	"github.com/cloudfoundry-incubator/bbs"
 	"github.com/cloudfoundry-incubator/bbs/models"
-	"github.com/cloudfoundry-incubator/tps/handler/cc_conv"
 	"github.com/pivotal-golang/clock"
 	"github.com/pivotal-golang/lager"
 

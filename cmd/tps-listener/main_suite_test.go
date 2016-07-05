@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"code.cloudfoundry.org/tps/cmd/tpsrunner"
 	"github.com/cloudfoundry-incubator/consuladapter/consulrunner"
-	"github.com/cloudfoundry-incubator/tps/cmd/tpsrunner"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/config"
 	. "github.com/onsi/gomega"
@@ -41,7 +41,7 @@ func TestTPS(t *testing.T) {
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	tps, err := gexec.Build("github.com/cloudfoundry-incubator/tps/cmd/tps-listener", "-race")
+	tps, err := gexec.Build("code.cloudfoundry.org/tps/cmd/tps-listener", "-race")
 	Expect(err).NotTo(HaveOccurred())
 
 	payload, err := json.Marshal(map[string]string{

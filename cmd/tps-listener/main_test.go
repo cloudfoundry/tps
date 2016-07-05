@@ -19,9 +19,9 @@ import (
 	"github.com/tedsuo/ifrit/ginkgomon"
 	"github.com/tedsuo/rata"
 
+	"code.cloudfoundry.org/tps"
 	"github.com/cloudfoundry-incubator/bbs/models"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
-	"github.com/cloudfoundry-incubator/tps"
 )
 
 var _ = Describe("TPS-Listener", func() {

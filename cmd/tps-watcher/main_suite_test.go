@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"code.cloudfoundry.org/tps/cmd/tpsrunner"
 	"github.com/cloudfoundry-incubator/consuladapter/consulrunner"
-	"github.com/cloudfoundry-incubator/tps/cmd/tpsrunner"
 	"github.com/pivotal-golang/lager/lagertest"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/ginkgomon"
@@ -38,7 +38,7 @@ func TestTPS(t *testing.T) {
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	tps, err := gexec.Build("github.com/cloudfoundry-incubator/tps/cmd/tps-watcher", "-race")
+	tps, err := gexec.Build("code.cloudfoundry.org/tps/cmd/tps-watcher", "-race")
 	Expect(err).NotTo(HaveOccurred())
 
 	payload, err := json.Marshal(map[string]string{

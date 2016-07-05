@@ -5,10 +5,10 @@ import (
 	"net/http/httptest"
 	"sync"
 
+	"code.cloudfoundry.org/tps/handler"
+	"code.cloudfoundry.org/tps/handler/lrpstats/fakes"
 	"github.com/cloudfoundry-incubator/bbs/fake_bbs"
 	"github.com/cloudfoundry-incubator/bbs/models"
-	"github.com/cloudfoundry-incubator/tps/handler"
-	"github.com/cloudfoundry-incubator/tps/handler/lrpstats/fakes"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
 	"github.com/pivotal-golang/lager"

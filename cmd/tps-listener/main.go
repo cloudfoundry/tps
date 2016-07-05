@@ -9,12 +9,12 @@ import (
 	"net/url"
 	"os"
 
+	"code.cloudfoundry.org/tps/handler"
 	"github.com/cloudfoundry-incubator/bbs"
 	"github.com/cloudfoundry-incubator/cf-debug-server"
 	"github.com/cloudfoundry-incubator/cf-lager"
 	"github.com/cloudfoundry-incubator/consuladapter"
 	"github.com/cloudfoundry-incubator/locket"
-	"github.com/cloudfoundry-incubator/tps/handler"
 	"github.com/cloudfoundry/dropsonde"
 	"github.com/cloudfoundry/noaa/consumer"
 	"github.com/hashicorp/consul/api"

@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"code.cloudfoundry.org/tps/cc_client"
 	"github.com/cloudfoundry-incubator/runtime-schema/cc_messages"
-	"github.com/cloudfoundry-incubator/tps/cc_client"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"

@@ -4,7 +4,7 @@ package fakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry-incubator/tps/handler/lrpstats"
+	"code.cloudfoundry.org/tps/handler/lrpstats"
 	"github.com/cloudfoundry/sonde-go/events"
 )
 
@@ -22,7 +22,7 @@ type FakeNoaaClient struct {
 	CloseStub        func() error
 	closeMutex       sync.RWMutex
 	closeArgsForCall []struct{}
-	closeReturns struct {
+	closeReturns     struct {
 		result1 error
 	}
 }

@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/cloudfoundry-incubator/tps/handler"
-	"github.com/cloudfoundry-incubator/tps/handler/handler_fakes"
+	"code.cloudfoundry.org/tps/handler"
+	"code.cloudfoundry.org/tps/handler/handler_fakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
