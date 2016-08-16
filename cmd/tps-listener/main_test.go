@@ -193,7 +193,7 @@ var _ = Describe("TPS-Listener", func() {
 
 			Context("when a DesiredLRP is not found", func() {
 				BeforeEach(func() {
-					fakeBBS.RouteToHandler("POST", "/v1/desired_lrps/get_by_process_guid.r1",
+					fakeBBS.RouteToHandler("POST", "/v1/desired_lrps/get_by_process_guid.r2",
 						ghttp.RespondWithProto(200, &models.DesiredLRPResponse{
 							Error: models.ErrResourceNotFound,
 						}),
@@ -239,7 +239,7 @@ var _ = Describe("TPS-Listener", func() {
 						},
 					)
 
-					fakeBBS.RouteToHandler("POST", "/v1/desired_lrps/get_by_process_guid.r1",
+					fakeBBS.RouteToHandler("POST", "/v1/desired_lrps/get_by_process_guid.r2",
 						ghttp.CombineHandlers(
 							ghttp.VerifyProtoRepresenting(&models.DesiredLRPByProcessGuidRequest{ProcessGuid: "some-process-guid"}),
 							ghttp.RespondWithProto(200, &models.DesiredLRPResponse{
@@ -325,7 +325,7 @@ var _ = Describe("TPS-Listener", func() {
 
 			Context("when the traffic controller is not running", func() {
 				BeforeEach(func() {
-					fakeBBS.RouteToHandler("POST", "/v1/desired_lrps/get_by_process_guid.r1",
+					fakeBBS.RouteToHandler("POST", "/v1/desired_lrps/get_by_process_guid.r2",
 						ghttp.CombineHandlers(
 							ghttp.VerifyProtoRepresenting(&models.DesiredLRPByProcessGuidRequest{ProcessGuid: "some-process-guid"}),
 							ghttp.RespondWithProto(200, &models.DesiredLRPResponse{
@@ -402,7 +402,7 @@ var _ = Describe("TPS-Listener", func() {
 				}),
 			}
 
-			fakeBBS.RouteToHandler("POST", "/v1/desired_lrps/get_by_process_guid.r1",
+			fakeBBS.RouteToHandler("POST", "/v1/desired_lrps/get_by_process_guid.r2",
 				func(w http.ResponseWriter, r *http.Request) {
 					body, err := ioutil.ReadAll(r.Body)
 					Expect(err).NotTo(HaveOccurred())
