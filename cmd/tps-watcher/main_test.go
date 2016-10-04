@@ -53,7 +53,7 @@ var _ = Describe("TPS", func() {
 
 		BeforeEach(func() {
 			ready = make(chan struct{})
-			fakeCC.RouteToHandler("POST", "/internal/apps/some-process-guid/crashed", func(res http.ResponseWriter, req *http.Request) {
+			fakeCC.RouteToHandler("POST", "/v3/internal/apps/some-process-guid/crashed", func(res http.ResponseWriter, req *http.Request) {
 				var appCrashed cc_messages.AppCrashedRequest
 
 				bytes, err := ioutil.ReadAll(req.Body)

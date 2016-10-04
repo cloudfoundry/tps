@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	appCrashedPath           = "/internal/apps/%s/crashed"
+	appCrashedPath           = "/v3/internal/apps/%s/crashed"
 	appCrashedRequestTimeout = 5 * time.Second
 )
 

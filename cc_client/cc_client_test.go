@@ -46,7 +46,7 @@ var _ = Describe("CC Client", func() {
 		BeforeEach(func() {
 			fakeCC.AppendHandlers(
 				ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/internal/apps/"+guid+"/crashed"),
+					ghttp.VerifyRequest("POST", "/v3/internal/apps/"+guid+"/crashed"),
 					ghttp.VerifyBasicAuth("username", "password"),
 					ghttp.RespondWith(200, `{}`),
 					func(w http.ResponseWriter, req *http.Request) {
@@ -73,7 +73,7 @@ var _ = Describe("CC Client", func() {
 			fakeCC = ghttp.NewTLSServer() // self-signed certificate
 			fakeCC.AppendHandlers(
 				ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/internal/apps/"+guid+"/crashed"),
+					ghttp.VerifyRequest("POST", "/v3/internal/apps/"+guid+"/crashed"),
 					ghttp.VerifyBasicAuth("username", "password"),
 					ghttp.RespondWith(200, `{}`),
 				),
@@ -130,7 +130,7 @@ var _ = Describe("CC Client", func() {
 			BeforeEach(func() {
 				fakeCC.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("POST", "/internal/apps/"+guid+"/crashed"),
+						ghttp.VerifyRequest("POST", "/v3/internal/apps/"+guid+"/crashed"),
 						ghttp.RespondWith(500, `{}`),
 					),
 				)
