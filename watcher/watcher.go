@@ -163,10 +163,19 @@ func nextEvent(logger lager.Logger, es events.EventSource, eventChan chan<- mode
 
 	case events.ErrUnrecognizedEventType:
 		logger.Error("failed-getting-next-event", err)
+		closeErr := es.Close()
+		if closeErr != nil {
+			logger.Error("failed-closing-event-source", closeErr)
+		}
+
 		errorChan <- err
 
 	default:
 		logger.Error("failed-getting-next-event", err)
+		closeErr := es.Close()
+		if closeErr != nil {
+			logger.Error("failed-closing-event-source", closeErr)
+		}
 		// wait a bit before retrying
 		time.Sleep(retryPauseInterval)
 		eventChan <- nil

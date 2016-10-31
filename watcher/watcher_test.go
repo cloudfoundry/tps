@@ -161,6 +161,25 @@ var _ = Describe("Watcher", func() {
 			It("does not emit any more messages", func() {
 				Consistently(ccClient.AppCrashedCallCount).Should(Equal(0))
 			})
+
+			Context("when it returns an ErrUnrecognizedEventType", func() {
+				JustBeforeEach(func() {
+					otherActual := makeActualLRP("other-process-guid", "instance-guid", 1, 3, 1, "", "")
+					otherEvent := EventHolder{models.NewActualLRPCrashedEvent(otherActual)}
+
+					eventSource.NextStub = func() (models.Event, error) {
+						if eventSource.NextCallCount() == 1 {
+							return nil, events.ErrUnrecognizedEventType
+						} else {
+							return otherEvent.event, nil
+						}
+					}
+				})
+
+				It("should cleanup unused connections", func() {
+					Eventually(eventSource.CloseCallCount).Should(Equal(1))
+				})
+			})
 		})
 	})
 
@@ -203,6 +222,9 @@ var _ = Describe("Watcher", func() {
 		It("retries 3 times and then re-subscribes", func() {
 			Eventually(bbsClient.SubscribeToEventsCallCount, 5*time.Second).Should(BeNumerically(">", 1))
 			Expect(eventSource.NextCallCount()).Should(BeNumerically(">=", 3))
+		})
+		It("should cleanup unused connections", func() {
+			Eventually(eventSource.CloseCallCount, 2*time.Second).Should(Equal(1))
 		})
 	})
 
