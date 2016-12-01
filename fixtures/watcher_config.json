@@ -16,8 +16,8 @@
   "lager_config": {
     "log_level": "debug"
   },
-  "lock_retry_interval": 100,
-  "lock_ttl": 200,
+  "lock_retry_interval": "100s",
+  "lock_ttl": "200s",
   "max_event_handling_workers": 33,
   "skip_cert_verify": true
 }

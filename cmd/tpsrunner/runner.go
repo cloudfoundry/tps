@@ -38,14 +38,25 @@ func NewListener(bin, listenAddr, bbsAddress, trafficControllerURL, consulCluste
 }
 
 func NewWatcher(bin, bbsAddress, ccBaseURL, consulCluster string) *ginkgomon.Runner {
+	configFile, err := ioutil.TempFile("", "listener_config")
+	Expect(err).NotTo(HaveOccurred())
+
+	watcherConfig := config.DefaultWatcherConfig()
+	watcherConfig.BBSAddress = bbsAddress
+	watcherConfig.ConsulCluster = consulCluster
+	watcherConfig.CCBaseUrl = ccBaseURL
+	watcherConfig.LagerConfig.LogLevel = "debug"
+
+	watcherJSON, err := json.Marshal(watcherConfig)
+	Expect(err).NotTo(HaveOccurred())
+	err = ioutil.WriteFile(configFile.Name(), watcherJSON, 0644)
+	Expect(err).NotTo(HaveOccurred())
+
 	return ginkgomon.New(ginkgomon.Config{
 		Name: "tps-watcher",
 		Command: exec.Command(
 			bin,
-			"-bbsAddress", bbsAddress,
-			"-ccBaseURL", ccBaseURL,
-			"-lockRetryInterval", "1s",
-			"-consulCluster", consulCluster,
+			"-configPath", configFile.Name(),
 		),
 		StartCheck: "tps-watcher.started",
 	})

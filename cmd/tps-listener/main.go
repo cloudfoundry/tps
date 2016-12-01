@@ -121,7 +121,7 @@ func initializeBBSClient(logger lager.Logger, listenerConfig config.ListenerConf
 		listenerConfig.BBSCACert,
 		listenerConfig.BBSClientCert,
 		listenerConfig.BBSClientKey,
-		listenerConfig.BBSClientSessionCacheSize,
+		0,
 		listenerConfig.BBSMaxIdleConnsPerHost,
 	)
 	if err != nil {
