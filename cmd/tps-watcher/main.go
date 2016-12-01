@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/bbs"
-	"code.cloudfoundry.org/cflager"
 	"code.cloudfoundry.org/clock"
 	"code.cloudfoundry.org/consuladapter"
 	"code.cloudfoundry.org/debugserver"
@@ -35,8 +34,6 @@ const (
 )
 
 func main() {
-	debugserver.AddFlags(flag.CommandLine)
-	cflager.AddFlags(flag.CommandLine)
 	flag.Parse()
 
 	logger := lager.NewLogger("tps-watcher")
@@ -73,7 +70,7 @@ func main() {
 		{"watcher", watcher},
 	}
 
-	if dbgAddr := debugserver.DebugAddress(flag.CommandLine); dbgAddr != "" {
+	if dbgAddr := watcherConfig.DebugServerConfig.DebugAddress; dbgAddr != "" {
 		members = append(grouper.Members{
 			{"debug-server", debugserver.Runner(dbgAddr, reconfigurableSink)},
 		}, members...)
