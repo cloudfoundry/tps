@@ -32,6 +32,12 @@ var configPath = flag.String(
 	"path to config",
 )
 
+var consulTTL = flag.String(
+	"consulTTL",
+	"3",
+	"TTL value for consul registration in seconds",
+)
+
 const (
 	dropsondeOrigin = "tps_listener"
 )
@@ -141,7 +147,7 @@ func initializeRegistrationRunner(logger lager.Logger, consulClient consuladapte
 		Name: "tps",
 		Port: portNum,
 		Check: &api.AgentServiceCheck{
-			TTL: "3s",
+			TTL: *consulTTL + "s",
 		},
 	}
 
