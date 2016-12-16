@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/consuladapter"
 	"code.cloudfoundry.org/debugserver"
 	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/lager/lagerflags"
 	"code.cloudfoundry.org/tps"
 	"code.cloudfoundry.org/tps/cc_client"
 	"code.cloudfoundry.org/tps/config"
@@ -36,15 +37,13 @@ const (
 func main() {
 	flag.Parse()
 
-	logger := lager.NewLogger("tps-watcher")
-
 	watcherConfig, err := config.NewWatcherConfig(*configPath)
 	if err != nil {
-		logger.Fatal(fmt.Sprintf("Couldn't parse config file %s", *configPath), err)
+		panic(err.Error())
 	}
 
-	reconfigurableSink := newReconfigurableSink(watcherConfig.LagerConfig.LogLevel)
-	logger.RegisterSink(reconfigurableSink)
+	logger, reconfigurableSink := lagerflags.NewFromConfig("tps-watcher", watcherConfig.LagerConfig)
+
 	initializeDropsonde(logger, watcherConfig.DropsondePort)
 
 	lockMaintainer := initializeLockMaintainer(logger, watcherConfig)
@@ -141,22 +140,4 @@ func initializeBBSClient(logger lager.Logger, watcherConfig config.WatcherConfig
 		logger.Fatal("Failed to configure secure BBS client", err)
 	}
 	return bbsClient
-}
-
-func newReconfigurableSink(logLevel string) *lager.ReconfigurableSink {
-	var minLagerLogLevel lager.LogLevel
-	switch logLevel {
-	case "debug":
-		minLagerLogLevel = lager.DEBUG
-	case "info":
-		minLagerLogLevel = lager.INFO
-	case "error":
-		minLagerLogLevel = lager.ERROR
-	case "fatal":
-		minLagerLogLevel = lager.FATAL
-	default:
-		panic(fmt.Errorf("unknown log level: %s", logLevel))
-	}
-
-	return lager.NewReconfigurableSink(lager.NewWriterSink(os.Stdout, lager.DEBUG), minLagerLogLevel)
 }

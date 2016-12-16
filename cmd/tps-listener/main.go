@@ -14,6 +14,7 @@ import (
 	"code.cloudfoundry.org/consuladapter"
 	"code.cloudfoundry.org/debugserver"
 	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/lager/lagerflags"
 	"code.cloudfoundry.org/locket"
 	"code.cloudfoundry.org/tps/config"
 	"code.cloudfoundry.org/tps/handler"
@@ -39,14 +40,12 @@ const (
 func main() {
 	flag.Parse()
 
-	logger := lager.NewLogger("tps-listener")
-
 	listenerConfig, err := config.NewListenerConfig(*configPath)
 	if err != nil {
-		logger.Fatal(fmt.Sprintf("Couldn't parse config file %s", *configPath), err)
+		panic(err.Error())
 	}
-	reconfigurableSink := newReconfigurableSink(listenerConfig.LagerConfig.LogLevel)
-	logger.RegisterSink(reconfigurableSink)
+
+	logger, reconfigurableSink := lagerflags.NewFromConfig("tps-listener", listenerConfig.LagerConfig)
 
 	initializeDropsonde(logger, listenerConfig)
 	noaaClient := consumer.New(listenerConfig.TrafficControllerURL, &tls.Config{InsecureSkipVerify: listenerConfig.SkipCertVerify}, nil)
@@ -146,22 +145,4 @@ func initializeRegistrationRunner(logger lager.Logger, consulClient consuladapte
 	}
 
 	return locket.NewRegistrationRunner(logger, registration, consulClient, locket.RetryInterval, clock)
-}
-
-func newReconfigurableSink(logLevel string) *lager.ReconfigurableSink {
-	var minLagerLogLevel lager.LogLevel
-	switch logLevel {
-	case "debug":
-		minLagerLogLevel = lager.DEBUG
-	case "info":
-		minLagerLogLevel = lager.INFO
-	case "error":
-		minLagerLogLevel = lager.ERROR
-	case "fatal":
-		minLagerLogLevel = lager.FATAL
-	default:
-		panic(fmt.Errorf("unknown log level: %s", logLevel))
-	}
-
-	return lager.NewReconfigurableSink(lager.NewWriterSink(os.Stdout, lager.DEBUG), minLagerLogLevel)
 }
