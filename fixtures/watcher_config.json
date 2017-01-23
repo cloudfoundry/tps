@@ -19,5 +19,8 @@
   "lock_retry_interval": "100s",
   "lock_ttl": "200s",
   "max_event_handling_workers": 33,
+  "server_cert_file": "/path/to/server.cert",
+  "server_key_file": "/path/to/server.key",
+  "server_ca_file": "/path/to/server-ca.cert",
   "skip_cert_verify": true
 }

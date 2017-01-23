@@ -39,7 +39,14 @@ func (b *BadResponseError) Error() string {
 	return fmt.Sprintf("Crashed response POST failed with %d", b.StatusCode)
 }
 
-func NewCcClient(baseURI string, username string, password string, skipCertVerify bool) CcClient {
+func NewTLSConfig(certFile string, keyFile string, caCertFile string) (*tls.Config, error) {
+	return &tls.Config{
+		InsecureSkipVerify: false,
+		MinVersion:         tls.VersionTLS10,
+	}, nil
+}
+
+func NewCcClient(baseURI string, username string, password string, tlsConfig *tls.Config) CcClient {
 	httpClient := &http.Client{
 		Timeout: appCrashedRequestTimeout,
 		Transport: &http.Transport{
@@ -49,10 +56,7 @@ func NewCcClient(baseURI string, username string, password string, skipCertVerif
 				KeepAlive: 30 * time.Second,
 			}).Dial,
 			TLSHandshakeTimeout: 10 * time.Second,
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: skipCertVerify,
-				MinVersion:         tls.VersionTLS10,
-			},
+			TLSClientConfig:     tlsConfig,
 		},
 	}
 

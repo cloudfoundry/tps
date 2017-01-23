@@ -48,7 +48,20 @@ func main() {
 
 	lockMaintainer := initializeLockMaintainer(logger, watcherConfig)
 
-	ccClient := cc_client.NewCcClient(watcherConfig.CCBaseUrl, watcherConfig.CCUsername, watcherConfig.CCPassword, watcherConfig.SkipCertVerify)
+	tlsConfig, err := cc_client.NewTLSConfig(
+		watcherConfig.ServerCertFile,
+		watcherConfig.ServerKeyFile,
+		watcherConfig.ServerCAFile,
+	)
+	if err != nil {
+		panic(err.Error())
+	}
+	ccClient := cc_client.NewCcClient(
+		watcherConfig.CCBaseUrl,
+		watcherConfig.CCUsername,
+		watcherConfig.CCPassword,
+		tlsConfig,
+	)
 
 	watcher := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
 

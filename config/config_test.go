@@ -55,7 +55,6 @@ var _ = Describe("Config", func() {
 			Expect(watcherConfig.DropsondePort).To(Equal(3457))
 			Expect(watcherConfig.LagerConfig.LogLevel).To(Equal("info"))
 			Expect(watcherConfig.MaxEventHandlingWorkers).To(Equal(500))
-			Expect(watcherConfig.SkipCertVerify).To(Equal(false))
 		})
 
 		It("reads from the config file and populates the config", func() {
@@ -79,7 +78,9 @@ var _ = Describe("Config", func() {
 			Expect(watcherConfig.LockRetryInterval).To(Equal(Duration(100 * time.Second)))
 			Expect(watcherConfig.LockTTL).To(Equal(Duration(200 * time.Second)))
 			Expect(watcherConfig.MaxEventHandlingWorkers).To(Equal(33))
-			Expect(watcherConfig.SkipCertVerify).To(Equal(true))
+			Expect(watcherConfig.ServerCertFile).To(Equal("/path/to/server.cert"))
+			Expect(watcherConfig.ServerKeyFile).To(Equal("/path/to/server.key"))
+			Expect(watcherConfig.ServerCAFile).To(Equal("/path/to/server-ca.cert"))
 		})
 	})
 })

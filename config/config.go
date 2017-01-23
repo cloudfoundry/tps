@@ -68,7 +68,9 @@ type WatcherConfig struct {
 	LockRetryInterval         Duration                      `json:"lock_retry_interval"`
 	LockTTL                   Duration                      `json:"lock_ttl"`
 	MaxEventHandlingWorkers   int                           `json:"max_event_handling_workers"`
-	SkipCertVerify            bool                          `json:"skip_cert_verify"`
+	ServerCertFile            string                        `json:"server_cert_file"`
+	ServerKeyFile             string                        `json:"server_key_file"`
+	ServerCAFile              string                        `json:"server_ca_file"`
 }
 
 func DefaultListenerConfig() ListenerConfig {
@@ -90,7 +92,6 @@ func DefaultWatcherConfig() WatcherConfig {
 		DropsondePort:             3457,
 		LagerConfig:               lagerflags.DefaultLagerConfig(),
 		MaxEventHandlingWorkers:   500,
-		SkipCertVerify:            false,
 		LockRetryInterval:         Duration(locket.RetryInterval),
 		LockTTL:                   Duration(locket.LockTTL),
 	}
