@@ -62,9 +62,13 @@ func NewTLSConfig(certFile string, keyFile string, caCertFile string) (*tls.Conf
 		Certificates:       []tls.Certificate{tlsCert},
 		InsecureSkipVerify: false,
 		ClientAuth:         tls.RequireAndVerifyClientCert,
-		MinVersion:         tls.VersionTLS10,
-		RootCAs:            caCertPool,
-		ClientCAs:          caCertPool,
+		MinVersion:         tls.VersionTLS12,
+		CipherSuites: []uint16{
+			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+		},
+		RootCAs:   caCertPool,
+		ClientCAs: caCertPool,
 	}
 
 	return tlsConfig, nil
