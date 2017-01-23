@@ -3,8 +3,11 @@ package cc_client
 import (
 	"bytes"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
@@ -15,7 +18,7 @@ import (
 )
 
 const (
-	appCrashedPath           = "/internal/apps/%s/crashed"
+	appCrashedPath           = "/internal/v4/apps/%s/crashed"
 	appCrashedRequestTimeout = 5 * time.Second
 )
 
@@ -40,10 +43,31 @@ func (b *BadResponseError) Error() string {
 }
 
 func NewTLSConfig(certFile string, keyFile string, caCertFile string) (*tls.Config, error) {
-	return &tls.Config{
+	tlsCert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load keypair: %s", err.Error())
+	}
+
+	caCertBytes, err := ioutil.ReadFile(caCertFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read ca cert file: %s", err.Error())
+	}
+
+	caCertPool := x509.NewCertPool()
+	if ok := caCertPool.AppendCertsFromPEM(caCertBytes); !ok {
+		return nil, errors.New("Unable to load ca cert")
+	}
+
+	tlsConfig := &tls.Config{
+		Certificates:       []tls.Certificate{tlsCert},
 		InsecureSkipVerify: false,
+		ClientAuth:         tls.RequireAndVerifyClientCert,
 		MinVersion:         tls.VersionTLS10,
-	}, nil
+		RootCAs:            caCertPool,
+		ClientCAs:          caCertPool,
+	}
+
+	return tlsConfig, nil
 }
 
 func NewCcClient(baseURI string, username string, password string, tlsConfig *tls.Config) CcClient {

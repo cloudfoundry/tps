@@ -49,9 +49,9 @@ func main() {
 	lockMaintainer := initializeLockMaintainer(logger, watcherConfig)
 
 	tlsConfig, err := cc_client.NewTLSConfig(
-		watcherConfig.ServerCertFile,
-		watcherConfig.ServerKeyFile,
-		watcherConfig.ServerCAFile,
+		watcherConfig.CCClientCert,
+		watcherConfig.CCClientKey,
+		watcherConfig.CCCACert,
 	)
 	if err != nil {
 		panic(err.Error())

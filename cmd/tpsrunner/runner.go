@@ -46,6 +46,9 @@ func NewWatcher(bin, bbsAddress, ccBaseURL, consulCluster string) *ginkgomon.Run
 	watcherConfig.ConsulCluster = consulCluster
 	watcherConfig.CCBaseUrl = ccBaseURL
 	watcherConfig.LagerConfig.LogLevel = "debug"
+	watcherConfig.CCClientCert = "../../fixtures/watcher_cc_client.crt"
+	watcherConfig.CCClientKey = "../../fixtures/watcher_cc_client.key"
+	watcherConfig.CCCACert = "../../fixtures/watcher_cc_ca.crt"
 
 	watcherJSON, err := json.Marshal(watcherConfig)
 	Expect(err).NotTo(HaveOccurred())

@@ -30,7 +30,10 @@ var _ = Describe("CC Client", func() {
 		logger = lager.NewLogger("fakelogger")
 		logger.RegisterSink(lager.NewWriterSink(GinkgoWriter, lager.DEBUG))
 
-		tlsConfig, err := cc_client.NewTLSConfig("../fixtures/server.crt", "../fixtures/server.key", "../fixtures/server_ca.crt")
+		tlsConfig, err := cc_client.NewTLSConfig(
+			"../fixtures/watcher_cc_client.crt",
+			"../fixtures/watcher_cc_client.key",
+			"../fixtures/watcher_cc_ca.crt")
 		Expect(err).NotTo(HaveOccurred())
 		ccClient = cc_client.NewCcClient(fakeCC.URL(), "username", "password", tlsConfig)
 	})
@@ -47,7 +50,7 @@ var _ = Describe("CC Client", func() {
 		BeforeEach(func() {
 			fakeCC.AppendHandlers(
 				ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/internal/apps/"+guid+"/crashed"),
+					ghttp.VerifyRequest("POST", "/internal/v4/apps/"+guid+"/crashed"),
 					ghttp.VerifyBasicAuth("username", "password"),
 					ghttp.RespondWith(200, `{}`),
 					func(w http.ResponseWriter, req *http.Request) {
@@ -89,7 +92,7 @@ var _ = Describe("CC Client", func() {
 			BeforeEach(func() {
 				fakeCC.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("POST", "/internal/apps/"+guid+"/crashed"),
+						ghttp.VerifyRequest("POST", "/internal/v4/apps/"+guid+"/crashed"),
 						ghttp.RespondWith(500, `{}`),
 					),
 				)

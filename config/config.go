@@ -68,9 +68,9 @@ type WatcherConfig struct {
 	LockRetryInterval         Duration                      `json:"lock_retry_interval"`
 	LockTTL                   Duration                      `json:"lock_ttl"`
 	MaxEventHandlingWorkers   int                           `json:"max_event_handling_workers"`
-	ServerCertFile            string                        `json:"server_cert_file"`
-	ServerKeyFile             string                        `json:"server_key_file"`
-	ServerCAFile              string                        `json:"server_ca_file"`
+	CCClientCert              string                        `json:"cc_client_cert"`
+	CCClientKey               string                        `json:"cc_client_key"`
+	CCCACert                  string                        `json:"cc_ca_cert"`
 }
 
 func DefaultListenerConfig() ListenerConfig {
