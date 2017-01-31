@@ -56,12 +56,7 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	ccClient := cc_client.NewCcClient(
-		watcherConfig.CCBaseUrl,
-		watcherConfig.CCUsername,
-		watcherConfig.CCPassword,
-		tlsConfig,
-	)
+	ccClient := cc_client.NewCcClient(watcherConfig.CCBaseUrl, tlsConfig)
 
 	watcher := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
 

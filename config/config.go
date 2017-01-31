@@ -59,8 +59,6 @@ type WatcherConfig struct {
 	BBSClientSessionCacheSize int                           `json:"bbs_client_cache_size"`
 	BBSMaxIdleConnsPerHost    int                           `json:"bbs_max_idle_conns_per_host"`
 	CCBaseUrl                 string                        `json:"cc_base_url"`
-	CCPassword                string                        `json:"cc_basic_auth_password"`
-	CCUsername                string                        `json:"cc_basic_auth_username"`
 	ConsulCluster             string                        `json:"consul_cluster"`
 	DebugServerConfig         debugserver.DebugServerConfig `json:"debug_server_config"`
 	DropsondePort             int                           `json:"dropsonde_port"`

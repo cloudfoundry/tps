@@ -29,8 +29,6 @@ type CcClient interface {
 
 type ccClient struct {
 	ccURI      string
-	username   string
-	password   string
 	httpClient *http.Client
 }
 
@@ -74,7 +72,7 @@ func NewTLSConfig(certFile string, keyFile string, caCertFile string) (*tls.Conf
 	return tlsConfig, nil
 }
 
-func NewCcClient(baseURI string, username string, password string, tlsConfig *tls.Config) CcClient {
+func NewCcClient(baseURI string, tlsConfig *tls.Config) CcClient {
 	httpClient := &http.Client{
 		Timeout: appCrashedRequestTimeout,
 		Transport: &http.Transport{
@@ -90,8 +88,6 @@ func NewCcClient(baseURI string, username string, password string, tlsConfig *tl
 
 	return &ccClient{
 		ccURI:      urljoiner.Join(baseURI, appCrashedPath),
-		username:   username,
-		password:   password,
 		httpClient: httpClient,
 	}
 }
@@ -110,7 +106,6 @@ func (cc *ccClient) AppCrashed(guid string, appCrashed cc_messages.AppCrashedReq
 		return err
 	}
 
-	request.SetBasicAuth(cc.username, cc.password)
 	request.Header.Set("content-type", "application/json")
 
 	response, err := cc.httpClient.Do(request)

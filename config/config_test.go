@@ -69,8 +69,6 @@ var _ = Describe("Config", func() {
 			Expect(watcherConfig.BBSMaxIdleConnsPerHost).To(Equal(10))
 			Expect(watcherConfig.ConsulCluster).To(Equal("https://consul.com"))
 			Expect(watcherConfig.CCBaseUrl).To(Equal("https://cloudcontroller.com"))
-			Expect(watcherConfig.CCPassword).To(Equal("cc_password"))
-			Expect(watcherConfig.CCUsername).To(Equal("cc_user"))
 			Expect(watcherConfig.ConsulCluster).To(Equal("https://consul.com"))
 			Expect(watcherConfig.DebugServerConfig.DebugAddress).To(Equal("https://debugger.com"))
 			Expect(watcherConfig.DropsondePort).To(Equal(666))

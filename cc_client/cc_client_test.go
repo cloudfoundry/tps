@@ -35,7 +35,7 @@ var _ = Describe("CC Client", func() {
 			"../fixtures/watcher_cc_client.key",
 			"../fixtures/watcher_cc_ca.crt")
 		Expect(err).NotTo(HaveOccurred())
-		ccClient = cc_client.NewCcClient(fakeCC.URL(), "username", "password", tlsConfig)
+		ccClient = cc_client.NewCcClient(fakeCC.URL(), tlsConfig)
 	})
 
 	AfterEach(func() {
@@ -51,7 +51,6 @@ var _ = Describe("CC Client", func() {
 			fakeCC.AppendHandlers(
 				ghttp.CombineHandlers(
 					ghttp.VerifyRequest("POST", "/internal/v4/apps/"+guid+"/crashed"),
-					ghttp.VerifyBasicAuth("username", "password"),
 					ghttp.RespondWith(200, `{}`),
 					func(w http.ResponseWriter, req *http.Request) {
 						body, err := ioutil.ReadAll(req.Body)
@@ -76,7 +75,7 @@ var _ = Describe("CC Client", func() {
 		Context("when the request couldn't be completed", func() {
 			BeforeEach(func() {
 				bogusURL := "http://0.0.0.0.0:80"
-				ccClient = cc_client.NewCcClient(bogusURL, "username", "password", &tls.Config{})
+				ccClient = cc_client.NewCcClient(bogusURL, &tls.Config{})
 			})
 
 			It("percolates the error", func() {
