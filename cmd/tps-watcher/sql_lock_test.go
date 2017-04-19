@@ -129,7 +129,7 @@ var _ = Describe("SqlLock", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				lockIdentifier := &locketmodels.Resource{
-					Key:   "tps_watcher_lock",
+					Key:   "tps_watcher",
 					Owner: "Your worst enemy.",
 					Value: "Something",
 				}

@@ -149,8 +149,9 @@ func initializeLocketLockMaintainer(logger lager.Logger, watcherConfig config.Wa
 	}
 
 	lockIdentifier := &locketmodels.Resource{
-		Key:   "tps_watcher_lock",
+		Key:   "tps_watcher",
 		Owner: uuid.String(),
+		Type:  "lock",
 	}
 
 	return lock.NewLockRunner(
