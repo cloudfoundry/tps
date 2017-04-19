@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"net/url"
@@ -13,6 +14,9 @@ import (
 	"code.cloudfoundry.org/debugserver"
 	"code.cloudfoundry.org/lager"
 	"code.cloudfoundry.org/lager/lagerflags"
+	"code.cloudfoundry.org/locket"
+	"code.cloudfoundry.org/locket/lock"
+	locketmodels "code.cloudfoundry.org/locket/models"
 	"code.cloudfoundry.org/tps"
 	"code.cloudfoundry.org/tps/cc_client"
 	"code.cloudfoundry.org/tps/config"
@@ -46,7 +50,18 @@ func main() {
 
 	initializeDropsonde(logger, watcherConfig.DropsondePort)
 
-	lockMaintainer := initializeLockMaintainer(logger, watcherConfig)
+	locks := []grouper.Member{}
+	if !watcherConfig.SkipConsulLock {
+		locks = append(locks, grouper.Member{"consul-lock", initializeConsulLockMaintainer(logger, watcherConfig)})
+	}
+
+	if watcherConfig.LocketAddress != "" {
+		locks = append(locks, grouper.Member{"sql-lock", initializeLocketLockMaintainer(logger, watcherConfig)})
+	}
+
+	if len(locks) < 1 {
+		logger.Fatal("no-locks-configured", errors.New("Lock configuration must be provided"))
+	}
 
 	tlsConfig, err := cc_client.NewTLSConfig(
 		watcherConfig.CCClientCert,
@@ -59,7 +74,6 @@ func main() {
 	ccClient := cc_client.NewCcClient(watcherConfig.CCBaseUrl, tlsConfig)
 
 	watcher := ifrit.RunFunc(func(signals <-chan os.Signal, ready chan<- struct{}) error {
-
 		w, err := watcher.NewWatcher(logger,
 			watcherConfig.MaxEventHandlingWorkers,
 			watcher.DefaultRetryPauseInterval,
@@ -72,10 +86,7 @@ func main() {
 		return w.Run(signals, ready)
 	})
 
-	members := grouper.Members{
-		{"lock-maintainer", lockMaintainer},
-		{"watcher", watcher},
-	}
+	members := append(locks, grouper.Member{"watcher", watcher})
 
 	if dbgAddr := watcherConfig.DebugServerConfig.DebugAddress; dbgAddr != "" {
 		members = append(grouper.Members{
@@ -115,7 +126,7 @@ func initializeServiceClient(logger lager.Logger, consulCluster string) tps.Serv
 	return tps.NewServiceClient(consulClient, clock.NewClock())
 }
 
-func initializeLockMaintainer(logger lager.Logger, watcherConfig config.WatcherConfig) ifrit.Runner {
+func initializeConsulLockMaintainer(logger lager.Logger, watcherConfig config.WatcherConfig) ifrit.Runner {
 	serviceClient := initializeServiceClient(logger, watcherConfig.ConsulCluster)
 
 	uuid, err := uuid.NewV4()
@@ -124,6 +135,32 @@ func initializeLockMaintainer(logger lager.Logger, watcherConfig config.WatcherC
 	}
 
 	return serviceClient.NewTPSWatcherLockRunner(logger, uuid.String(), time.Duration(watcherConfig.LockRetryInterval), time.Duration(watcherConfig.LockTTL))
+}
+
+func initializeLocketLockMaintainer(logger lager.Logger, watcherConfig config.WatcherConfig) ifrit.Runner {
+	locketClient, err := locket.NewClient(logger, watcherConfig.ClientLocketConfig)
+	if err != nil {
+		logger.Fatal("Failed to initialize locket client", err)
+	}
+
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		logger.Fatal("Couldn't generate uuid", err)
+	}
+
+	lockIdentifier := &locketmodels.Resource{
+		Key:   "tps_watcher_lock",
+		Owner: uuid.String(),
+	}
+
+	return lock.NewLockRunner(
+		logger,
+		locketClient,
+		lockIdentifier,
+		locket.DefaultSessionTTLInSeconds,
+		clock.NewClock(),
+		locket.SQLRetryInterval,
+	)
 }
 
 func initializeBBSClient(logger lager.Logger, watcherConfig config.WatcherConfig) bbs.Client {

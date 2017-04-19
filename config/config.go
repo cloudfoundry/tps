@@ -69,6 +69,10 @@ type WatcherConfig struct {
 	CCClientCert              string                        `json:"cc_client_cert"`
 	CCClientKey               string                        `json:"cc_client_key"`
 	CCCACert                  string                        `json:"cc_ca_cert"`
+
+	SkipConsulLock bool `json:"skip_consul_lock"`
+
+	locket.ClientLocketConfig
 }
 
 func DefaultListenerConfig() ListenerConfig {
@@ -91,7 +95,8 @@ func DefaultWatcherConfig() WatcherConfig {
 		LagerConfig:               lagerflags.DefaultLagerConfig(),
 		MaxEventHandlingWorkers:   500,
 		LockRetryInterval:         Duration(locket.RetryInterval),
-		LockTTL:                   Duration(locket.LockTTL),
+		LockTTL:                   Duration(locket.DefaultSessionTTL),
+		SkipConsulLock:            false,
 	}
 }
 

@@ -158,7 +158,15 @@ var _ = Describe("TPS", func() {
 				},
 			)
 
-			competingWatcher := locket.NewLock(logger, consulRunner.NewClient(), locket.LockSchemaPath(watcherLockName), []byte("something-else"), clock.NewClock(), locket.RetryInterval, locket.LockTTL)
+			competingWatcher := locket.NewLock(
+				logger,
+				consulRunner.NewClient(),
+				locket.LockSchemaPath(watcherLockName),
+				[]byte("something-else"),
+				clock.NewClock(),
+				locket.RetryInterval,
+				locket.DefaultSessionTTL,
+			)
 			competingWatcherProcess = ifrit.Invoke(competingWatcher)
 
 			disableStartCheck = true

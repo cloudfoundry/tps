@@ -20,5 +20,12 @@
   "cc_client_cert": "/path/to/server.cert",
   "cc_client_key": "/path/to/server.key",
   "cc_ca_cert": "/path/to/server-ca.cert",
-  "skip_cert_verify": true
+  "skip_cert_verify": true,
+
+  "skip_consul_lock": true,
+
+  "locket_address": "https://locket.com",
+  "locket_ca_cert_file": "/path/to/locket/ca-cert",
+  "locket_client_cert_file": "/path/to/locket/cert",
+  "locket_client_key_file": "/path/to/locket/key"
 }

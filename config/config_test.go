@@ -55,6 +55,7 @@ var _ = Describe("Config", func() {
 			Expect(watcherConfig.DropsondePort).To(Equal(3457))
 			Expect(watcherConfig.LagerConfig.LogLevel).To(Equal("info"))
 			Expect(watcherConfig.MaxEventHandlingWorkers).To(Equal(500))
+			Expect(watcherConfig.SkipConsulLock).To(Equal(false))
 		})
 
 		It("reads from the config file and populates the config", func() {
@@ -79,6 +80,11 @@ var _ = Describe("Config", func() {
 			Expect(watcherConfig.CCClientCert).To(Equal("/path/to/server.cert"))
 			Expect(watcherConfig.CCClientKey).To(Equal("/path/to/server.key"))
 			Expect(watcherConfig.CCCACert).To(Equal("/path/to/server-ca.cert"))
+			Expect(watcherConfig.SkipConsulLock).To(Equal(true))
+			Expect(watcherConfig.LocketAddress).To(Equal("https://locket.com"))
+			Expect(watcherConfig.LocketCACertFile).To(Equal("/path/to/locket/ca-cert"))
+			Expect(watcherConfig.LocketClientCertFile).To(Equal("/path/to/locket/cert"))
+			Expect(watcherConfig.LocketClientKeyFile).To(Equal("/path/to/locket/key"))
 		})
 	})
 })
