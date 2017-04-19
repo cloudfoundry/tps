@@ -23,14 +23,6 @@ import (
 const watcherLockName = "tps_watcher_lock"
 
 var _ = Describe("TPS", func() {
-	startWatcher := func(check bool) (ifrit.Process, *ginkgomon.Runner) {
-		if !check {
-			runner.StartCheck = ""
-		}
-
-		return ginkgomon.Invoke(runner), runner
-	}
-
 	var (
 		domain string
 	)
@@ -113,10 +105,6 @@ var _ = Describe("TPS", func() {
 			)
 		})
 
-		JustBeforeEach(func() {
-			watcher, _ = startWatcher(true)
-		})
-
 		It("POSTs to the CC that the application has crashed", func() {
 			Eventually(ready, 5*time.Second).Should(BeClosed())
 		})
@@ -137,8 +125,6 @@ var _ = Describe("TPS", func() {
 					<-closeNotifier
 				},
 			)
-
-			watcher, _ = startWatcher(true)
 		})
 
 		JustBeforeEach(func() {
@@ -155,7 +141,6 @@ var _ = Describe("TPS", func() {
 	})
 
 	Context("when the watcher initially does not have the lock", func() {
-		var runner *ginkgomon.Runner
 		var competingWatcherProcess ifrit.Process
 
 		BeforeEach(func() {
@@ -175,10 +160,8 @@ var _ = Describe("TPS", func() {
 
 			competingWatcher := locket.NewLock(logger, consulRunner.NewClient(), locket.LockSchemaPath(watcherLockName), []byte("something-else"), clock.NewClock(), locket.RetryInterval, locket.LockTTL)
 			competingWatcherProcess = ifrit.Invoke(competingWatcher)
-		})
 
-		JustBeforeEach(func() {
-			watcher, runner = startWatcher(false)
+			disableStartCheck = true
 		})
 
 		AfterEach(func() {

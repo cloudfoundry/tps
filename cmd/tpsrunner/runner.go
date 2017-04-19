@@ -37,18 +37,9 @@ func NewListener(bin, listenAddr, bbsAddress, trafficControllerURL, consulCluste
 	})
 }
 
-func NewWatcher(bin, bbsAddress, ccBaseURL, consulCluster string) *ginkgomon.Runner {
+func NewWatcher(bin string, watcherConfig config.WatcherConfig) *ginkgomon.Runner {
 	configFile, err := ioutil.TempFile("", "listener_config")
 	Expect(err).NotTo(HaveOccurred())
-
-	watcherConfig := config.DefaultWatcherConfig()
-	watcherConfig.BBSAddress = bbsAddress
-	watcherConfig.ConsulCluster = consulCluster
-	watcherConfig.CCBaseUrl = ccBaseURL
-	watcherConfig.LagerConfig.LogLevel = "debug"
-	watcherConfig.CCClientCert = "../../fixtures/watcher_cc_client.crt"
-	watcherConfig.CCClientKey = "../../fixtures/watcher_cc_client.key"
-	watcherConfig.CCCACert = "../../fixtures/watcher_cc_ca.crt"
 
 	watcherJSON, err := json.Marshal(watcherConfig)
 	Expect(err).NotTo(HaveOccurred())

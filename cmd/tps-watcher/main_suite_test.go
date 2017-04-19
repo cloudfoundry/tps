@@ -10,6 +10,7 @@ import (
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/ginkgomon"
 
+	tpsconfig "code.cloudfoundry.org/tps/config"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/config"
 	. "github.com/onsi/gomega"
@@ -22,10 +23,12 @@ import (
 var (
 	consulRunner *consulrunner.ClusterRunner
 
-	watcher ifrit.Process
-	runner  *ginkgomon.Runner
+	watcher           ifrit.Process
+	runner            *ginkgomon.Runner
+	disableStartCheck bool
 
-	watcherPath string
+	watcherPath   string
+	watcherConfig tpsconfig.WatcherConfig
 
 	fakeCC  *ghttp.Server
 	fakeBBS *ghttp.Server
@@ -71,12 +74,24 @@ var _ = BeforeEach(func() {
 	fakeCC = ghttp.NewServer()
 	fakeBBS = ghttp.NewServer()
 
-	runner = tpsrunner.NewWatcher(
-		string(watcherPath),
-		fakeBBS.URL(),
-		fmt.Sprintf(fakeCC.URL()),
-		consulRunner.ConsulCluster(),
-	)
+	watcherConfig = tpsconfig.DefaultWatcherConfig()
+	watcherConfig.BBSAddress = fakeBBS.URL()
+	watcherConfig.ConsulCluster = consulRunner.ConsulCluster()
+	watcherConfig.CCBaseUrl = fmt.Sprintf(fakeCC.URL())
+	watcherConfig.LagerConfig.LogLevel = "debug"
+	watcherConfig.CCClientCert = "../../fixtures/watcher_cc_client.crt"
+	watcherConfig.CCClientKey = "../../fixtures/watcher_cc_client.key"
+	watcherConfig.CCCACert = "../../fixtures/watcher_cc_ca.crt"
+
+	disableStartCheck = false
+})
+
+var _ = JustBeforeEach(func() {
+	runner = tpsrunner.NewWatcher(string(watcherPath), watcherConfig)
+	if disableStartCheck {
+		runner.StartCheck = ""
+	}
+	watcher = ginkgomon.Invoke(runner)
 })
 
 var _ = AfterEach(func() {
