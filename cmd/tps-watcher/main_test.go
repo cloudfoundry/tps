@@ -90,7 +90,7 @@ var _ = Describe("TPS", func() {
 					flusher := w.(http.Flusher)
 					flusher.Flush()
 					closeNotifier := w.(http.CloseNotifier).CloseNotify()
-					event := models.NewActualLRPCrashedEvent(&afterActualLRP)
+					event := models.NewActualLRPCrashedEvent(&beforeActualLRP, &afterActualLRP)
 
 					sseEvent, err := events.NewEventFromModelEvent(0, event)
 					Expect(err).NotTo(HaveOccurred())
