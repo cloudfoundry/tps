@@ -91,8 +91,8 @@ var _ = Describe("SqlLock", func() {
 				ginkgomon.Interrupt(locketProcess, 5)
 			})
 
-			It("exits", func() {
-				Eventually(runner, 5*time.Second).Should(gexec.Exit(1))
+			It("exits after the TTL expires", func() {
+				Eventually(runner, 16*time.Second).Should(gexec.Exit(1))
 			})
 		})
 
@@ -129,9 +129,10 @@ var _ = Describe("SqlLock", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				lockIdentifier := &locketmodels.Resource{
-					Key:   "tps_watcher",
-					Owner: "Your worst enemy.",
-					Value: "Something",
+					Key:      "tps_watcher",
+					Owner:    "Your worst enemy.",
+					Value:    "Something",
+					TypeCode: locketmodels.LOCK,
 				}
 
 				clock := clock.NewClock()
