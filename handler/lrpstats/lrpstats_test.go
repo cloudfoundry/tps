@@ -98,6 +98,7 @@ var _ = Describe("Stats", func() {
 
 			netInfo = models.NewActualLRPNetInfo(
 				"host",
+				"instance-host",
 				models.NewPortMapping(5432, 7890),
 				models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
 			)

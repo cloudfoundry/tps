@@ -92,11 +92,13 @@ var _ = Describe("Bulk Status", func() {
 
 			netInfo1 = models.NewActualLRPNetInfo(
 				"host",
+				"instance-host",
 				models.NewPortMapping(5432, 7890),
 				models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
 			)
 			netInfo2 = models.NewActualLRPNetInfo(
 				"host2",
+				"instance-host",
 				models.NewPortMapping(5432, 7890),
 				models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
 			)
@@ -181,6 +183,7 @@ var _ = Describe("Bulk Status", func() {
 							ActualLRPInstanceKey: models.NewActualLRPInstanceKey("instanceId", "some-cell"),
 							ActualLRPNetInfo: models.NewActualLRPNetInfo(
 								"host",
+								"instance-host",
 								models.NewPortMapping(5432, 7890),
 								models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
 							),
