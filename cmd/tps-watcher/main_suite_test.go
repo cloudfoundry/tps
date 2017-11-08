@@ -16,8 +16,8 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 	"github.com/onsi/gomega/ghttp"
-
 	"testing"
+	"time"
 )
 
 var (
@@ -99,6 +99,7 @@ var _ = JustBeforeEach(func() {
 		runner.StartCheck = ""
 	}
 	watcher = ginkgomon.Invoke(runner)
+	time.Sleep(1 * time.Second)
 })
 
 var _ = AfterEach(func() {

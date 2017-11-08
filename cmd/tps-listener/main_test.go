@@ -178,7 +178,7 @@ var _ = Describe("TPS-Listener", func() {
 			var netInfo models.ActualLRPNetInfo
 
 			JustBeforeEach(func() {
-				netInfo = models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
+				netInfo = models.NewActualLRPNetInfo("1.2.3.4", "5.6.7.8", models.NewPortMapping(65100, 8080))
 
 				fakeBBS.RouteToHandler("POST", "/v1/actual_lrp_groups/list_by_process_guid",
 					ghttp.RespondWithProto(200, &models.ActualLRPGroupsResponse{
@@ -424,7 +424,7 @@ var _ = Describe("TPS-Listener", func() {
 				},
 			)
 
-			netInfo = models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
+			netInfo = models.NewActualLRPNetInfo("1.2.3.4", "5.6.7.8", models.NewPortMapping(65100, 8080))
 
 			fakeBBS.RouteToHandler("POST", "/v1/actual_lrp_groups/list_by_process_guid",
 				func(w http.ResponseWriter, r *http.Request) {

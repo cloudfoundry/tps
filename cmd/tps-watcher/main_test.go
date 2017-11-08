@@ -71,7 +71,7 @@ var _ = Describe("TPS", func() {
 
 			lrpKey := models.NewActualLRPKey("some-process-guid", 1, domain)
 			instanceKey := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-			netInfo := models.NewActualLRPNetInfo("1.2.3.4", models.NewPortMapping(65100, 8080))
+			netInfo := models.NewActualLRPNetInfo("1.2.3.4", "5.6.7.8", models.NewPortMapping(65100, 8080))
 			beforeActualLRP := *models.NewRunningActualLRP(lrpKey, instanceKey, netInfo, 0)
 			afterActualLRP := beforeActualLRP
 			afterActualLRP.State = models.ActualLRPStateCrashed
@@ -119,10 +119,6 @@ var _ = Describe("TPS", func() {
 					w.Header().Add("Connection", "keep-alive")
 
 					w.WriteHeader(http.StatusOK)
-
-					closeNotifier := w.(http.CloseNotifier).CloseNotify()
-
-					<-closeNotifier
 				},
 			)
 		})
@@ -136,7 +132,7 @@ var _ = Describe("TPS", func() {
 		})
 
 		It("exits with an error", func() {
-			Eventually(watcher.Wait(), 5).Should(Receive(HaveOccurred()))
+			Eventually(runner.Buffer, 5*time.Second).Should(gbytes.Say("lock lost"))
 		})
 	})
 
@@ -151,10 +147,6 @@ var _ = Describe("TPS", func() {
 					w.Header().Add("Connection", "keep-alive")
 
 					w.WriteHeader(http.StatusOK)
-
-					closeNotifier := w.(http.CloseNotifier).CloseNotify()
-
-					<-closeNotifier
 				},
 			)
 
