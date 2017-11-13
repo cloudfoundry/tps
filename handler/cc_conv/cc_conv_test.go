@@ -11,6 +11,9 @@ var _ = Describe("CC Conversion Tools", func() {
 	var placementError string
 	Describe("StateFor", func() {
 		Context("without a placement error", func() {
+			BeforeEach(func() {
+				placementError = ""
+			})
 			It("converts state from ActualLRPState to cc_messages LRPInstanceState", func() {
 				Expect(StateFor(models.ActualLRPStateUnclaimed, placementError)).To(Equal(cc_messages.LRPInstanceStateStarting))
 				Expect(StateFor(models.ActualLRPStateClaimed, placementError)).To(Equal(cc_messages.LRPInstanceStateStarting))
