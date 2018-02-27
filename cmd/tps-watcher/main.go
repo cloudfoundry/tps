@@ -170,12 +170,22 @@ func initializeBBSClient(logger lager.Logger, watcherConfig config.WatcherConfig
 	if err != nil {
 		logger.Fatal("Invalid BBS URL", err)
 	}
+	var bbsClient bbs.InternalClient
 
 	if bbsURL.Scheme != "https" {
-		return bbs.NewClient(watcherConfig.BBSAddress)
+		var cfg bbs.ClientConfig
+		cfg.URL = watcherConfig.BBSAddress
+		cfg.IsTLS = false
+
+		bbsClient, err = bbs.NewClientWithConfig(cfg)
+		if err != nil {
+			logger.Fatal("Failed to configure insecure BBS client", err)
+		}
+
+		return bbsClient
 	}
 
-	bbsClient, err := bbs.NewSecureClient(
+	bbsClient, err = bbs.NewClient(
 		watcherConfig.BBSAddress,
 		watcherConfig.BBSCACert,
 		watcherConfig.BBSClientCert,
