@@ -8,12 +8,14 @@ import (
 	"code.cloudfoundry.org/bbs/models"
 	"code.cloudfoundry.org/clock"
 	"code.cloudfoundry.org/lager"
-	"code.cloudfoundry.org/nsync/recipebuilder"
 	"code.cloudfoundry.org/runtimeschema/cc_messages"
 	"code.cloudfoundry.org/tps/handler/lrpstatus"
 	"github.com/cloudfoundry/sonde-go/events"
 )
 
+const (
+	DefaultContainerPort = uint32(8080)
+)
 //go:generate counterfeiter -o fakes/fake_noaaclient.go . NoaaClient
 type NoaaClient interface {
 	ContainerMetrics(appGuid string, authToken string) ([]*events.ContainerMetric, error)
@@ -121,7 +123,7 @@ func (handler *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func getDefaultPort(mappings []*models.PortMapping) uint16 {
 	for _, mapping := range mappings {
-		if mapping.ContainerPort == recipebuilder.DefaultPort {
+		if mapping.ContainerPort == DefaultContainerPort {
 			return uint16(mapping.HostPort)
 		}
 	}

@@ -12,7 +12,6 @@ import (
 	"code.cloudfoundry.org/bbs/models"
 	"code.cloudfoundry.org/clock/fakeclock"
 	"code.cloudfoundry.org/lager/lagertest"
-	"code.cloudfoundry.org/nsync/recipebuilder"
 	"code.cloudfoundry.org/runtimeschema/cc_messages"
 	"code.cloudfoundry.org/tps/handler/lrpstats"
 	"code.cloudfoundry.org/tps/handler/lrpstats/fakes"
@@ -100,7 +99,7 @@ var _ = Describe("Stats", func() {
 				"host",
 				"instance-host",
 				models.NewPortMapping(5432, 7890),
-				models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
+				models.NewPortMapping(1234, 8080),
 			)
 
 			actualLRP = &models.ActualLRP{

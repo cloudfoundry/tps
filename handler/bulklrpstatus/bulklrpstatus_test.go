@@ -13,7 +13,6 @@ import (
 	"code.cloudfoundry.org/clock/fakeclock"
 	"code.cloudfoundry.org/lager"
 	"code.cloudfoundry.org/lager/lagertest"
-	"code.cloudfoundry.org/nsync/recipebuilder"
 	"code.cloudfoundry.org/runtimeschema/cc_messages"
 	"code.cloudfoundry.org/tps/handler/bulklrpstatus"
 
@@ -94,13 +93,13 @@ var _ = Describe("Bulk Status", func() {
 				"host",
 				"instance-host",
 				models.NewPortMapping(5432, 7890),
-				models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
+				models.NewPortMapping(1234, 8080),
 			)
 			netInfo2 = models.NewActualLRPNetInfo(
 				"host2",
 				"instance-host",
 				models.NewPortMapping(5432, 7890),
-				models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
+				models.NewPortMapping(1234, 8080),
 			)
 
 			request.Header.Set("Authorization", authorization)
@@ -185,7 +184,7 @@ var _ = Describe("Bulk Status", func() {
 								"host",
 								"instance-host",
 								models.NewPortMapping(5432, 7890),
-								models.NewPortMapping(1234, uint32(recipebuilder.DefaultPort)),
+								models.NewPortMapping(1234, 8080),
 							),
 							State: models.ActualLRPStateRunning,
 							Since: actualSinceTime,
