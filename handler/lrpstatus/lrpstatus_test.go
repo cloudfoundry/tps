@@ -13,7 +13,6 @@ import (
 	"code.cloudfoundry.org/lager"
 	"code.cloudfoundry.org/lager/lagertest"
 	"code.cloudfoundry.org/runtimeschema/cc_messages"
-	"code.cloudfoundry.org/stager/diego_errors"
 	"code.cloudfoundry.org/tps/handler/lrpstatus"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -45,7 +44,7 @@ var _ = Describe("LRPStatus", func() {
 					makeActualLRPGroup(1, models.ActualLRPStateUnclaimed, ""),
 					makeActualLRPGroup(2, models.ActualLRPStateClaimed, ""),
 					makeActualLRPGroup(3, models.ActualLRPStateRunning, ""),
-					makeActualLRPGroup(4, models.ActualLRPStateCrashed, diego_errors.CELL_MISMATCH_MESSAGE),
+					makeActualLRPGroup(4, models.ActualLRPStateCrashed, "found no compatible cell"),
 				}, nil
 			}
 		})
@@ -64,7 +63,7 @@ var _ = Describe("LRPStatus", func() {
 			Expect(response[1].State).To(Equal(cc_messages.LRPInstanceStateStarting))
 			Expect(response[2].State).To(Equal(cc_messages.LRPInstanceStateRunning))
 			Expect(response[3].State).To(Equal(cc_messages.LRPInstanceStateCrashed))
-			Expect(response[3].Details).To(Equal(diego_errors.CELL_MISMATCH_MESSAGE))
+			Expect(response[3].Details).To(Equal("found no compatible cell"))
 		})
 	})
 })
