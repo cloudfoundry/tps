@@ -59,7 +59,7 @@ func LRPInstances(
 ) []cc_messages.LRPInstance {
 	instances := make([]cc_messages.LRPInstance, len(actualLRPGroups))
 	for i, actualLRPGroup := range actualLRPGroups {
-		actual, _ := actualLRPGroup.Resolve()
+		actual, _, _ := actualLRPGroup.Resolve()
 
 		instance := cc_messages.LRPInstance{
 			ProcessGuid:  actual.ProcessGuid,
