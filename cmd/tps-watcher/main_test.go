@@ -61,6 +61,7 @@ var _ = Describe("TPS", func() {
 				Expect(appCrashed).To(Equal(cc_messages.AppCrashedRequest{
 					Instance:        "some-instance-guid-1",
 					Index:           1,
+					CellID:          "cell-id",
 					Reason:          "CRASHED",
 					ExitDescription: "out of memory",
 					CrashCount:      1,

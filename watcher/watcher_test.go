@@ -111,6 +111,7 @@ var _ = Describe("Watcher", func() {
 				Expect(crashed).To(Equal(cc_messages.AppCrashedRequest{
 					Instance:        "instance-guid",
 					Index:           1,
+					CellID:          "some-cell",
 					Reason:          "CRASHED",
 					ExitDescription: "out of memory",
 					CrashCount:      1,

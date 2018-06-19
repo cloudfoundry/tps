@@ -45,7 +45,7 @@ var _ = Describe("CC Client", func() {
 	})
 
 	Describe("Successfully calling the Cloud Controller", func() {
-		var expectedBody = []byte(`{"instance":"","index":1,"reason":"","crash_count":0,"crash_timestamp":0}`)
+		var expectedBody = []byte(`{"instance":"","index":1,"cell_id":"","reason":"","crash_count":0,"crash_timestamp":0}`)
 
 		BeforeEach(func() {
 			fakeCC.AppendHandlers(
