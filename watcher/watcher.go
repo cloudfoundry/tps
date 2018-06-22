@@ -116,9 +116,11 @@ func (watcher *Watcher) handleEvent(logger lager.Logger, event models.Event) {
 			})
 
 			guid := crashed.ActualLRPKey.ProcessGuid
+			cellId := crashed.ActualLRPInstanceKey.CellId
 			appCrashed := cc_messages.AppCrashedRequest{
 				Instance:        crashed.ActualLRPInstanceKey.InstanceGuid,
 				Index:           int(crashed.ActualLRPKey.Index),
+				CellID:          cellId,
 				Reason:          "CRASHED",
 				ExitDescription: crashed.CrashReason,
 				CrashCount:      int(crashed.CrashCount),
