@@ -3,7 +3,7 @@ tps
 
 **Note**: This repository should be imported as `code.cloudfoundry.org/tps`.
 
-**Note**: The tps listener is deprecated, its functionality is in cloud_controller_ng
+**Note**: The tps listener has been removed, its functionality is in cloud_controller_ng
 
 
 the process status reporter
