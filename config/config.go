@@ -34,23 +34,6 @@ func (d Duration) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, t.String())), nil
 }
 
-type ListenerConfig struct {
-	BBSAddress             string                        `json:"bbs_api_url"`
-	BBSCACert              string                        `json:"bbs_ca_cert"`
-	BBSClientCert          string                        `json:"bbs_client_cert"`
-	BBSClientKey           string                        `json:"bbs_client_key"`
-	BBSMaxIdleConnsPerHost int                           `json:"bbs_max_idle_conns_per_host"`
-	BulkLRPStatusWorkers   int                           `json:"bulk_lrp_status_workers"`
-	ConsulCluster          string                        `json:"consul_cluster"`
-	DebugServerConfig      debugserver.DebugServerConfig `json:"debug_server_config"`
-	DropsondePort          int                           `json:"dropsonde_port"`
-	ListenAddress          string                        `json:"listen_addr"`
-	LagerConfig            lagerflags.LagerConfig        `json:"lager_config"`
-	MaxInFlightRequests    int                           `json:"max_in_flight_requests"`
-	SkipCertVerify         bool                          `json:"skip_cert_verify"`
-	TrafficControllerURL   string                        `json:"traffic_controller_url"`
-}
-
 type WatcherConfig struct {
 	BBSAddress                string                        `json:"bbs_api_url"`
 	BBSCACert                 string                        `json:"bbs_ca_cert"`
@@ -75,18 +58,6 @@ type WatcherConfig struct {
 	locket.ClientLocketConfig
 }
 
-func DefaultListenerConfig() ListenerConfig {
-	return ListenerConfig{
-		BBSMaxIdleConnsPerHost: 0,
-		BulkLRPStatusWorkers:   15,
-		DropsondePort:          3457,
-		LagerConfig:            lagerflags.DefaultLagerConfig(),
-		ListenAddress:          "0.0.0.0:1518",
-		MaxInFlightRequests:    200,
-		SkipCertVerify:         true,
-	}
-}
-
 func DefaultWatcherConfig() WatcherConfig {
 	return WatcherConfig{
 		BBSClientSessionCacheSize: 0,
@@ -98,21 +69,6 @@ func DefaultWatcherConfig() WatcherConfig {
 		LockTTL:                   Duration(locket.DefaultSessionTTL),
 		SkipConsulLock:            false,
 	}
-}
-
-func NewListenerConfig(configPath string) (ListenerConfig, error) {
-	configFile, err := ioutil.ReadFile(configPath)
-	if err != nil {
-		return ListenerConfig{}, err
-	}
-
-	listenerConfig := DefaultListenerConfig()
-	err = json.Unmarshal(configFile, &listenerConfig)
-	if err != nil {
-		return ListenerConfig{}, err
-	}
-
-	return listenerConfig, nil
 }
 
 func NewWatcherConfig(configPath string) (WatcherConfig, error) {
