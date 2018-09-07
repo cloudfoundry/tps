@@ -52,6 +52,7 @@ type WatcherConfig struct {
 	CCClientCert              string                        `json:"cc_client_cert"`
 	CCClientKey               string                        `json:"cc_client_key"`
 	CCCACert                  string                        `json:"cc_ca_cert"`
+	InstanceID                string                        `json:"instance_id"`
 
 	SkipConsulLock bool `json:"skip_consul_lock"`
 

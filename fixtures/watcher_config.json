@@ -27,5 +27,7 @@
   "locket_address": "https://locket.com",
   "locket_ca_cert_file": "/path/to/locket/ca-cert",
   "locket_client_cert_file": "/path/to/locket/cert",
-  "locket_client_key_file": "/path/to/locket/key"
+  "locket_client_key_file": "/path/to/locket/key",
+
+  "instance_id": "long-bosh-guid"
 }

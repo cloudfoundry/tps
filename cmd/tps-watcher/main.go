@@ -143,14 +143,11 @@ func initializeLocketLockMaintainer(logger lager.Logger, watcherConfig config.Wa
 		logger.Fatal("Failed to initialize locket client", err)
 	}
 
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		logger.Fatal("Couldn't generate uuid", err)
-	}
+	owner := fmt.Sprintf("tps-watcher-%s", watcherConfig.InstanceID)
 
 	lockIdentifier := &locketmodels.Resource{
 		Key:      "tps_watcher",
-		Owner:    uuid.String(),
+		Owner:    owner,
 		TypeCode: locketmodels.LOCK,
 		Type:     locketmodels.LockType,
 	}

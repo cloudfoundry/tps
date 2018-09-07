@@ -50,6 +50,7 @@ var _ = Describe("Config", func() {
 			Expect(watcherConfig.LocketCACertFile).To(Equal("/path/to/locket/ca-cert"))
 			Expect(watcherConfig.LocketClientCertFile).To(Equal("/path/to/locket/cert"))
 			Expect(watcherConfig.LocketClientKeyFile).To(Equal("/path/to/locket/key"))
+			Expect(watcherConfig.InstanceID).To(Equal("long-bosh-guid"))
 		})
 	})
 })
