@@ -80,7 +80,7 @@ var _ = Describe("TPS", func() {
 			afterActualLRP.CrashCount = 1
 			afterActualLRP.CrashReason = "out of memory"
 
-			fakeBBS.RouteToHandler("GET", "/v1/events",
+			fakeBBS.RouteToHandler("GET", "/v1/events.r1",
 				func(w http.ResponseWriter, _ *http.Request) {
 					w.Header().Add("Content-Type", "text/event-stream; charset=utf-8")
 					w.Header().Add("Cache-Control", "no-cache, no-store, must-revalidate")
@@ -113,7 +113,7 @@ var _ = Describe("TPS", func() {
 
 	Context("when the watcher loses the lock", func() {
 		BeforeEach(func() {
-			fakeBBS.RouteToHandler("GET", "/v1/events",
+			fakeBBS.RouteToHandler("GET", "/v1/events.r1",
 				func(w http.ResponseWriter, _ *http.Request) {
 					w.Header().Add("Content-Type", "text/event-stream; charset=utf-8")
 					w.Header().Add("Cache-Control", "no-cache, no-store, must-revalidate")
@@ -141,7 +141,7 @@ var _ = Describe("TPS", func() {
 		var competingWatcherProcess ifrit.Process
 
 		BeforeEach(func() {
-			fakeBBS.RouteToHandler("GET", "/v1/events",
+			fakeBBS.RouteToHandler("GET", "/v1/events.r1",
 				func(w http.ResponseWriter, _ *http.Request) {
 					w.Header().Add("Content-Type", "text/event-stream; charset=utf-8")
 					w.Header().Add("Cache-Control", "no-cache, no-store, must-revalidate")
