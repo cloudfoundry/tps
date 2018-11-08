@@ -61,8 +61,8 @@ var _ = Describe("SqlLock", func() {
 	})
 
 	AfterEach(func() {
-		ginkgomon.Interrupt(watcher, 5)
-		ginkgomon.Interrupt(locketProcess, 5)
+		ginkgomon.Interrupt(watcher, 5*time.Second)
+		ginkgomon.Interrupt(locketProcess, 5*time.Second)
 	})
 
 	Context("with invalid configuration", func() {
@@ -88,7 +88,7 @@ var _ = Describe("SqlLock", func() {
 			JustBeforeEach(func() {
 				Eventually(runner.Buffer, 5*time.Second).Should(gbytes.Say("tps-watcher.started"))
 
-				ginkgomon.Interrupt(locketProcess, 5)
+				ginkgomon.Interrupt(locketProcess, 5*time.Second)
 			})
 
 			It("exits after the TTL expires", func() {
@@ -113,7 +113,7 @@ var _ = Describe("SqlLock", func() {
 			})
 
 			AfterEach(func() {
-				ginkgomon.Kill(competingLockProcess)
+				ginkgomon.Kill(competingLockProcess, 5*time.Second)
 			})
 
 			It("does not acquire the consul lock", func() {
@@ -143,7 +143,7 @@ var _ = Describe("SqlLock", func() {
 			})
 
 			AfterEach(func() {
-				ginkgomon.Interrupt(competingProcess)
+				ginkgomon.Interrupt(competingProcess, 5*time.Second)
 			})
 
 			It("does not become active", func() {
@@ -154,7 +154,7 @@ var _ = Describe("SqlLock", func() {
 				JustBeforeEach(func() {
 					Consistently(runner.Buffer, 5*time.Second).ShouldNot(gbytes.Say("tps-watcher.started"))
 
-					ginkgomon.Interrupt(competingProcess)
+					ginkgomon.Interrupt(competingProcess, 5*time.Second)
 				})
 
 				It("grabs the lock and becomes active", func() {
