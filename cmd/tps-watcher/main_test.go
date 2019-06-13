@@ -72,7 +72,7 @@ var _ = Describe("TPS", func() {
 
 			lrpKey := models.NewActualLRPKey("some-process-guid", 1, domain)
 			instanceKey := models.NewActualLRPInstanceKey("some-instance-guid-1", "cell-id")
-			netInfo := models.NewActualLRPNetInfo("1.2.3.4", "5.6.7.8", models.NewPortMapping(65100, 8080))
+			netInfo := models.NewActualLRPNetInfo("1.2.3.4", "5.6.7.8", models.ActualLRPNetInfo_PreferredAddressHost, models.NewPortMapping(65100, 8080))
 			beforeActualLRP := *models.NewRunningActualLRP(lrpKey, instanceKey, netInfo, 0)
 			afterActualLRP := beforeActualLRP
 			afterActualLRP.State = models.ActualLRPStateCrashed
