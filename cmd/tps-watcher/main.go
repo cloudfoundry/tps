@@ -6,23 +6,19 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"time"
 
 	"code.cloudfoundry.org/bbs"
 	"code.cloudfoundry.org/clock"
-	"code.cloudfoundry.org/consuladapter"
 	"code.cloudfoundry.org/debugserver"
 	"code.cloudfoundry.org/lager"
 	"code.cloudfoundry.org/lager/lagerflags"
 	"code.cloudfoundry.org/locket"
 	"code.cloudfoundry.org/locket/lock"
 	locketmodels "code.cloudfoundry.org/locket/models"
-	"code.cloudfoundry.org/tps"
 	"code.cloudfoundry.org/tps/cc_client"
 	"code.cloudfoundry.org/tps/config"
 	"code.cloudfoundry.org/tps/watcher"
 	"github.com/cloudfoundry/dropsonde"
-	"github.com/nu7hatch/gouuid"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/grouper"
 	"github.com/tedsuo/ifrit/sigmon"
@@ -50,16 +46,9 @@ func main() {
 
 	initializeDropsonde(logger, watcherConfig.DropsondePort)
 
-	locks := []grouper.Member{}
-	if !watcherConfig.SkipConsulLock {
-		locks = append(locks, grouper.Member{"consul-lock", initializeConsulLockMaintainer(logger, watcherConfig)})
-	}
+	locks := []grouper.Member{{"sql-lock", initializeLocketLockMaintainer(logger, watcherConfig)}}
 
-	if watcherConfig.LocketAddress != "" {
-		locks = append(locks, grouper.Member{"sql-lock", initializeLocketLockMaintainer(logger, watcherConfig)})
-	}
-
-	if len(locks) < 1 {
+	if watcherConfig.LocketAddress == "" {
 		logger.Fatal("no-locks-configured", errors.New("Lock configuration must be provided"))
 	}
 
@@ -115,26 +104,6 @@ func initializeDropsonde(logger lager.Logger, dropsondePort int) {
 	if err != nil {
 		logger.Error("failed to initialize dropsonde: %v", err)
 	}
-}
-
-func initializeServiceClient(logger lager.Logger, consulCluster string) tps.ServiceClient {
-	consulClient, err := consuladapter.NewClientFromUrl(consulCluster)
-	if err != nil {
-		logger.Fatal("new-client-failed", err)
-	}
-
-	return tps.NewServiceClient(consulClient, clock.NewClock())
-}
-
-func initializeConsulLockMaintainer(logger lager.Logger, watcherConfig config.WatcherConfig) ifrit.Runner {
-	serviceClient := initializeServiceClient(logger, watcherConfig.ConsulCluster)
-
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		logger.Fatal("Couldn't generate uuid", err)
-	}
-
-	return serviceClient.NewTPSWatcherLockRunner(logger, uuid.String(), time.Duration(watcherConfig.LockRetryInterval), time.Duration(watcherConfig.LockTTL))
 }
 
 func initializeLocketLockMaintainer(logger lager.Logger, watcherConfig config.WatcherConfig) ifrit.Runner {

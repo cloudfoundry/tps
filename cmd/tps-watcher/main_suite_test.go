@@ -4,25 +4,23 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"code.cloudfoundry.org/consuladapter/consulrunner"
 	"code.cloudfoundry.org/lager/lagertest"
 	"code.cloudfoundry.org/tps/cmd/tpsrunner"
+	_ "github.com/lib/pq"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/ginkgomon"
 
+	"testing"
+	"time"
+
 	tpsconfig "code.cloudfoundry.org/tps/config"
 	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/config"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 	"github.com/onsi/gomega/ghttp"
-	"testing"
-	"time"
 )
 
 var (
-	consulRunner *consulrunner.ClusterRunner
-
 	watcher           ifrit.Process
 	runner            *ginkgomon.Runner
 	disableStartCheck bool
@@ -65,25 +63,15 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	watcherPath = string(binaries["watcher"])
 	locketBinPath = string(binaries["locket"])
 
-	consulRunner = consulrunner.NewClusterRunner(
-		9001+config.GinkgoConfig.ParallelNode*consulrunner.PortOffsetLength,
-		1,
-		"http",
-	)
-
 	logger = lagertest.NewTestLogger("test")
 })
 
 var _ = BeforeEach(func() {
-	consulRunner.Start()
-	consulRunner.WaitUntilReady()
-
 	fakeCC = ghttp.NewServer()
 	fakeBBS = ghttp.NewServer()
 
 	watcherConfig = tpsconfig.DefaultWatcherConfig()
 	watcherConfig.BBSAddress = fakeBBS.URL()
-	watcherConfig.ConsulCluster = consulRunner.ConsulCluster()
 	watcherConfig.CCBaseUrl = fmt.Sprintf(fakeCC.URL())
 	watcherConfig.LagerConfig.LogLevel = "debug"
 	watcherConfig.CCClientCert = "../../fixtures/watcher_cc_client.crt"
@@ -105,7 +93,6 @@ var _ = JustBeforeEach(func() {
 var _ = AfterEach(func() {
 	fakeCC.Close()
 	fakeBBS.Close()
-	consulRunner.Stop()
 })
 
 var _ = SynchronizedAfterSuite(func() {

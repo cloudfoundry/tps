@@ -6,7 +6,6 @@
   "bbs_client_cache_size": 1234,
   "bbs_max_idle_conns_per_host": 10,
   "cc_base_url": "https://cloudcontroller.com",
-  "consul_cluster": "https://consul.com",
   "debug_server_config": {
     "debug_address": "https://debugger.com"
   },
