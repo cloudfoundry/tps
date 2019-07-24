@@ -42,7 +42,6 @@ type WatcherConfig struct {
 	BBSClientSessionCacheSize int                           `json:"bbs_client_cache_size"`
 	BBSMaxIdleConnsPerHost    int                           `json:"bbs_max_idle_conns_per_host"`
 	CCBaseUrl                 string                        `json:"cc_base_url"`
-	ConsulCluster             string                        `json:"consul_cluster"`
 	DebugServerConfig         debugserver.DebugServerConfig `json:"debug_server_config"`
 	DropsondePort             int                           `json:"dropsonde_port"`
 	LagerConfig               lagerflags.LagerConfig        `json:"lager_config"`
@@ -53,8 +52,6 @@ type WatcherConfig struct {
 	CCClientKey               string                        `json:"cc_client_key"`
 	CCCACert                  string                        `json:"cc_ca_cert"`
 	InstanceID                string                        `json:"instance_id"`
-
-	SkipConsulLock bool `json:"skip_consul_lock"`
 
 	locket.ClientLocketConfig
 }
@@ -68,7 +65,6 @@ func DefaultWatcherConfig() WatcherConfig {
 		MaxEventHandlingWorkers:   500,
 		LockRetryInterval:         Duration(locket.RetryInterval),
 		LockTTL:                   Duration(locket.DefaultSessionTTL),
-		SkipConsulLock:            false,
 	}
 }
 
