@@ -44,7 +44,7 @@ var _ = Describe("CC Client", func() {
 		}
 	})
 
-	Describe("Successfully calling the Cloud Controller", func() {
+	Describe("Successfully calling the Cloud Controller's crashed endpoint", func() {
 		var expectedBody = []byte(`{"instance":"","index":1,"cell_id":"","reason":"","crash_count":0,"crash_timestamp":0}`)
 
 		BeforeEach(func() {
@@ -71,6 +71,36 @@ var _ = Describe("CC Client", func() {
 		})
 	})
 
+	Describe("Successfully calling the Cloud Controller's rescheduling endpoint", func() {
+		var expectedBody = []byte(`{"instance":"instance-id","index":3,"cell_id":"id-of-cell","reason":"reason-for-evacuation"}`)
+
+		BeforeEach(func() {
+			fakeCC.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("POST", "/internal/v4/apps/"+guid+"/rescheduling"),
+					ghttp.RespondWith(200, `{}`),
+					func(w http.ResponseWriter, req *http.Request) {
+						body, err := ioutil.ReadAll(req.Body)
+						defer req.Body.Close()
+
+						Expect(err).NotTo(HaveOccurred())
+						Expect(body).To(Equal(expectedBody))
+					},
+				),
+			)
+		})
+
+		It("sends the request payload to the CC without modification", func() {
+			err := ccClient.AppRescheduling(guid, cc_messages.AppReschedulingRequest{
+				Index:    3,
+				Instance: "instance-id",
+				CellID:   "id-of-cell",
+				Reason:   "reason-for-evacuation",
+			}, logger)
+			Expect(err).NotTo(HaveOccurred())
+		})
+	})
+
 	Describe("Error conditions", func() {
 		Context("when the request couldn't be completed", func() {
 			BeforeEach(func() {
@@ -78,8 +108,16 @@ var _ = Describe("CC Client", func() {
 				ccClient = cc_client.NewCcClient(bogusURL, &tls.Config{})
 			})
 
-			It("percolates the error", func() {
+			It("percolates errors calling app crashed", func() {
 				err := ccClient.AppCrashed(guid, cc_messages.AppCrashedRequest{
+					Index: 1,
+				}, logger)
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(BeAssignableToTypeOf(&url.Error{}))
+			})
+
+			It("percolates errors calling app rescheduling", func() {
+				err := ccClient.AppRescheduling(guid, cc_messages.AppReschedulingRequest{
 					Index: 1,
 				}, logger)
 				Expect(err).To(HaveOccurred())
@@ -87,7 +125,7 @@ var _ = Describe("CC Client", func() {
 			})
 		})
 
-		Context("when the response code is not StatusOK (200)", func() {
+		Context("when the crashed response code is not StatusOK (200)", func() {
 			BeforeEach(func() {
 				fakeCC.AppendHandlers(
 					ghttp.CombineHandlers(
@@ -99,6 +137,26 @@ var _ = Describe("CC Client", func() {
 
 			It("returns an error with the actual status code", func() {
 				err := ccClient.AppCrashed(guid, cc_messages.AppCrashedRequest{
+					Index: 1,
+				}, logger)
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(BeAssignableToTypeOf(&cc_client.BadResponseError{}))
+				Expect(err.(*cc_client.BadResponseError).StatusCode).To(Equal(500))
+			})
+		})
+
+		Context("when the rescheduling response code is not StatusOK (200)", func() {
+			BeforeEach(func() {
+				fakeCC.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/internal/v4/apps/"+guid+"/rescheduling"),
+						ghttp.RespondWith(500, `{}`),
+					),
+				)
+			})
+
+			It("returns an error with the actual status code", func() {
+				err := ccClient.AppRescheduling(guid, cc_messages.AppReschedulingRequest{
 					Index: 1,
 				}, logger)
 				Expect(err).To(HaveOccurred())
