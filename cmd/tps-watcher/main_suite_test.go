@@ -25,8 +25,7 @@ var (
 	runner            *ginkgomon.Runner
 	disableStartCheck bool
 
-	watcherPath   string
-	locketBinPath string
+	watcherPath string
 
 	watcherConfig tpsconfig.WatcherConfig
 
@@ -41,15 +40,11 @@ func TestTPS(t *testing.T) {
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	tps, err := gexec.Build("code.cloudfoundry.org/tps/cmd/tps-watcher", "-race")
-	Expect(err).NotTo(HaveOccurred())
-
-	locketPath, err := gexec.Build("code.cloudfoundry.org/locket/cmd/locket", "-race")
+	tps, err := gexec.Build("../tps-watcher", "-race")
 	Expect(err).NotTo(HaveOccurred())
 
 	payload, err := json.Marshal(map[string]string{
 		"watcher": tps,
-		"locket":  locketPath,
 	})
 	Expect(err).NotTo(HaveOccurred())
 
@@ -61,7 +56,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(err).NotTo(HaveOccurred())
 
 	watcherPath = string(binaries["watcher"])
-	locketBinPath = string(binaries["locket"])
 
 	logger = lagertest.NewTestLogger("test")
 })

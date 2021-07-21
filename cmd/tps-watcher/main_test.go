@@ -27,7 +27,7 @@ import (
 	"github.com/tedsuo/ifrit/ginkgomon"
 )
 
-	const watcherLockName = "tps_watcher_lock"
+const watcherLockName = "tps_watcher_lock"
 
 var _ = Describe("TPS", func() {
 	var (
@@ -53,8 +53,9 @@ var _ = Describe("TPS", func() {
 		_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", dbName))
 		Expect(err).NotTo(HaveOccurred())
 
+		locketBinName := "locket"
 		locketAddress = fmt.Sprintf("localhost:%d", locketPort)
-		locketRunner = locketrunner.NewLocketRunner(locketBinPath, func(cfg *locketconfig.LocketConfig) {
+		locketRunner = locketrunner.NewLocketRunner(locketBinName, func(cfg *locketconfig.LocketConfig) {
 			cfg.DatabaseConnectionString = connectionString + "/" + dbName
 			cfg.DatabaseDriver = "postgres"
 			cfg.ListenAddress = locketAddress

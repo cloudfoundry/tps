@@ -36,6 +36,8 @@ $ createdb locket
 $ createuser -d -P -r -s locket
 ```
 
+The specs also require that the [locket](https://github.com/cloudfoundry/locket) binary is on the `$PATH`.
+
 ### Resources
 
 Learn more about Diego and its components at [diego-design-notes](https://github.com/cloudfoundry-incubator/diego-design-notes)
