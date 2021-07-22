@@ -180,7 +180,7 @@ var _ = Describe("TPS", func() {
 				})
 
 				It("exits after the TTL expires", func() {
-					Eventually(runner, 16*time.Second).Should(gexec.Exit(1))
+					Eventually(runner, 17*time.Second).Should(gexec.Exit(1))
 				})
 			})
 
