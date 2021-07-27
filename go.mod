@@ -1,4 +1,4 @@
-module github.com/cloudfoundry/tps
+module code.cloudfoundry.org/tps
 
 go 1.16
 
@@ -20,7 +20,6 @@ require (
 	code.cloudfoundry.org/rfc5424 v0.0.0-20201103192249-000122071b78 // indirect
 	code.cloudfoundry.org/runtimeschema v0.0.0-20180622184205-c38d8be9f68c
 	code.cloudfoundry.org/tlsconfig v0.0.0-20200131000646-bbe0f8da39b3 // indirect
-	code.cloudfoundry.org/tps v0.0.0-20190724214151-ce1ef3913d8e
 	code.cloudfoundry.org/urljoiner v0.0.0-20170223060717-5cabba6c0a50
 	code.cloudfoundry.org/workpool v0.0.0-20200131000409-2ac56b354115
 	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
