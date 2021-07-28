@@ -46,7 +46,7 @@ var _ = Describe("Watcher", func() {
 	BeforeEach(func() {
 		eventSource = new(eventfakes.FakeEventSource)
 		bbsClient = new(fake_bbs.FakeInternalClient)
-		bbsClient.SubscribeToEventsReturns(eventSource, nil)
+		bbsClient.SubscribeToInstanceEventsReturns(eventSource, nil)
 
 		logger = lagertest.NewTestLogger("test")
 		ccClient = new(fakes.FakeCcClient)
@@ -154,7 +154,6 @@ var _ = Describe("Watcher", func() {
 
 	Describe("Unrecognized events", func() {
 		Context("when its not ActualLRPCrashed event", func() {
-
 			BeforeEach(func() {
 				nextEvent.Store(EventHolder{&models.ActualLRPCreatedEvent{}})
 			})
@@ -171,8 +170,8 @@ var _ = Describe("Watcher", func() {
 		BeforeEach(func() {
 			subscribeErr = models.ErrUnknownError
 
-			bbsClient.SubscribeToEventsStub = func(logger lager.Logger) (events.EventSource, error) {
-				if bbsClient.SubscribeToEventsCallCount() > 1 {
+			bbsClient.SubscribeToInstanceEventsStub = func(logger lager.Logger) (events.EventSource, error) {
+				if bbsClient.SubscribeToInstanceEventsCallCount() > 1 {
 					return eventSource, nil
 				}
 				return nil, subscribeErr
@@ -184,7 +183,7 @@ var _ = Describe("Watcher", func() {
 		})
 
 		It("re-subscribes", func() {
-			Eventually(bbsClient.SubscribeToEventsCallCount, 2*time.Second).Should(BeNumerically(">", 1))
+			Eventually(bbsClient.SubscribeToInstanceEventsCallCount, 2*time.Second).Should(BeNumerically(">", 1))
 		})
 
 		Context("when re-subscribing fails", func() {
@@ -202,7 +201,7 @@ var _ = Describe("Watcher", func() {
 		})
 
 		It("retries 3 times and then re-subscribes", func() {
-			Eventually(bbsClient.SubscribeToEventsCallCount, 5*time.Second).Should(BeNumerically(">", 1))
+			Eventually(bbsClient.SubscribeToInstanceEventsCallCount, 5*time.Second).Should(BeNumerically(">", 1))
 			Expect(eventSource.NextCallCount()).Should(BeNumerically(">=", 3))
 		})
 	})
