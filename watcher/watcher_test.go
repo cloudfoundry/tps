@@ -46,7 +46,7 @@ var _ = Describe("Watcher", func() {
 	BeforeEach(func() {
 		eventSource = new(eventfakes.FakeEventSource)
 		bbsClient = new(fake_bbs.FakeInternalClient)
-		bbsClient.SubscribeToEventsReturns(eventSource, nil)
+		bbsClient.SubscribeToInstanceEventsReturns(eventSource, nil)
 
 		logger = lagertest.NewTestLogger("test")
 		ccClient = new(fakes.FakeCcClient)
@@ -96,7 +96,7 @@ var _ = Describe("Watcher", func() {
 		var actual *models.ActualLRP
 
 		BeforeEach(func() {
-			actual = makeActualLRP("process-guid", "instance-guid", 1, 3, 1, cc_messages.AppLRPDomain, "out of memory")
+			actual = makeCrashingActualLRP("process-guid", "instance-guid", 1, 3, 1, cc_messages.AppLRPDomain, "out of memory")
 		})
 
 		JustBeforeEach(func() {
@@ -126,7 +126,7 @@ var _ = Describe("Watcher", func() {
 			var otherActual *models.ActualLRP
 
 			BeforeEach(func() {
-				otherActual = makeActualLRP("other-process-guid", "instance-guid", 1, 3, 1, "", "")
+				otherActual = makeCrashingActualLRP("other-process-guid", "instance-guid", 1, 3, 1, "", "")
 
 				event := EventHolder{models.NewActualLRPCrashedEvent(actual, actual)}
 				otherEvent := EventHolder{models.NewActualLRPCrashedEvent(otherActual, otherActual)}
@@ -152,9 +152,82 @@ var _ = Describe("Watcher", func() {
 		})
 	})
 
+	Describe("Actual LRP instance removed", func() {
+		var firstEventDomain string
+		var firstEventPresence models.ActualLRP_Presence
+
+		JustBeforeEach(func() {
+			firstActual := makeRemovingActualLRP("first-process-guid", "first-instance-guid", 1, firstEventDomain, firstEventPresence)
+			secondActual := makeRemovingActualLRP("other-process-guid", "other-instance-guid", 1, cc_messages.AppLRPDomain, models.ActualLRP_Evacuating)
+
+			events := []EventHolder{
+				{models.NewActualLRPInstanceRemovedEvent(firstActual)},
+				{models.NewActualLRPInstanceRemovedEvent(secondActual)},
+			}
+
+			eventSource.NextStub = func() (models.Event, error) {
+				var e EventHolder
+				time.Sleep(10 * time.Millisecond)
+				if len(events) == 0 {
+					return nil, nil
+				}
+				e, events = events[0], events[1:]
+				return e.event, nil
+			}
+		})
+
+		Context("if the application only has the cc-app Domain", func() {
+			BeforeEach(func() {
+				firstEventDomain = cc_messages.AppLRPDomain
+				firstEventPresence = models.ActualLRP_Ordinary
+			})
+
+			It("does not call AppRescheduling for that event", func() {
+				Eventually(ccClient.AppReschedulingCallCount).Should(Equal(1))
+				buffer := logger.Buffer()
+				Expect(buffer).NotTo(Say("first-process-guid"))
+				Expect(buffer).To(Say("other-process-guid"))
+			})
+		})
+
+		Context("if the application only has the Evacuating Presence", func() {
+			BeforeEach(func() {
+				firstEventDomain = cc_messages.RunningTaskDomain
+				firstEventPresence = models.ActualLRP_Evacuating
+			})
+
+			It("does not call AppRescheduling for that event", func() {
+				Eventually(ccClient.AppReschedulingCallCount).Should(Equal(1))
+				buffer := logger.Buffer()
+				Expect(buffer).NotTo(Say("first-process-guid"))
+				Expect(buffer).To(Say("other-process-guid"))
+			})
+		})
+
+		Context("if the application has both the cc-app Domain and the Evacuating Presence", func() {
+			BeforeEach(func() {
+				firstEventDomain = cc_messages.AppLRPDomain
+				firstEventPresence = models.ActualLRP_Evacuating
+			})
+
+			It("calls AppRescheduling", func() {
+				Eventually(ccClient.AppReschedulingCallCount).Should(Equal(1))
+				guid, crashed, _ := ccClient.AppReschedulingArgsForCall(0)
+				Expect(guid).To(Equal("first-process-guid"))
+				Expect(crashed).To(Equal(cc_messages.AppReschedulingRequest{
+					Instance: "first-instance-guid",
+					Index:    1,
+					CellID:   "some-cell",
+					Reason:   "Cell is being evacuated",
+				}))
+
+				Expect(logger).To(Say("app-evacuating"))
+			})
+		})
+	})
+
 	Describe("Unrecognized events", func() {
 		Context("when its not ActualLRPCrashed event", func() {
-
 			BeforeEach(func() {
 				nextEvent.Store(EventHolder{&models.ActualLRPCreatedEvent{}})
 			})
@@ -171,8 +244,8 @@ var _ = Describe("Watcher", func() {
 		BeforeEach(func() {
 			subscribeErr = models.ErrUnknownError
 
-			bbsClient.SubscribeToEventsStub = func(logger lager.Logger) (events.EventSource, error) {
-				if bbsClient.SubscribeToEventsCallCount() > 1 {
+			bbsClient.SubscribeToInstanceEventsStub = func(logger lager.Logger) (events.EventSource, error) {
+				if bbsClient.SubscribeToInstanceEventsCallCount() > 1 {
 					return eventSource, nil
 				}
 				return nil, subscribeErr
@@ -184,7 +257,7 @@ var _ = Describe("Watcher", func() {
 		})
 
 		It("re-subscribes", func() {
-			Eventually(bbsClient.SubscribeToEventsCallCount, 2*time.Second).Should(BeNumerically(">", 1))
+			Eventually(bbsClient.SubscribeToInstanceEventsCallCount, 2*time.Second).Should(BeNumerically(">", 1))
 		})
 
 		Context("when re-subscribing fails", func() {
@@ -202,20 +275,29 @@ var _ = Describe("Watcher", func() {
 		})
 
 		It("retries 3 times and then re-subscribes", func() {
-			Eventually(bbsClient.SubscribeToEventsCallCount, 5*time.Second).Should(BeNumerically(">", 1))
+			Eventually(bbsClient.SubscribeToInstanceEventsCallCount, 5*time.Second).Should(BeNumerically(">", 1))
 			Expect(eventSource.NextCallCount()).Should(BeNumerically(">=", 3))
 		})
 	})
 
 })
 
-func makeActualLRP(processGuid, instanceGuid string, index, since, crashCount int32, domain, reason string) *models.ActualLRP {
+func makeCrashingActualLRP(processGuid, instanceGuid string, index, since, crashCount int32, domain, reason string) *models.ActualLRP {
 	lrp := model_helpers.NewValidActualLRP(processGuid, index)
 	lrp.InstanceGuid = instanceGuid
 	lrp.Since = int64(since)
 	lrp.CrashCount = crashCount
 	lrp.Domain = domain
 	lrp.CrashReason = reason
+
+	return lrp
+}
+
+func makeRemovingActualLRP(processGuid, instanceGuid string, index int32, domain string, presence models.ActualLRP_Presence) *models.ActualLRP {
+	lrp := model_helpers.NewValidActualLRP(processGuid, index)
+	lrp.InstanceGuid = instanceGuid
+	lrp.ActualLRPKey.Domain = domain
+	lrp.Presence = presence
 
 	return lrp
 }
