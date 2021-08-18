@@ -10,8 +10,24 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    container:
+      image: "cloudfoundry/capi:go-units"
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/checkout@master
+      with:
+        repository: cloudfoundry/diego-release
+        path: diego-release
+
+    - name: Setup PostgreSQL
+      run: service postgresql restart
+
+    - name: Build locket
+      run: |
+        cd diego-release/
+        ./scripts/update
+        cd src/code.cloudfoundry.org
+        go build -o /go/bin/locket ./locket/cmd/locket
 
     - name: Set up Go
       uses: actions/setup-go@v2
@@ -20,6 +36,9 @@ jobs:
 
     - name: Build
       run: go build -v ./...
+
+    - name: Install ginkgo
+      run: go install github.com/onsi/ginkgo/ginkgo@latest
 
     - name: Test
       run: ginkgo -r -keepGoing -p -trace -randomizeAllSpecs -progress --race .
