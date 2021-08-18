@@ -122,7 +122,7 @@ var _ = Describe("TPS", func() {
 			afterActualLRP.CrashCount = 1
 			afterActualLRP.CrashReason = "out of memory"
 
-			fakeBBS.RouteToHandler("POST", "/v1/events/lrp_instances.r1",
+			fakeBBS.RouteToHandler("GET", "/v1/events.r1",
 				func(w http.ResponseWriter, _ *http.Request) {
 					w.Header().Add("Content-Type", "text/event-stream; charset=utf-8")
 					w.Header().Add("Cache-Control", "no-cache, no-store, must-revalidate")
