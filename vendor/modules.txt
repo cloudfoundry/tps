@@ -62,6 +62,13 @@ code.cloudfoundry.org/runtimeschema/cc_messages
 # code.cloudfoundry.org/tlsconfig v0.0.0-20200131000646-bbe0f8da39b3
 ## explicit
 code.cloudfoundry.org/tlsconfig
+# code.cloudfoundry.org/tps v0.0.0-20190724214151-ce1ef3913d8e
+## explicit
+code.cloudfoundry.org/tps/cc_client
+code.cloudfoundry.org/tps/cc_client/fakes
+code.cloudfoundry.org/tps/cmd/tpsrunner
+code.cloudfoundry.org/tps/config
+code.cloudfoundry.org/tps/watcher
 # code.cloudfoundry.org/urljoiner v0.0.0-20170223060717-5cabba6c0a50
 ## explicit
 code.cloudfoundry.org/urljoiner
