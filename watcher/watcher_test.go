@@ -156,30 +156,27 @@ var _ = Describe("Watcher", func() {
 		var firstEventDomain string
 		var firstEventPresence models.ActualLRP_Presence
 
-		JustBeforeEach(func() {
-			firstActual := makeRemovingActualLRP("first-process-guid", "first-instance-guid", 1, firstEventDomain, firstEventPresence)
-			secondActual := makeRemovingActualLRP("other-process-guid", "other-instance-guid", 1, cc_messages.AppLRPDomain, models.ActualLRP_Evacuating)
-
-			events := []EventHolder{
-				{models.NewActualLRPInstanceRemovedEvent(firstActual)},
-				{models.NewActualLRPInstanceRemovedEvent(secondActual)},
-			}
-
-			eventSource.NextStub = func() (models.Event, error) {
-				var e EventHolder
-				time.Sleep(10 * time.Millisecond)
-				if len(events) == 0 {
-					return nil, nil
-				}
-				e, events = events[0], events[1:]
-				return e.event, nil
-			}
-		})
-
 		Context("if the application only has the cc-app Domain", func() {
 			BeforeEach(func() {
 				firstEventDomain = cc_messages.AppLRPDomain
 				firstEventPresence = models.ActualLRP_Ordinary
+				firstActual := makeRemovingActualLRP("first-process-guid", "first-instance-guid", 1, firstEventDomain, firstEventPresence)
+				secondActual := makeRemovingActualLRP("other-process-guid", "other-instance-guid", 1, cc_messages.AppLRPDomain, models.ActualLRP_Evacuating)
+
+				events := []EventHolder{
+					{models.NewActualLRPInstanceRemovedEvent(firstActual)},
+					{models.NewActualLRPInstanceRemovedEvent(secondActual)},
+				}
+
+				eventSource.NextStub = func() (models.Event, error) {
+					var e EventHolder
+					time.Sleep(10 * time.Millisecond)
+					if len(events) == 0 {
+						return nil, nil
+					}
+					e, events = events[0], events[1:]
+					return e.event, nil
+				}
 			})
 
 			It("does not call AppRescheduling for that event", func() {
@@ -194,6 +191,23 @@ var _ = Describe("Watcher", func() {
 			BeforeEach(func() {
 				firstEventDomain = cc_messages.RunningTaskDomain
 				firstEventPresence = models.ActualLRP_Evacuating
+				firstActual := makeRemovingActualLRP("first-process-guid", "first-instance-guid", 1, firstEventDomain, firstEventPresence)
+				secondActual := makeRemovingActualLRP("other-process-guid", "other-instance-guid", 1, cc_messages.AppLRPDomain, models.ActualLRP_Evacuating)
+
+				events := []EventHolder{
+					{models.NewActualLRPInstanceRemovedEvent(firstActual)},
+					{models.NewActualLRPInstanceRemovedEvent(secondActual)},
+				}
+
+				eventSource.NextStub = func() (models.Event, error) {
+					var e EventHolder
+					time.Sleep(10 * time.Millisecond)
+					if len(events) == 0 {
+						return nil, nil
+					}
+					e, events = events[0], events[1:]
+					return e.event, nil
+				}
 			})
 
 			It("does not call AppRescheduling for that event", func() {
@@ -208,6 +222,23 @@ var _ = Describe("Watcher", func() {
 			BeforeEach(func() {
 				firstEventDomain = cc_messages.AppLRPDomain
 				firstEventPresence = models.ActualLRP_Evacuating
+				firstActual := makeRemovingActualLRP("first-process-guid", "first-instance-guid", 1, firstEventDomain, firstEventPresence)
+				secondActual := makeRemovingActualLRP("other-process-guid", "other-instance-guid", 1, cc_messages.AppLRPDomain, models.ActualLRP_Evacuating)
+
+				events := []EventHolder{
+					{models.NewActualLRPInstanceRemovedEvent(firstActual)},
+					{models.NewActualLRPInstanceRemovedEvent(secondActual)},
+				}
+
+				eventSource.NextStub = func() (models.Event, error) {
+					var e EventHolder
+					time.Sleep(10 * time.Millisecond)
+					if len(events) == 0 {
+						return nil, nil
+					}
+					e, events = events[0], events[1:]
+					return e.event, nil
+				}
 			})
 
 			It("calls AppRescheduling", func() {
