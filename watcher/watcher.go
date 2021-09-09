@@ -140,6 +140,37 @@ func (watcher *Watcher) handleEvent(logger lager.Logger, event models.Event) {
 			})
 		}
 	}
+
+	if removed, ok := event.(*models.ActualLRPInstanceRemovedEvent); ok {
+		key := removed.ActualLrp.ActualLRPKey
+		if removed.ActualLrp.Presence == models.ActualLRP_Evacuating && key.Domain == cc_messages.AppLRPDomain {
+			instanceKey := removed.ActualLrp.ActualLRPInstanceKey
+
+			logger.Info("app-evacuating", lager.Data{
+				"process-guid": key.ProcessGuid,
+				"index":        key.Index,
+			})
+
+			appRescheduling := cc_messages.AppReschedulingRequest{
+				Instance: instanceKey.InstanceGuid,
+				Index:    int(key.Index),
+				CellID:   instanceKey.CellId,
+				Reason:   "Cell is being evacuated",
+			}
+
+			watcher.pool.Submit(func() {
+				logger := logger.WithData(lager.Data{
+					"process-guid": key.ProcessGuid,
+					"index":        key.Index,
+				})
+				logger.Info("recording-evacuating-app-instance")
+				err := watcher.ccClient.AppRescheduling(key.ProcessGuid, appRescheduling, logger)
+				if err != nil {
+					logger.Error("failed-recording-evacuating-app-instance", err)
+				}
+			})
+		}
+	}
 }
 
 func subscribeToEvents(logger lager.Logger, bbsClient bbs.Client, subscriptionChan chan<- events.EventSource) {
