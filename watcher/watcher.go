@@ -144,7 +144,7 @@ func (watcher *Watcher) handleEvent(logger lager.Logger, event models.Event) {
 
 func subscribeToEvents(logger lager.Logger, bbsClient bbs.Client, subscriptionChan chan<- events.EventSource) {
 	logger.Info("subscribing-to-events")
-	eventSource, err := bbsClient.SubscribeToEvents(logger)
+	eventSource, err := bbsClient.SubscribeToInstanceEvents(logger)
 	if err != nil {
 		logger.Error("failed-subscribing-to-events", err)
 		subscriptionChan <- nil
