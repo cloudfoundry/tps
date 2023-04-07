@@ -23,6 +23,7 @@ jobs:
 
     - name: postgresdb setup
       run: |
+          sudo systemctl start postgresql.service
           createdb locket
           createuser -d -r -s locket
           psql -c "update role locket with login password 'locket_pw';"
