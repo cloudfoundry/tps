@@ -22,4 +22,7 @@ jobs:
       run: go build -v ./...
 
     - name: Test
-      run: ginkgo -r --keep-going -p -trace --randomize-all --race .
+      run: |
+          go install github.com/onsi/ginkgo/v2/ginkgo@v2
+          ginkgo version
+          ginkgo -r --keep-going -p -trace --randomize-all --race .
