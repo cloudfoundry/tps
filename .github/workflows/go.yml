@@ -24,9 +24,9 @@ jobs:
     - name: postgresdb setup
       run: |
           sudo systemctl start postgresql.service
-          createdb -U root locket
-          createuser -d -r -s locket
-          psql -c "update role locket with login password 'locket_pw';"
+          sudo -u postgres psql --command="CREATE USER locket PASSWORD 'locket_pw'"
+          sudo -u postgres psql --command="ALTER USER locket CREATEDB"
+          sudo -u postgres createdb --owner=locket locket
 
     - name: Test
       run: |
