@@ -2,6 +2,7 @@ package cc_client
 
 import (
 	"bytes"
+	"code.cloudfoundry.org/lager/v3"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -12,7 +13,6 @@ import (
 	"net/http"
 	"time"
 
-	"code.cloudfoundry.org/lager"
 	"code.cloudfoundry.org/runtimeschema/cc_messages"
 	"code.cloudfoundry.org/urljoiner"
 )

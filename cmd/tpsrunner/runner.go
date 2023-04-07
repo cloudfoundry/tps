@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/tps/config"
 	. "github.com/onsi/gomega"
 
-	"github.com/tedsuo/ifrit/ginkgomon"
+	ginkgomon "github.com/tedsuo/ifrit/ginkgomon_v2"
 )
 
 func NewWatcher(bin string, watcherConfig config.WatcherConfig) *ginkgomon.Runner {

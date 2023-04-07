@@ -4,7 +4,7 @@ package fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/lager"
+	lager "code.cloudfoundry.org/lager/v3"
 	"code.cloudfoundry.org/runtimeschema/cc_messages"
 	"code.cloudfoundry.org/tps/cc_client"
 )

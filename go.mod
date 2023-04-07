@@ -1,47 +1,62 @@
 module code.cloudfoundry.org/tps
 
-go 1.16
+go 1.20
 
 require (
-	code.cloudfoundry.org/bbs v0.0.0-20220325145300-b2855629fde1
-	code.cloudfoundry.org/clock v1.0.0
-	code.cloudfoundry.org/consuladapter v0.0.0-20211122211027-9dbbfa656ee0 // indirect
-	code.cloudfoundry.org/debugserver v0.0.0-20200131002057-141d5fa0e064
+	code.cloudfoundry.org/bbs v0.0.0-20230406145249-41bd09f9f0ca
+	code.cloudfoundry.org/clock v1.1.0
+	code.cloudfoundry.org/debugserver v0.0.0-20230329140605-8c21649a9a42
+	code.cloudfoundry.org/lager/v3 v3.0.1
+	code.cloudfoundry.org/localip v0.0.0-20230406154046-f137f65d303d
+	code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2
+	code.cloudfoundry.org/runtimeschema v0.0.0-20230323223330-5366865eed76
+	code.cloudfoundry.org/urljoiner v0.0.0-20170223060717-5cabba6c0a50
+	code.cloudfoundry.org/workpool v0.0.0-20230406174608-2e26d5d93731
+	github.com/cloudfoundry/dropsonde v1.0.0
+	github.com/lib/pq v1.9.0
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.6.1
+	github.com/onsi/ginkgo/v2 v2.9.2
+	github.com/onsi/gomega v1.27.6
+	github.com/tedsuo/ifrit v0.0.0-20230330192023-5cba443a66c4
+)
+
+require (
+	code.cloudfoundry.org/cfhttp/v2 v2.0.1-0.20210513172332-4c5ee488a657 // indirect
 	code.cloudfoundry.org/diego-logging-client v0.0.0-20220314190632-277a9c460661 // indirect
 	code.cloudfoundry.org/durationjson v0.0.0-20200131001738-04c274cd71ed // indirect
-	code.cloudfoundry.org/executor v0.0.0-20201214152003-d98dd1d962d6 // indirect
 	code.cloudfoundry.org/go-diodes v0.0.0-20220325013804-800fb6f70e2f // indirect
-	code.cloudfoundry.org/lager v2.0.0+incompatible
-	code.cloudfoundry.org/localip v0.0.0-20200131001204-30f63a0935f5
-	code.cloudfoundry.org/locket v0.0.0-20220325152040-ad30c800960d
-	code.cloudfoundry.org/rep v0.0.0-20210223164058-636ff033bfc3 // indirect
-	code.cloudfoundry.org/runtimeschema v0.0.0-20210817192503-36a2cb16a206
-	code.cloudfoundry.org/tlsconfig v0.0.0-20211123175040-23cc9f05b6b3 // indirect
-	code.cloudfoundry.org/urljoiner v0.0.0-20170223060717-5cabba6c0a50
-	code.cloudfoundry.org/workpool v0.0.0-20200131000409-2ac56b354115
-	github.com/armon/go-metrics v0.3.10 // indirect
+	code.cloudfoundry.org/go-loggregator/v8 v8.0.5 // indirect
+	code.cloudfoundry.org/tlsconfig v0.0.0-20230320190829-8f91c367795b // indirect
+	filippo.io/edwards25519 v1.0.0-rc.1 // indirect
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
-	github.com/cloudfoundry/dropsonde v1.0.0
+	github.com/cloudfoundry/gosteno v0.0.0-20150423193413-0c8581caea35 // indirect
 	github.com/cloudfoundry/sonde-go v0.0.0-20220324234026-9851b3a0dce2 // indirect
-	github.com/fatih/color v1.13.0 // indirect
-	github.com/go-sql-driver/mysql v1.5.0 // indirect
-	github.com/go-test/deep v1.0.7 // indirect
-	github.com/hashicorp/consul/api v1.12.0 // indirect
-	github.com/hashicorp/go-hclog v1.2.0 // indirect
-	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
-	github.com/hashicorp/serf v0.9.7 // indirect
-	github.com/jackc/pgx v3.6.2+incompatible // indirect
-	github.com/lib/pq v1.9.0
-	github.com/mattn/go-colorable v0.1.12 // indirect
-	github.com/mitchellh/mapstructure v1.4.3 // indirect
-	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.18.1
-	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00
+	github.com/go-logr/logr v1.2.4 // indirect
+	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/google/pprof v0.0.0-20230323073829-e72429f035bd // indirect
+	github.com/josharian/intern v1.0.0 // indirect
+	github.com/kr/pretty v0.2.1 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
+	github.com/openzipkin/zipkin-go v0.4.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/square/certstrap v1.3.0 // indirect
 	github.com/tedsuo/rata v1.0.0 // indirect
 	github.com/vito/go-sse v1.0.0 // indirect
-	golang.org/x/net v0.0.0-20220325170049-de3da57026de // indirect
-	golang.org/x/sys v0.0.0-20220328115105-d36c6a25d886 // indirect
-	google.golang.org/genproto v0.0.0-20220328180837-c47567c462d1 // indirect
+	go.step.sm/crypto v0.16.2 // indirect
+	golang.org/x/crypto v0.1.0 // indirect
+	golang.org/x/mod v0.9.0 // indirect
+	golang.org/x/net v0.8.0 // indirect
+	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/text v0.8.0 // indirect
+	golang.org/x/tools v0.7.0 // indirect
+	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f // indirect
+	google.golang.org/grpc v1.54.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 replace github.com/hashicorp/consul => github.com/hashicorp/consul v1.8.1

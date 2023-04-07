@@ -19,12 +19,12 @@ import (
 	"code.cloudfoundry.org/locket/lock"
 	locketmodels "code.cloudfoundry.org/locket/models"
 	"code.cloudfoundry.org/runtimeschema/cc_messages"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
 	"github.com/tedsuo/ifrit"
-	"github.com/tedsuo/ifrit/ginkgomon"
+	ginkgomon "github.com/tedsuo/ifrit/ginkgomon_v2"
 )
 
 const watcherLockName = "tps_watcher_lock"
@@ -41,7 +41,7 @@ var _ = Describe("TPS", func() {
 		locketPort, err := localip.LocalPort()
 		Expect(err).NotTo(HaveOccurred())
 
-		dbName := fmt.Sprintf("locket_%d", GinkgoParallelNode())
+		dbName := fmt.Sprintf("locket_%d", GinkgoParallelProcess())
 		connectionString := "postgres://locket:locket_pw@localhost"
 		db, err := sql.Open("postgres", connectionString+"?sslmode=disable")
 		Expect(err).NotTo(HaveOccurred())
