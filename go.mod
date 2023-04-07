@@ -13,8 +13,7 @@ require (
 	code.cloudfoundry.org/urljoiner v0.0.0-20170223060717-5cabba6c0a50
 	code.cloudfoundry.org/workpool v0.0.0-20230406174608-2e26d5d93731
 	github.com/cloudfoundry/dropsonde v1.0.0
-	github.com/lib/pq v1.9.0
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.6.1
+	github.com/lib/pq v1.10.7
 	github.com/onsi/ginkgo/v2 v2.9.2
 	github.com/onsi/gomega v1.27.6
 	github.com/tedsuo/ifrit v0.0.0-20230330192023-5cba443a66c4
@@ -38,7 +37,6 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/pprof v0.0.0-20230323073829-e72429f035bd // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/kr/pretty v0.2.1 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/openzipkin/zipkin-go v0.4.1 // indirect
@@ -48,7 +46,6 @@ require (
 	github.com/vito/go-sse v1.0.0 // indirect
 	go.step.sm/crypto v0.16.2 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
-	golang.org/x/mod v0.9.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
@@ -56,6 +53,7 @@ require (
 	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f // indirect
 	google.golang.org/grpc v1.54.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
