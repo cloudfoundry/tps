@@ -21,6 +21,12 @@ jobs:
     - name: Build
       run: go build -v ./...
 
+    - name: postgresdb setup
+      run: |
+          createdb locket
+          createuser -d -r -s locket
+          psql -c "update role locket with login password 'locket_pw';"
+
     - name: Test
       run: |
           go install github.com/onsi/ginkgo/v2/ginkgo@v2
