@@ -31,5 +31,6 @@ jobs:
     - name: Test
       run: |
           go install github.com/onsi/ginkgo/v2/ginkgo@v2
+          go install code.cloudfoundry.org/locket/cmd/locket@latest
           ginkgo version
           ginkgo -r --keep-going -p -trace --randomize-all --race .
