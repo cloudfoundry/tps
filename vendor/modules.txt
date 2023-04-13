@@ -355,5 +355,3 @@ google.golang.org/protobuf/types/known/timestamppb
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
-# github.com/hashicorp/consul => github.com/hashicorp/consul v1.8.1
-# github.com/irconus-labs/circonusllhist => github.com/openhistorgram/circonusllhist v0.3.0
