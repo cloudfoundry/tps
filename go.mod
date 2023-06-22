@@ -12,7 +12,7 @@ require (
 	code.cloudfoundry.org/runtimeschema v0.0.0-20230323223330-5366865eed76
 	code.cloudfoundry.org/urljoiner v0.0.0-20170223060717-5cabba6c0a50
 	code.cloudfoundry.org/workpool v0.0.0-20230406174608-2e26d5d93731
-	github.com/cloudfoundry/dropsonde v1.0.0
+	github.com/cloudfoundry/dropsonde v1.1.0
 	github.com/lib/pq v1.10.7
 	github.com/onsi/ginkgo/v2 v2.11.0
 	github.com/onsi/gomega v1.27.8
@@ -28,8 +28,7 @@ require (
 	code.cloudfoundry.org/tlsconfig v0.0.0-20230320190829-8f91c367795b // indirect
 	filippo.io/edwards25519 v1.0.0-rc.1 // indirect
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
-	github.com/cloudfoundry/gosteno v0.0.0-20150423193413-0c8581caea35 // indirect
-	github.com/cloudfoundry/sonde-go v0.0.0-20220324234026-9851b3a0dce2 // indirect
+	github.com/cloudfoundry/sonde-go v0.0.0-20220627221915-ff36de9c3435 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
