@@ -11,15 +11,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4
       with:
-        go-version: 1.16
+        go-version: '1.20'
 
     - name: Build
       run: go build -v ./...
 
+    - name: postgresdb setup
+      run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres psql --command="CREATE USER locket PASSWORD 'locket_pw'"
+          sudo -u postgres psql --command="ALTER USER locket CREATEDB"
+          sudo -u postgres createdb --owner=locket locket
+
     - name: Test
-      run: ginkgo -r -keepGoing -p -trace -randomizeAllSpecs -progress --race .
+      run: |
+          go install github.com/onsi/ginkgo/v2/ginkgo@v2
+          go install code.cloudfoundry.org/locket/cmd/locket@latest
+          ginkgo version
+          ginkgo -r --keep-going -p -trace --randomize-all --race .

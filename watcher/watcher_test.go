@@ -11,14 +11,14 @@ import (
 	"code.cloudfoundry.org/bbs/fake_bbs"
 	"code.cloudfoundry.org/bbs/models"
 	"code.cloudfoundry.org/bbs/models/test/model_helpers"
-	"code.cloudfoundry.org/lager"
-	"code.cloudfoundry.org/lager/lagertest"
+	"code.cloudfoundry.org/lager/v3"
+	"code.cloudfoundry.org/lager/v3/lagertest"
 	"code.cloudfoundry.org/runtimeschema/cc_messages"
 	"code.cloudfoundry.org/tps/cc_client/fakes"
 	"code.cloudfoundry.org/tps/watcher"
 	"github.com/tedsuo/ifrit"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 )

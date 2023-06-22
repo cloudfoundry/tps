@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/bbs"
 	"code.cloudfoundry.org/bbs/events"
 	"code.cloudfoundry.org/bbs/models"
-	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/lager/v3"
 	"code.cloudfoundry.org/runtimeschema/cc_messages"
 	"code.cloudfoundry.org/tps/cc_client"
 	"code.cloudfoundry.org/workpool"
