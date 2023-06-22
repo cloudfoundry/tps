@@ -68,8 +68,8 @@ filippo.io/edwards25519/field
 # github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f
 ## explicit
 github.com/bmizerany/pat
-# github.com/cloudfoundry/dropsonde v1.0.0
-## explicit
+# github.com/cloudfoundry/dropsonde v1.1.0
+## explicit; go 1.18
 github.com/cloudfoundry/dropsonde
 github.com/cloudfoundry/dropsonde/emitter
 github.com/cloudfoundry/dropsonde/envelope_sender
@@ -83,11 +83,7 @@ github.com/cloudfoundry/dropsonde/metric_sender
 github.com/cloudfoundry/dropsonde/metricbatcher
 github.com/cloudfoundry/dropsonde/metrics
 github.com/cloudfoundry/dropsonde/runtime_stats
-# github.com/cloudfoundry/gosteno v0.0.0-20150423193413-0c8581caea35
-## explicit
-github.com/cloudfoundry/gosteno
-github.com/cloudfoundry/gosteno/syslog
-# github.com/cloudfoundry/sonde-go v0.0.0-20220324234026-9851b3a0dce2
+# github.com/cloudfoundry/sonde-go v0.0.0-20220627221915-ff36de9c3435
 ## explicit; go 1.17
 github.com/cloudfoundry/sonde-go/events
 # github.com/go-logr/logr v1.2.4
