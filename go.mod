@@ -10,7 +10,6 @@ require (
 	code.cloudfoundry.org/localip v0.0.0-20230406154046-f137f65d303d
 	code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2
 	code.cloudfoundry.org/runtimeschema v0.0.0-20230323223330-5366865eed76
-	code.cloudfoundry.org/urljoiner v0.0.0-20170223060717-5cabba6c0a50
 	code.cloudfoundry.org/workpool v0.0.0-20230406174608-2e26d5d93731
 	github.com/cloudfoundry/dropsonde v1.1.0
 	github.com/lib/pq v1.10.9

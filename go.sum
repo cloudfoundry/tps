@@ -29,8 +29,6 @@ code.cloudfoundry.org/runtimeschema v0.0.0-20230323223330-5366865eed76/go.mod h1
 code.cloudfoundry.org/tlsconfig v0.0.0-20200131000646-bbe0f8da39b3/go.mod h1:eTbFJpyXRGuFVyg5+oaj9B2eIbIc+0/kZjH8ftbtdew=
 code.cloudfoundry.org/tlsconfig v0.0.0-20230320190829-8f91c367795b h1:FjTuGbVBKeaSyvW7WEATlIFCyb0uCpaiuTSaMQXjUyY=
 code.cloudfoundry.org/tlsconfig v0.0.0-20230320190829-8f91c367795b/go.mod h1:C8SxvGRSutmgzV2FxH8Zwqz2Q8HsaAITQRQFKhlDzPw=
-code.cloudfoundry.org/urljoiner v0.0.0-20170223060717-5cabba6c0a50 h1:y+DtLO/eX/9NZjGGHntWs1bNG6uxdql8SqrHzu6VH3Q=
-code.cloudfoundry.org/urljoiner v0.0.0-20170223060717-5cabba6c0a50/go.mod h1:GyubIUn2eHGSlpIqJhGKBKicAe6CUV/pQJosfNEHdo4=
 code.cloudfoundry.org/workpool v0.0.0-20230406174608-2e26d5d93731 h1:eRKSACvMmv+rcx0BZIQXwlKO7aQzQLMa5NDgdpKVzlY=
 code.cloudfoundry.org/workpool v0.0.0-20230406174608-2e26d5d93731/go.mod h1:O9HdfntfyDvYRH9nh03XdpnGMbjyZVi8nb2Kh+6hDho=
 filippo.io/edwards25519 v1.0.0-rc.1 h1:m0VOOB23frXZvAOK44usCgLWvtsxIoMCTBGJZlpmGfU=
