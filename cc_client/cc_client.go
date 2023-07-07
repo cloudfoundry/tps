@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/runtimeschema/cc_messages"
-	"code.cloudfoundry.org/urljoiner"
 )
 
 const (
@@ -103,7 +102,7 @@ func (cc *ccClient) AppCrashed(guid string, appCrashed cc_messages.AppCrashedReq
 		return err
 	}
 
-	url := fmt.Sprintf(urljoiner.Join(cc.ccURI, appCrashedPath), guid)
+	url := fmt.Sprintf(cc.ccURI+appCrashedPath, guid)
 	request, err := http.NewRequest("POST", url, bytes.NewReader(payload))
 	if err != nil {
 		return err
@@ -136,7 +135,7 @@ func (cc *ccClient) AppRescheduling(guid string, appRescheduling cc_messages.App
 		return err
 	}
 
-	url := fmt.Sprintf(urljoiner.Join(cc.ccURI, appReschedulingPath), guid)
+	url := fmt.Sprintf(cc.ccURI+appReschedulingPath, guid)
 	request, err := http.NewRequest("POST", url, bytes.NewReader(payload))
 	if err != nil {
 		return err
