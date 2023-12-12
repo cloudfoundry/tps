@@ -167,6 +167,7 @@ func (m *ActualLRPRemovedEvent) GetActualLrpGroup() *ActualLRPGroup {
 
 type ActualLRPInstanceCreatedEvent struct {
 	ActualLrp *ActualLRP `protobuf:"bytes,1,opt,name=actual_lrp,json=actualLrp,proto3" json:"actual_lrp,omitempty"`
+	TraceId   string     `protobuf:"bytes,2,opt,name=trace_id,json=traceId,proto3" json:"trace_id"`
 }
 
 func (m *ActualLRPInstanceCreatedEvent) Reset()      { *m = ActualLRPInstanceCreatedEvent{} }
@@ -208,6 +209,13 @@ func (m *ActualLRPInstanceCreatedEvent) GetActualLrp() *ActualLRP {
 	return nil
 }
 
+func (m *ActualLRPInstanceCreatedEvent) GetTraceId() string {
+	if m != nil {
+		return m.TraceId
+	}
+	return ""
+}
+
 type ActualLRPInfo struct {
 	ActualLRPNetInfo `protobuf:"bytes,3,opt,name=actual_lrp_net_info,json=actualLrpNetInfo,proto3,embedded=actual_lrp_net_info" json:""`
 	CrashCount       int32              `protobuf:"varint,4,opt,name=crash_count,json=crashCount,proto3" json:"crash_count"`
@@ -217,6 +225,10 @@ type ActualLRPInfo struct {
 	Since            int64              `protobuf:"varint,8,opt,name=since,proto3" json:"since"`
 	ModificationTag  ModificationTag    `protobuf:"bytes,9,opt,name=modification_tag,json=modificationTag,proto3" json:"modification_tag"`
 	Presence         ActualLRP_Presence `protobuf:"varint,10,opt,name=presence,proto3,enum=models.ActualLRP_Presence" json:"presence"`
+	// Types that are valid to be assigned to OptionalRoutable:
+	//	*ActualLRPInfo_Routable
+	OptionalRoutable isActualLRPInfo_OptionalRoutable `protobuf_oneof:"optional_routable"`
+	AvailabilityZone string                           `protobuf:"bytes,12,opt,name=availability_zone,json=availabilityZone,proto3" json:"availability_zone"`
 }
 
 func (m *ActualLRPInfo) Reset()      { *m = ActualLRPInfo{} }
@@ -250,6 +262,26 @@ func (m *ActualLRPInfo) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_ActualLRPInfo proto.InternalMessageInfo
+
+type isActualLRPInfo_OptionalRoutable interface {
+	isActualLRPInfo_OptionalRoutable()
+	Equal(interface{}) bool
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type ActualLRPInfo_Routable struct {
+	Routable bool `protobuf:"varint,11,opt,name=Routable,proto3,oneof" json:"Routable,omitempty"`
+}
+
+func (*ActualLRPInfo_Routable) isActualLRPInfo_OptionalRoutable() {}
+
+func (m *ActualLRPInfo) GetOptionalRoutable() isActualLRPInfo_OptionalRoutable {
+	if m != nil {
+		return m.OptionalRoutable
+	}
+	return nil
+}
 
 func (m *ActualLRPInfo) GetCrashCount() int32 {
 	if m != nil {
@@ -300,11 +332,33 @@ func (m *ActualLRPInfo) GetPresence() ActualLRP_Presence {
 	return ActualLRP_Ordinary
 }
 
+func (m *ActualLRPInfo) GetRoutable() bool {
+	if x, ok := m.GetOptionalRoutable().(*ActualLRPInfo_Routable); ok {
+		return x.Routable
+	}
+	return false
+}
+
+func (m *ActualLRPInfo) GetAvailabilityZone() string {
+	if m != nil {
+		return m.AvailabilityZone
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ActualLRPInfo) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*ActualLRPInfo_Routable)(nil),
+	}
+}
+
 type ActualLRPInstanceChangedEvent struct {
 	ActualLRPKey         `protobuf:"bytes,1,opt,name=actual_lrp_key,json=actualLrpKey,proto3,embedded=actual_lrp_key" json:""`
 	ActualLRPInstanceKey `protobuf:"bytes,2,opt,name=actual_lrp_instance_key,json=actualLrpInstanceKey,proto3,embedded=actual_lrp_instance_key" json:""`
 	Before               *ActualLRPInfo `protobuf:"bytes,3,opt,name=before,proto3" json:"before,omitempty"`
 	After                *ActualLRPInfo `protobuf:"bytes,4,opt,name=after,proto3" json:"after,omitempty"`
+	TraceId              string         `protobuf:"bytes,5,opt,name=trace_id,json=traceId,proto3" json:"trace_id"`
 }
 
 func (m *ActualLRPInstanceChangedEvent) Reset()      { *m = ActualLRPInstanceChangedEvent{} }
@@ -353,8 +407,16 @@ func (m *ActualLRPInstanceChangedEvent) GetAfter() *ActualLRPInfo {
 	return nil
 }
 
+func (m *ActualLRPInstanceChangedEvent) GetTraceId() string {
+	if m != nil {
+		return m.TraceId
+	}
+	return ""
+}
+
 type ActualLRPInstanceRemovedEvent struct {
 	ActualLrp *ActualLRP `protobuf:"bytes,1,opt,name=actual_lrp,json=actualLrp,proto3" json:"actual_lrp,omitempty"`
+	TraceId   string     `protobuf:"bytes,2,opt,name=trace_id,json=traceId,proto3" json:"trace_id"`
 }
 
 func (m *ActualLRPInstanceRemovedEvent) Reset()      { *m = ActualLRPInstanceRemovedEvent{} }
@@ -396,8 +458,16 @@ func (m *ActualLRPInstanceRemovedEvent) GetActualLrp() *ActualLRP {
 	return nil
 }
 
+func (m *ActualLRPInstanceRemovedEvent) GetTraceId() string {
+	if m != nil {
+		return m.TraceId
+	}
+	return ""
+}
+
 type DesiredLRPCreatedEvent struct {
 	DesiredLrp *DesiredLRP `protobuf:"bytes,1,opt,name=desired_lrp,json=desiredLrp,proto3" json:"desired_lrp,omitempty"`
+	TraceId    string      `protobuf:"bytes,2,opt,name=trace_id,json=traceId,proto3" json:"trace_id"`
 }
 
 func (m *DesiredLRPCreatedEvent) Reset()      { *m = DesiredLRPCreatedEvent{} }
@@ -439,9 +509,17 @@ func (m *DesiredLRPCreatedEvent) GetDesiredLrp() *DesiredLRP {
 	return nil
 }
 
+func (m *DesiredLRPCreatedEvent) GetTraceId() string {
+	if m != nil {
+		return m.TraceId
+	}
+	return ""
+}
+
 type DesiredLRPChangedEvent struct {
-	Before *DesiredLRP `protobuf:"bytes,1,opt,name=before,proto3" json:"before,omitempty"`
-	After  *DesiredLRP `protobuf:"bytes,2,opt,name=after,proto3" json:"after,omitempty"`
+	Before  *DesiredLRP `protobuf:"bytes,1,opt,name=before,proto3" json:"before,omitempty"`
+	After   *DesiredLRP `protobuf:"bytes,2,opt,name=after,proto3" json:"after,omitempty"`
+	TraceId string      `protobuf:"bytes,3,opt,name=trace_id,json=traceId,proto3" json:"trace_id"`
 }
 
 func (m *DesiredLRPChangedEvent) Reset()      { *m = DesiredLRPChangedEvent{} }
@@ -490,8 +568,16 @@ func (m *DesiredLRPChangedEvent) GetAfter() *DesiredLRP {
 	return nil
 }
 
+func (m *DesiredLRPChangedEvent) GetTraceId() string {
+	if m != nil {
+		return m.TraceId
+	}
+	return ""
+}
+
 type DesiredLRPRemovedEvent struct {
 	DesiredLrp *DesiredLRP `protobuf:"bytes,1,opt,name=desired_lrp,json=desiredLrp,proto3" json:"desired_lrp,omitempty"`
+	TraceId    string      `protobuf:"bytes,2,opt,name=trace_id,json=traceId,proto3" json:"trace_id"`
 }
 
 func (m *DesiredLRPRemovedEvent) Reset()      { *m = DesiredLRPRemovedEvent{} }
@@ -531,6 +617,13 @@ func (m *DesiredLRPRemovedEvent) GetDesiredLrp() *DesiredLRP {
 		return m.DesiredLrp
 	}
 	return nil
+}
+
+func (m *DesiredLRPRemovedEvent) GetTraceId() string {
+	if m != nil {
+		return m.TraceId
+	}
+	return ""
 }
 
 type ActualLRPCrashedEvent struct {
@@ -795,58 +888,65 @@ func init() {
 func init() { proto.RegisterFile("events.proto", fileDescriptor_8f22242cb04491f9) }
 
 var fileDescriptor_8f22242cb04491f9 = []byte{
-	// 815 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x56, 0x4f, 0x4f, 0xdb, 0x48,
-	0x14, 0xb7, 0xf3, 0x0f, 0x32, 0xc9, 0x86, 0xe0, 0xe5, 0x8f, 0x85, 0x76, 0xed, 0xac, 0x85, 0xb4,
-	0xd1, 0xee, 0x12, 0x10, 0xa0, 0x3d, 0xf4, 0xd4, 0x1a, 0x50, 0x8b, 0x80, 0x8a, 0x5a, 0xf4, 0x46,
-	0x15, 0x4d, 0x9c, 0x49, 0x62, 0xe1, 0x78, 0x22, 0x7b, 0x82, 0x94, 0x5b, 0x3f, 0x42, 0x3f, 0x06,
-	0x9f, 0xa1, 0x9f, 0x00, 0xf5, 0x94, 0x23, 0x27, 0xab, 0x84, 0x4b, 0x95, 0x13, 0x1f, 0xa1, 0xf2,
-	0x78, 0x6c, 0xc6, 0x49, 0x04, 0xa2, 0xea, 0xa5, 0xa7, 0xcc, 0xbc, 0xf7, 0x7b, 0xbf, 0xf7, 0xfc,
-	0xe6, 0xf7, 0x1e, 0x80, 0x22, 0xba, 0x44, 0x0e, 0xf1, 0x6a, 0x3d, 0x17, 0x13, 0x2c, 0xe5, 0xba,
-	0xb8, 0x89, 0x6c, 0x6f, 0x6d, 0xa3, 0x6d, 0x91, 0x4e, 0xbf, 0x51, 0x33, 0x71, 0x77, 0xb3, 0x8d,
-	0xdb, 0x78, 0x93, 0xba, 0x1b, 0xfd, 0x16, 0xbd, 0xd1, 0x0b, 0x3d, 0x85, 0x61, 0x6b, 0x65, 0x68,
-	0x92, 0x3e, 0xb4, 0xeb, 0xb6, 0xdb, 0x63, 0x96, 0xc5, 0x26, 0xf2, 0x2c, 0x17, 0x35, 0x39, 0x13,
-	0x20, 0xd0, 0xbb, 0x60, 0xe7, 0x95, 0x2e, 0x6e, 0x5a, 0x2d, 0xcb, 0x84, 0xc4, 0xc2, 0x4e, 0x9d,
-	0xc0, 0x76, 0x68, 0xd7, 0x3e, 0x80, 0xe5, 0x57, 0x94, 0xea, 0xd8, 0x38, 0xdd, 0x73, 0x11, 0x24,
-	0xa8, 0x79, 0x10, 0xd4, 0x27, 0xbd, 0x04, 0x5c, 0x8e, 0x7a, 0xdb, 0xc5, 0xfd, 0x9e, 0x2c, 0x56,
-	0xc4, 0x6a, 0x61, 0x7b, 0xa5, 0x16, 0xd6, 0x5c, 0x8b, 0x03, 0x5f, 0x07, 0x5e, 0xa3, 0x14, 0xe2,
-	0x8f, 0xdd, 0x1e, 0xbd, 0xbf, 0x48, 0xc9, 0xa2, 0x36, 0xe0, 0xe9, 0x3b, 0xd0, 0x69, 0x47, 0xf4,
-	0x35, 0x90, 0x6b, 0xa0, 0x16, 0x76, 0xd1, 0x13, 0xa4, 0x0c, 0x25, 0xfd, 0x07, 0xb2, 0xb0, 0x45,
-	0x90, 0x2b, 0xa7, 0x1e, 0x85, 0x87, 0x20, 0x9a, 0x9a, 0xff, 0x32, 0x03, 0x75, 0xf1, 0xe5, 0xcf,
-	0xfd, 0xb2, 0x77, 0xe0, 0xcf, 0x18, 0x75, 0xe8, 0x78, 0x04, 0x3a, 0x26, 0x4a, 0x34, 0x70, 0x0b,
-	0x80, 0x87, 0x34, 0x2c, 0xc1, 0xe2, 0x54, 0x02, 0x23, 0x1f, 0x73, 0x6b, 0x5f, 0xd2, 0xe0, 0x37,
-	0x8e, 0xb3, 0x85, 0xa5, 0xf7, 0xe0, 0x77, 0xae, 0x54, 0x07, 0x91, 0xba, 0xe5, 0xb4, 0xb0, 0x9c,
-	0xa6, 0x64, 0xf2, 0x14, 0xd9, 0x5b, 0x44, 0x82, 0x30, 0xbd, 0x78, 0xed, 0xab, 0xc2, 0xd0, 0x57,
-	0xc5, 0xb1, 0xaf, 0x0a, 0x46, 0x39, 0xce, 0xc0, 0xfc, 0xd2, 0x16, 0x28, 0x98, 0x2e, 0xf4, 0x3a,
-	0x75, 0x13, 0xf7, 0x1d, 0x22, 0x67, 0x2a, 0x62, 0x35, 0xab, 0x2f, 0x8c, 0x7d, 0x95, 0x37, 0x1b,
-	0x80, 0x5e, 0xf6, 0x82, 0xb3, 0xf4, 0x17, 0x28, 0x86, 0x2e, 0x17, 0x41, 0x0f, 0x3b, 0x72, 0xb6,
-	0x22, 0x56, 0xf3, 0x46, 0x08, 0x37, 0xa8, 0x49, 0x52, 0x41, 0xd6, 0x23, 0x90, 0x20, 0x39, 0x17,
-	0xf8, 0xf4, 0xfc, 0xd8, 0x57, 0x43, 0x83, 0x11, 0xfe, 0x48, 0x7f, 0x83, 0x85, 0x9e, 0x0d, 0x4d,
-	0xd4, 0x45, 0x0e, 0xa9, 0x23, 0xd7, 0xc5, 0xae, 0x3c, 0x47, 0x69, 0x4a, 0xb1, 0xf9, 0x20, 0xb0,
-	0x52, 0x26, 0xcb, 0x31, 0x91, 0x3c, 0x5f, 0x11, 0xab, 0x69, 0xc6, 0x14, 0x18, 0x8c, 0xf0, 0x47,
-	0x3a, 0x07, 0xe5, 0x49, 0x39, 0xcb, 0x79, 0xda, 0x93, 0xd5, 0xa8, 0x27, 0x27, 0x9c, 0xff, 0x0c,
-	0xb6, 0x75, 0x39, 0x68, 0xc9, 0xd8, 0x57, 0xa7, 0x02, 0x8d, 0x85, 0x6e, 0x12, 0x2a, 0xed, 0x83,
-	0xf9, 0x9e, 0x8b, 0x3c, 0x14, 0x54, 0x00, 0x2a, 0x62, 0xb5, 0xb4, 0xbd, 0x36, 0xd5, 0xe9, 0xda,
-	0x29, 0x43, 0xe8, 0xc5, 0xb1, 0xaf, 0xc6, 0x78, 0x23, 0x3e, 0x69, 0x57, 0xa9, 0x59, 0x02, 0xe1,
-	0x47, 0xe0, 0x0d, 0x28, 0x71, 0x8f, 0x7b, 0x81, 0x06, 0x4c, 0x24, 0x4b, 0x53, 0xd9, 0x8e, 0xd0,
-	0x60, 0xe2, 0x4d, 0x8b, 0xf1, 0x9b, 0x1e, 0xa1, 0x81, 0x04, 0xc1, 0x2a, 0xc7, 0x64, 0xb1, 0x64,
-	0x94, 0x32, 0x1c, 0x97, 0x3f, 0xa6, 0x28, 0xa3, 0x8a, 0xa6, 0xa9, 0x97, 0x62, 0x6a, 0x0e, 0x23,
-	0x6d, 0xc4, 0xf3, 0x1a, 0x8a, 0x6f, 0x79, 0x06, 0x63, 0x0b, 0xc7, 0xe3, 0xfa, 0x6f, 0x34, 0xae,
-	0x99, 0xc7, 0xd0, 0x21, 0x66, 0xe6, 0x28, 0x25, 0x26, 0xf6, 0xf9, 0xa3, 0x74, 0x02, 0x56, 0xf6,
-	0xc3, 0x7d, 0x38, 0xb9, 0xd7, 0x76, 0x40, 0x81, 0xdb, 0x94, 0x8c, 0x4c, 0x8a, 0xc8, 0x1e, 0x82,
-	0x0c, 0xc0, 0x60, 0x01, 0x9d, 0x93, 0xa0, 0xe3, 0x1f, 0xf1, 0x9f, 0x89, 0x3d, 0x36, 0x8b, 0x29,
-	0x6a, 0x4a, 0x35, 0xb9, 0xc3, 0x66, 0x41, 0x59, 0x47, 0x12, 0xe5, 0x27, 0x5a, 0xf1, 0x43, 0xe5,
-	0x7f, 0x4e, 0x25, 0xb6, 0x3c, 0xf4, 0x3a, 0xbf, 0xa4, 0x06, 0x27, 0xd6, 0x56, 0xfa, 0xf9, 0x6b,
-	0x2b, 0x33, 0x7b, 0x6d, 0xd1, 0x65, 0x93, 0x9d, 0xbd, 0x6c, 0xb4, 0xff, 0x41, 0x89, 0xf6, 0xca,
-	0xd3, 0x07, 0x7b, 0xc8, 0xb6, 0x0f, 0x9b, 0xd2, 0x3a, 0x98, 0x33, 0x91, 0x6d, 0xd7, 0xad, 0x26,
-	0xed, 0x56, 0x5e, 0x2f, 0x8c, 0x7d, 0x35, 0x32, 0x19, 0x39, 0x93, 0xa2, 0xb4, 0x5d, 0x50, 0x3e,
-	0x83, 0xde, 0x45, 0x42, 0x7c, 0x15, 0x90, 0x09, 0xfe, 0x26, 0xb3, 0x26, 0x17, 0xa3, 0x8e, 0x04,
-	0x38, 0x83, 0x7a, 0xb4, 0x73, 0x16, 0xc5, 0x6b, 0x6c, 0x7d, 0x42, 0x63, 0xc9, 0xb8, 0x48, 0x5d,
-	0x5a, 0x52, 0x5d, 0x49, 0x10, 0xd3, 0x15, 0xab, 0x29, 0xa1, 0xa8, 0x27, 0x6b, 0xd2, 0x77, 0x87,
-	0xb7, 0x8a, 0x70, 0x73, 0xab, 0x08, 0xf7, 0xb7, 0x8a, 0xf8, 0x71, 0xa4, 0x88, 0x57, 0x23, 0x45,
-	0xbc, 0x1e, 0x29, 0xe2, 0x70, 0xa4, 0x88, 0x5f, 0x47, 0x8a, 0xf8, 0x6d, 0xa4, 0x08, 0xf7, 0x23,
-	0x45, 0xfc, 0x74, 0xa7, 0x08, 0xc3, 0x3b, 0x45, 0xb8, 0xb9, 0x53, 0x84, 0x46, 0x8e, 0xfe, 0x83,
-	0xb1, 0xf3, 0x3d, 0x00, 0x00, 0xff, 0xff, 0x2c, 0xcb, 0xb2, 0x87, 0xf0, 0x08, 0x00, 0x00,
+	// 913 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x56, 0x4f, 0x6f, 0xdb, 0x36,
+	0x14, 0x17, 0x13, 0xdb, 0x71, 0x9e, 0x3d, 0xc7, 0x61, 0x9b, 0x54, 0x08, 0x3a, 0xc9, 0x33, 0x0a,
+	0xd4, 0xd8, 0x56, 0xb7, 0x68, 0x8b, 0x1d, 0x76, 0xda, 0x9c, 0x16, 0x6b, 0xd0, 0x6e, 0x28, 0x88,
+	0xee, 0x32, 0x74, 0x10, 0x68, 0x99, 0x76, 0x84, 0xc8, 0xa2, 0x21, 0xd1, 0x01, 0xdc, 0xd3, 0x3e,
+	0xc2, 0x6e, 0xfb, 0x0a, 0xfb, 0x0c, 0xbb, 0xed, 0xd6, 0x63, 0x76, 0xeb, 0x49, 0x58, 0x9c, 0xcb,
+	0xe0, 0x53, 0x3f, 0xc2, 0x20, 0x52, 0x52, 0x29, 0xdb, 0x48, 0x57, 0x60, 0x39, 0xf4, 0x64, 0xf2,
+	0xbd, 0x1f, 0x7f, 0xef, 0x0f, 0x1f, 0x7f, 0x32, 0xd4, 0xd9, 0x29, 0x0b, 0x44, 0xd4, 0x9d, 0x84,
+	0x5c, 0x70, 0x5c, 0x19, 0xf3, 0x01, 0xf3, 0xa3, 0x83, 0x3b, 0x23, 0x4f, 0x1c, 0x4f, 0xfb, 0x5d,
+	0x97, 0x8f, 0xef, 0x8e, 0xf8, 0x88, 0xdf, 0x95, 0xee, 0xfe, 0x74, 0x28, 0x77, 0x72, 0x23, 0x57,
+	0xea, 0xd8, 0x41, 0x93, 0xba, 0x62, 0x4a, 0x7d, 0xc7, 0x0f, 0x27, 0xa9, 0x65, 0x77, 0xc0, 0x22,
+	0x2f, 0x64, 0x03, 0xcd, 0x04, 0x82, 0x46, 0x27, 0xe9, 0x7a, 0x7f, 0xcc, 0x07, 0xde, 0xd0, 0x73,
+	0xa9, 0xf0, 0x78, 0xe0, 0x08, 0x3a, 0x52, 0xf6, 0xf6, 0xcf, 0xb0, 0xf7, 0xad, 0xa4, 0x7a, 0x46,
+	0x9e, 0x1f, 0x86, 0x8c, 0x0a, 0x36, 0x78, 0x9c, 0xe4, 0x87, 0xbf, 0x01, 0x2d, 0x86, 0x33, 0x0a,
+	0xf9, 0x74, 0x62, 0xa2, 0x16, 0xea, 0xd4, 0xee, 0xef, 0x77, 0x55, 0xce, 0xdd, 0xfc, 0xe0, 0x77,
+	0x89, 0x97, 0x34, 0x14, 0xfe, 0x59, 0x38, 0x91, 0xfb, 0xaf, 0x37, 0x4c, 0xd4, 0x9e, 0xe9, 0xf4,
+	0xc7, 0x34, 0x18, 0x65, 0xf4, 0x5d, 0xa8, 0xf4, 0xd9, 0x90, 0x87, 0xec, 0x3d, 0xa4, 0x29, 0x0a,
+	0x7f, 0x09, 0x65, 0x3a, 0x14, 0x2c, 0x34, 0x37, 0x2e, 0x85, 0x2b, 0x90, 0x0c, 0xad, 0x57, 0x46,
+	0xd8, 0x98, 0x9f, 0xfe, 0xbf, 0x95, 0xbd, 0x82, 0x4f, 0x73, 0xd4, 0x51, 0x10, 0x09, 0x1a, 0xb8,
+	0xac, 0xd0, 0xc0, 0x7b, 0x00, 0xef, 0xc2, 0xa4, 0x01, 0x76, 0x57, 0x02, 0x90, 0xed, 0x9c, 0x1b,
+	0xdf, 0x86, 0xaa, 0x08, 0xa9, 0xcb, 0x1c, 0x6f, 0x20, 0xcb, 0xdc, 0xee, 0xd5, 0x17, 0xb1, 0x9d,
+	0xdb, 0xc8, 0x96, 0x5c, 0x1d, 0x0d, 0xda, 0x7f, 0x96, 0xe0, 0x13, 0x2d, 0xf8, 0x90, 0xe3, 0x1f,
+	0xe1, 0x9a, 0x56, 0x53, 0xc0, 0x84, 0xe3, 0x05, 0x43, 0x6e, 0x6e, 0xca, 0xa8, 0xe6, 0x4a, 0xd4,
+	0x1f, 0x98, 0x48, 0x8e, 0xf5, 0xea, 0xaf, 0x63, 0xdb, 0x38, 0x8b, 0x6d, 0xb4, 0x88, 0x6d, 0x83,
+	0x34, 0xf3, 0x54, 0x52, 0x3f, 0xbe, 0x07, 0x35, 0x37, 0xa4, 0xd1, 0xb1, 0xe3, 0xf2, 0x69, 0x20,
+	0xcc, 0x52, 0x0b, 0x75, 0xca, 0xbd, 0x9d, 0x45, 0x6c, 0xeb, 0x66, 0x02, 0x72, 0x73, 0x98, 0xac,
+	0xf1, 0x67, 0x50, 0x57, 0xae, 0x90, 0xd1, 0x88, 0x07, 0x66, 0x39, 0xa9, 0x83, 0x28, 0x38, 0x91,
+	0x26, 0x6c, 0x43, 0x39, 0x12, 0x54, 0x30, 0xb3, 0x22, 0x6b, 0xdc, 0x5e, 0xc4, 0xb6, 0x32, 0x10,
+	0xf5, 0x83, 0x6f, 0xc3, 0xce, 0xc4, 0xa7, 0x2e, 0x1b, 0xb3, 0x40, 0x38, 0x2c, 0x0c, 0x79, 0x68,
+	0x6e, 0x49, 0x9a, 0x46, 0x6e, 0x7e, 0x9c, 0x58, 0x25, 0x93, 0x17, 0xb8, 0xcc, 0xac, 0xb6, 0x50,
+	0x67, 0x33, 0x65, 0x4a, 0x0c, 0x44, 0xfd, 0xe0, 0x97, 0xd0, 0x5c, 0x9e, 0x7b, 0x73, 0x5b, 0xf6,
+	0xe4, 0x46, 0xd6, 0x93, 0xef, 0x35, 0xff, 0x0b, 0x3a, 0xea, 0x99, 0x49, 0x4b, 0x16, 0xb1, 0xbd,
+	0x72, 0x90, 0xec, 0x8c, 0x8b, 0x50, 0xfc, 0x08, 0xaa, 0x93, 0x90, 0x45, 0x2c, 0xc9, 0x00, 0x5a,
+	0xa8, 0xd3, 0xb8, 0x7f, 0xb0, 0xd2, 0xe9, 0xee, 0xf3, 0x14, 0xa1, 0xee, 0x32, 0xc3, 0x93, 0x7c,
+	0x85, 0x6f, 0x42, 0x95, 0xf0, 0xa9, 0xa0, 0x7d, 0x9f, 0x99, 0xb5, 0x16, 0xea, 0x54, 0x9f, 0x18,
+	0x24, 0xb7, 0xe0, 0x1e, 0xec, 0xd2, 0x53, 0xea, 0xf9, 0xb4, 0xef, 0xf9, 0x9e, 0x98, 0x39, 0xaf,
+	0x78, 0xc0, 0xcc, 0xba, 0x6c, 0xdc, 0xde, 0x22, 0xb6, 0x57, 0x9d, 0xa4, 0xa9, 0x9b, 0x7e, 0xe2,
+	0x01, 0xeb, 0x5d, 0x83, 0x5d, 0x3e, 0x49, 0x92, 0xa6, 0xbe, 0x13, 0xa6, 0xc4, 0xed, 0xbf, 0x36,
+	0xd6, 0x0d, 0xb0, 0xfe, 0x44, 0x9f, 0x40, 0x43, 0x9b, 0xa9, 0x13, 0x36, 0x4b, 0x87, 0xf8, 0xfa,
+	0x4a, 0x91, 0x4f, 0xd9, 0x6c, 0x69, 0x94, 0xea, 0xf9, 0x28, 0x3d, 0x65, 0x33, 0x4c, 0xe1, 0x86,
+	0xc6, 0xe4, 0xa5, 0xc1, 0x24, 0xa5, 0x7a, 0xce, 0x37, 0x57, 0x28, 0xb3, 0x8c, 0x56, 0xa9, 0xaf,
+	0xe7, 0xd4, 0x1a, 0x06, 0xdf, 0xc9, 0xf5, 0x44, 0xcd, 0xfc, 0xde, 0x1a, 0xc6, 0x21, 0xcf, 0xe5,
+	0xe4, 0x8b, 0x4c, 0x4e, 0x4a, 0x97, 0xa1, 0x15, 0xa6, 0xf0, 0x2e, 0xcb, 0x97, 0xbd, 0xcb, 0x75,
+	0x9a, 0x50, 0x90, 0x9e, 0x2b, 0xd4, 0x84, 0x53, 0xd8, 0x7f, 0xa4, 0xbe, 0x00, 0xcb, 0x4a, 0xfe,
+	0x00, 0x6a, 0xda, 0xb7, 0x21, 0x8d, 0x8a, 0xb3, 0xa8, 0xef, 0x0e, 0x11, 0x48, 0x61, 0x1f, 0x14,
+	0xf7, 0x37, 0x54, 0x08, 0xac, 0x0f, 0xd0, 0xe7, 0x4b, 0x1a, 0xbf, 0x2e, 0x66, 0x76, 0x21, 0x9d,
+	0xa2, 0xbe, 0xaf, 0x83, 0xae, 0xb9, 0x8d, 0xcd, 0xff, 0xdc, 0x91, 0xc2, 0x35, 0x5c, 0x6d, 0x47,
+	0xfe, 0xd8, 0x28, 0x7c, 0x53, 0x69, 0x74, 0xfc, 0x51, 0xbe, 0xa8, 0x25, 0xed, 0xdf, 0xfc, 0x70,
+	0xed, 0x2f, 0xad, 0xd7, 0x7e, 0xa9, 0xd8, 0xe5, 0xf5, 0x8a, 0xdd, 0xfe, 0x0a, 0x1a, 0xb2, 0x57,
+	0x51, 0x6f, 0x76, 0xc8, 0x7c, 0xff, 0x68, 0x80, 0x6f, 0xc1, 0x96, 0xcb, 0x7c, 0x3f, 0x69, 0x3b,
+	0x92, 0x6d, 0xaf, 0x2d, 0x62, 0x3b, 0x33, 0x91, 0x8a, 0x2b, 0x51, 0xed, 0x87, 0xd0, 0x7c, 0x41,
+	0xa3, 0x93, 0xc2, 0xe0, 0xb7, 0xa0, 0x94, 0xfc, 0x03, 0x4a, 0x9b, 0x5c, 0xcf, 0x3a, 0x92, 0xe0,
+	0x88, 0xf4, 0xb4, 0x5f, 0xa6, 0xa7, 0xf4, 0xa9, 0xbd, 0xb5, 0x34, 0xb5, 0xc5, 0x73, 0xd9, 0xbc,
+	0xb6, 0x8b, 0xf3, 0x5a, 0x04, 0x29, 0x57, 0x96, 0x53, 0x61, 0xf4, 0xde, 0x9b, 0x53, 0xef, 0xe1,
+	0xd9, 0xb9, 0x65, 0xbc, 0x39, 0xb7, 0x8c, 0xb7, 0xe7, 0x16, 0xfa, 0x65, 0x6e, 0xa1, 0xdf, 0xe7,
+	0x16, 0x7a, 0x3d, 0xb7, 0xd0, 0xd9, 0xdc, 0x42, 0x7f, 0xcf, 0x2d, 0xf4, 0xcf, 0xdc, 0x32, 0xde,
+	0xce, 0x2d, 0xf4, 0xeb, 0x85, 0x65, 0x9c, 0x5d, 0x58, 0xc6, 0x9b, 0x0b, 0xcb, 0xe8, 0x57, 0xe4,
+	0xdf, 0xb9, 0x07, 0xff, 0x06, 0x00, 0x00, 0xff, 0xff, 0x15, 0xfc, 0xcc, 0x44, 0x5e, 0x0a, 0x00,
+	0x00,
 }
 
 func (this *ActualLRPCreatedEvent) Equal(that interface{}) bool {
@@ -946,6 +1046,9 @@ func (this *ActualLRPInstanceCreatedEvent) Equal(that interface{}) bool {
 	if !this.ActualLrp.Equal(that1.ActualLrp) {
 		return false
 	}
+	if this.TraceId != that1.TraceId {
+		return false
+	}
 	return true
 }
 func (this *ActualLRPInfo) Equal(that interface{}) bool {
@@ -991,6 +1094,42 @@ func (this *ActualLRPInfo) Equal(that interface{}) bool {
 	if this.Presence != that1.Presence {
 		return false
 	}
+	if that1.OptionalRoutable == nil {
+		if this.OptionalRoutable != nil {
+			return false
+		}
+	} else if this.OptionalRoutable == nil {
+		return false
+	} else if !this.OptionalRoutable.Equal(that1.OptionalRoutable) {
+		return false
+	}
+	if this.AvailabilityZone != that1.AvailabilityZone {
+		return false
+	}
+	return true
+}
+func (this *ActualLRPInfo_Routable) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ActualLRPInfo_Routable)
+	if !ok {
+		that2, ok := that.(ActualLRPInfo_Routable)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Routable != that1.Routable {
+		return false
+	}
 	return true
 }
 func (this *ActualLRPInstanceChangedEvent) Equal(that interface{}) bool {
@@ -1024,6 +1163,9 @@ func (this *ActualLRPInstanceChangedEvent) Equal(that interface{}) bool {
 	if !this.After.Equal(that1.After) {
 		return false
 	}
+	if this.TraceId != that1.TraceId {
+		return false
+	}
 	return true
 }
 func (this *ActualLRPInstanceRemovedEvent) Equal(that interface{}) bool {
@@ -1048,6 +1190,9 @@ func (this *ActualLRPInstanceRemovedEvent) Equal(that interface{}) bool {
 	if !this.ActualLrp.Equal(that1.ActualLrp) {
 		return false
 	}
+	if this.TraceId != that1.TraceId {
+		return false
+	}
 	return true
 }
 func (this *DesiredLRPCreatedEvent) Equal(that interface{}) bool {
@@ -1070,6 +1215,9 @@ func (this *DesiredLRPCreatedEvent) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.DesiredLrp.Equal(that1.DesiredLrp) {
+		return false
+	}
+	if this.TraceId != that1.TraceId {
 		return false
 	}
 	return true
@@ -1099,6 +1247,9 @@ func (this *DesiredLRPChangedEvent) Equal(that interface{}) bool {
 	if !this.After.Equal(that1.After) {
 		return false
 	}
+	if this.TraceId != that1.TraceId {
+		return false
+	}
 	return true
 }
 func (this *DesiredLRPRemovedEvent) Equal(that interface{}) bool {
@@ -1121,6 +1272,9 @@ func (this *DesiredLRPRemovedEvent) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.DesiredLrp.Equal(that1.DesiredLrp) {
+		return false
+	}
+	if this.TraceId != that1.TraceId {
 		return false
 	}
 	return true
@@ -1303,11 +1457,12 @@ func (this *ActualLRPInstanceCreatedEvent) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 5)
+	s := make([]string, 0, 6)
 	s = append(s, "&models.ActualLRPInstanceCreatedEvent{")
 	if this.ActualLrp != nil {
 		s = append(s, "ActualLrp: "+fmt.Sprintf("%#v", this.ActualLrp)+",\n")
 	}
+	s = append(s, "TraceId: "+fmt.Sprintf("%#v", this.TraceId)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -1315,7 +1470,7 @@ func (this *ActualLRPInfo) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 12)
+	s := make([]string, 0, 14)
 	s = append(s, "&models.ActualLRPInfo{")
 	s = append(s, "ActualLRPNetInfo: "+strings.Replace(this.ActualLRPNetInfo.GoString(), `&`, ``, 1)+",\n")
 	s = append(s, "CrashCount: "+fmt.Sprintf("%#v", this.CrashCount)+",\n")
@@ -1325,14 +1480,26 @@ func (this *ActualLRPInfo) GoString() string {
 	s = append(s, "Since: "+fmt.Sprintf("%#v", this.Since)+",\n")
 	s = append(s, "ModificationTag: "+strings.Replace(this.ModificationTag.GoString(), `&`, ``, 1)+",\n")
 	s = append(s, "Presence: "+fmt.Sprintf("%#v", this.Presence)+",\n")
+	if this.OptionalRoutable != nil {
+		s = append(s, "OptionalRoutable: "+fmt.Sprintf("%#v", this.OptionalRoutable)+",\n")
+	}
+	s = append(s, "AvailabilityZone: "+fmt.Sprintf("%#v", this.AvailabilityZone)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
+}
+func (this *ActualLRPInfo_Routable) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&models.ActualLRPInfo_Routable{` +
+		`Routable:` + fmt.Sprintf("%#v", this.Routable) + `}`}, ", ")
+	return s
 }
 func (this *ActualLRPInstanceChangedEvent) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 8)
+	s := make([]string, 0, 9)
 	s = append(s, "&models.ActualLRPInstanceChangedEvent{")
 	s = append(s, "ActualLRPKey: "+strings.Replace(this.ActualLRPKey.GoString(), `&`, ``, 1)+",\n")
 	s = append(s, "ActualLRPInstanceKey: "+strings.Replace(this.ActualLRPInstanceKey.GoString(), `&`, ``, 1)+",\n")
@@ -1342,6 +1509,7 @@ func (this *ActualLRPInstanceChangedEvent) GoString() string {
 	if this.After != nil {
 		s = append(s, "After: "+fmt.Sprintf("%#v", this.After)+",\n")
 	}
+	s = append(s, "TraceId: "+fmt.Sprintf("%#v", this.TraceId)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -1349,11 +1517,12 @@ func (this *ActualLRPInstanceRemovedEvent) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 5)
+	s := make([]string, 0, 6)
 	s = append(s, "&models.ActualLRPInstanceRemovedEvent{")
 	if this.ActualLrp != nil {
 		s = append(s, "ActualLrp: "+fmt.Sprintf("%#v", this.ActualLrp)+",\n")
 	}
+	s = append(s, "TraceId: "+fmt.Sprintf("%#v", this.TraceId)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -1361,11 +1530,12 @@ func (this *DesiredLRPCreatedEvent) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 5)
+	s := make([]string, 0, 6)
 	s = append(s, "&models.DesiredLRPCreatedEvent{")
 	if this.DesiredLrp != nil {
 		s = append(s, "DesiredLrp: "+fmt.Sprintf("%#v", this.DesiredLrp)+",\n")
 	}
+	s = append(s, "TraceId: "+fmt.Sprintf("%#v", this.TraceId)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -1373,7 +1543,7 @@ func (this *DesiredLRPChangedEvent) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 6)
+	s := make([]string, 0, 7)
 	s = append(s, "&models.DesiredLRPChangedEvent{")
 	if this.Before != nil {
 		s = append(s, "Before: "+fmt.Sprintf("%#v", this.Before)+",\n")
@@ -1381,6 +1551,7 @@ func (this *DesiredLRPChangedEvent) GoString() string {
 	if this.After != nil {
 		s = append(s, "After: "+fmt.Sprintf("%#v", this.After)+",\n")
 	}
+	s = append(s, "TraceId: "+fmt.Sprintf("%#v", this.TraceId)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -1388,11 +1559,12 @@ func (this *DesiredLRPRemovedEvent) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 5)
+	s := make([]string, 0, 6)
 	s = append(s, "&models.DesiredLRPRemovedEvent{")
 	if this.DesiredLrp != nil {
 		s = append(s, "DesiredLrp: "+fmt.Sprintf("%#v", this.DesiredLrp)+",\n")
 	}
+	s = append(s, "TraceId: "+fmt.Sprintf("%#v", this.TraceId)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -1604,6 +1776,13 @@ func (m *ActualLRPInstanceCreatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, 
 	_ = i
 	var l int
 	_ = l
+	if len(m.TraceId) > 0 {
+		i -= len(m.TraceId)
+		copy(dAtA[i:], m.TraceId)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.TraceId)))
+		i--
+		dAtA[i] = 0x12
+	}
 	if m.ActualLrp != nil {
 		{
 			size, err := m.ActualLrp.MarshalToSizedBuffer(dAtA[:i])
@@ -1639,6 +1818,22 @@ func (m *ActualLRPInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.AvailabilityZone) > 0 {
+		i -= len(m.AvailabilityZone)
+		copy(dAtA[i:], m.AvailabilityZone)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.AvailabilityZone)))
+		i--
+		dAtA[i] = 0x62
+	}
+	if m.OptionalRoutable != nil {
+		{
+			size := m.OptionalRoutable.Size()
+			i -= size
+			if _, err := m.OptionalRoutable.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
 	if m.Presence != 0 {
 		i = encodeVarintEvents(dAtA, i, uint64(m.Presence))
 		i--
@@ -1698,6 +1893,23 @@ func (m *ActualLRPInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *ActualLRPInfo_Routable) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ActualLRPInfo_Routable) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
+	if m.Routable {
+		dAtA[i] = 1
+	} else {
+		dAtA[i] = 0
+	}
+	i--
+	dAtA[i] = 0x58
+	return len(dAtA) - i, nil
+}
 func (m *ActualLRPInstanceChangedEvent) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1718,6 +1930,13 @@ func (m *ActualLRPInstanceChangedEvent) MarshalToSizedBuffer(dAtA []byte) (int, 
 	_ = i
 	var l int
 	_ = l
+	if len(m.TraceId) > 0 {
+		i -= len(m.TraceId)
+		copy(dAtA[i:], m.TraceId)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.TraceId)))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if m.After != nil {
 		{
 			size, err := m.After.MarshalToSizedBuffer(dAtA[:i])
@@ -1785,6 +2004,13 @@ func (m *ActualLRPInstanceRemovedEvent) MarshalToSizedBuffer(dAtA []byte) (int, 
 	_ = i
 	var l int
 	_ = l
+	if len(m.TraceId) > 0 {
+		i -= len(m.TraceId)
+		copy(dAtA[i:], m.TraceId)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.TraceId)))
+		i--
+		dAtA[i] = 0x12
+	}
 	if m.ActualLrp != nil {
 		{
 			size, err := m.ActualLrp.MarshalToSizedBuffer(dAtA[:i])
@@ -1820,6 +2046,13 @@ func (m *DesiredLRPCreatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	_ = i
 	var l int
 	_ = l
+	if len(m.TraceId) > 0 {
+		i -= len(m.TraceId)
+		copy(dAtA[i:], m.TraceId)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.TraceId)))
+		i--
+		dAtA[i] = 0x12
+	}
 	if m.DesiredLrp != nil {
 		{
 			size, err := m.DesiredLrp.MarshalToSizedBuffer(dAtA[:i])
@@ -1855,6 +2088,13 @@ func (m *DesiredLRPChangedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	_ = i
 	var l int
 	_ = l
+	if len(m.TraceId) > 0 {
+		i -= len(m.TraceId)
+		copy(dAtA[i:], m.TraceId)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.TraceId)))
+		i--
+		dAtA[i] = 0x1a
+	}
 	if m.After != nil {
 		{
 			size, err := m.After.MarshalToSizedBuffer(dAtA[:i])
@@ -1902,6 +2142,13 @@ func (m *DesiredLRPRemovedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	_ = i
 	var l int
 	_ = l
+	if len(m.TraceId) > 0 {
+		i -= len(m.TraceId)
+		copy(dAtA[i:], m.TraceId)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.TraceId)))
+		i--
+		dAtA[i] = 0x12
+	}
 	if m.DesiredLrp != nil {
 		{
 			size, err := m.DesiredLrp.MarshalToSizedBuffer(dAtA[:i])
@@ -2188,6 +2435,10 @@ func (m *ActualLRPInstanceCreatedEvent) Size() (n int) {
 		l = m.ActualLrp.Size()
 		n += 1 + l + sovEvents(uint64(l))
 	}
+	l = len(m.TraceId)
+	if l > 0 {
+		n += 1 + l + sovEvents(uint64(l))
+	}
 	return n
 }
 
@@ -2222,9 +2473,25 @@ func (m *ActualLRPInfo) Size() (n int) {
 	if m.Presence != 0 {
 		n += 1 + sovEvents(uint64(m.Presence))
 	}
+	if m.OptionalRoutable != nil {
+		n += m.OptionalRoutable.Size()
+	}
+	l = len(m.AvailabilityZone)
+	if l > 0 {
+		n += 1 + l + sovEvents(uint64(l))
+	}
 	return n
 }
 
+func (m *ActualLRPInfo_Routable) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	n += 2
+	return n
+}
 func (m *ActualLRPInstanceChangedEvent) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2243,6 +2510,10 @@ func (m *ActualLRPInstanceChangedEvent) Size() (n int) {
 		l = m.After.Size()
 		n += 1 + l + sovEvents(uint64(l))
 	}
+	l = len(m.TraceId)
+	if l > 0 {
+		n += 1 + l + sovEvents(uint64(l))
+	}
 	return n
 }
 
@@ -2256,6 +2527,10 @@ func (m *ActualLRPInstanceRemovedEvent) Size() (n int) {
 		l = m.ActualLrp.Size()
 		n += 1 + l + sovEvents(uint64(l))
 	}
+	l = len(m.TraceId)
+	if l > 0 {
+		n += 1 + l + sovEvents(uint64(l))
+	}
 	return n
 }
 
@@ -2267,6 +2542,10 @@ func (m *DesiredLRPCreatedEvent) Size() (n int) {
 	_ = l
 	if m.DesiredLrp != nil {
 		l = m.DesiredLrp.Size()
+		n += 1 + l + sovEvents(uint64(l))
+	}
+	l = len(m.TraceId)
+	if l > 0 {
 		n += 1 + l + sovEvents(uint64(l))
 	}
 	return n
@@ -2286,6 +2565,10 @@ func (m *DesiredLRPChangedEvent) Size() (n int) {
 		l = m.After.Size()
 		n += 1 + l + sovEvents(uint64(l))
 	}
+	l = len(m.TraceId)
+	if l > 0 {
+		n += 1 + l + sovEvents(uint64(l))
+	}
 	return n
 }
 
@@ -2297,6 +2580,10 @@ func (m *DesiredLRPRemovedEvent) Size() (n int) {
 	_ = l
 	if m.DesiredLrp != nil {
 		l = m.DesiredLrp.Size()
+		n += 1 + l + sovEvents(uint64(l))
+	}
+	l = len(m.TraceId)
+	if l > 0 {
 		n += 1 + l + sovEvents(uint64(l))
 	}
 	return n
@@ -2424,6 +2711,7 @@ func (this *ActualLRPInstanceCreatedEvent) String() string {
 	}
 	s := strings.Join([]string{`&ActualLRPInstanceCreatedEvent{`,
 		`ActualLrp:` + strings.Replace(fmt.Sprintf("%v", this.ActualLrp), "ActualLRP", "ActualLRP", 1) + `,`,
+		`TraceId:` + fmt.Sprintf("%v", this.TraceId) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2441,6 +2729,18 @@ func (this *ActualLRPInfo) String() string {
 		`Since:` + fmt.Sprintf("%v", this.Since) + `,`,
 		`ModificationTag:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ModificationTag), "ModificationTag", "ModificationTag", 1), `&`, ``, 1) + `,`,
 		`Presence:` + fmt.Sprintf("%v", this.Presence) + `,`,
+		`OptionalRoutable:` + fmt.Sprintf("%v", this.OptionalRoutable) + `,`,
+		`AvailabilityZone:` + fmt.Sprintf("%v", this.AvailabilityZone) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ActualLRPInfo_Routable) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ActualLRPInfo_Routable{`,
+		`Routable:` + fmt.Sprintf("%v", this.Routable) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2454,6 +2754,7 @@ func (this *ActualLRPInstanceChangedEvent) String() string {
 		`ActualLRPInstanceKey:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ActualLRPInstanceKey), "ActualLRPInstanceKey", "ActualLRPInstanceKey", 1), `&`, ``, 1) + `,`,
 		`Before:` + strings.Replace(this.Before.String(), "ActualLRPInfo", "ActualLRPInfo", 1) + `,`,
 		`After:` + strings.Replace(this.After.String(), "ActualLRPInfo", "ActualLRPInfo", 1) + `,`,
+		`TraceId:` + fmt.Sprintf("%v", this.TraceId) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2464,6 +2765,7 @@ func (this *ActualLRPInstanceRemovedEvent) String() string {
 	}
 	s := strings.Join([]string{`&ActualLRPInstanceRemovedEvent{`,
 		`ActualLrp:` + strings.Replace(fmt.Sprintf("%v", this.ActualLrp), "ActualLRP", "ActualLRP", 1) + `,`,
+		`TraceId:` + fmt.Sprintf("%v", this.TraceId) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2474,6 +2776,7 @@ func (this *DesiredLRPCreatedEvent) String() string {
 	}
 	s := strings.Join([]string{`&DesiredLRPCreatedEvent{`,
 		`DesiredLrp:` + strings.Replace(fmt.Sprintf("%v", this.DesiredLrp), "DesiredLRP", "DesiredLRP", 1) + `,`,
+		`TraceId:` + fmt.Sprintf("%v", this.TraceId) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2485,6 +2788,7 @@ func (this *DesiredLRPChangedEvent) String() string {
 	s := strings.Join([]string{`&DesiredLRPChangedEvent{`,
 		`Before:` + strings.Replace(fmt.Sprintf("%v", this.Before), "DesiredLRP", "DesiredLRP", 1) + `,`,
 		`After:` + strings.Replace(fmt.Sprintf("%v", this.After), "DesiredLRP", "DesiredLRP", 1) + `,`,
+		`TraceId:` + fmt.Sprintf("%v", this.TraceId) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2495,6 +2799,7 @@ func (this *DesiredLRPRemovedEvent) String() string {
 	}
 	s := strings.Join([]string{`&DesiredLRPRemovedEvent{`,
 		`DesiredLrp:` + strings.Replace(fmt.Sprintf("%v", this.DesiredLrp), "DesiredLRP", "DesiredLRP", 1) + `,`,
+		`TraceId:` + fmt.Sprintf("%v", this.TraceId) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2921,6 +3226,38 @@ func (m *ActualLRPInstanceCreatedEvent) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TraceId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TraceId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEvents(dAtA[iNdEx:])
@@ -3190,6 +3527,59 @@ func (m *ActualLRPInfo) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		case 11:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Routable", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			b := bool(v != 0)
+			m.OptionalRoutable = &ActualLRPInfo_Routable{b}
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AvailabilityZone", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AvailabilityZone = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEvents(dAtA[iNdEx:])
@@ -3378,6 +3768,38 @@ func (m *ActualLRPInstanceChangedEvent) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TraceId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TraceId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEvents(dAtA[iNdEx:])
@@ -3464,6 +3886,38 @@ func (m *ActualLRPInstanceRemovedEvent) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TraceId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TraceId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEvents(dAtA[iNdEx:])
@@ -3549,6 +4003,38 @@ func (m *DesiredLRPCreatedEvent) Unmarshal(dAtA []byte) error {
 			if err := m.DesiredLrp.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TraceId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TraceId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3672,6 +4158,38 @@ func (m *DesiredLRPChangedEvent) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TraceId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TraceId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEvents(dAtA[iNdEx:])
@@ -3757,6 +4275,38 @@ func (m *DesiredLRPRemovedEvent) Unmarshal(dAtA []byte) error {
 			if err := m.DesiredLrp.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TraceId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TraceId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

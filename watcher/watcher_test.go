@@ -20,6 +20,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gbytes"
 )
 
@@ -164,8 +165,8 @@ var _ = Describe("Watcher", func() {
 				secondActual := makeRemovingActualLRP("other-process-guid", "other-instance-guid", 1, cc_messages.AppLRPDomain, models.ActualLRP_Evacuating)
 
 				events := []EventHolder{
-					{models.NewActualLRPInstanceRemovedEvent(firstActual)},
-					{models.NewActualLRPInstanceRemovedEvent(secondActual)},
+					{models.NewActualLRPInstanceRemovedEvent(firstActual, "trace-id")},
+					{models.NewActualLRPInstanceRemovedEvent(secondActual, "trace-id")},
 				}
 
 				eventSource.NextStub = func() (models.Event, error) {
@@ -195,8 +196,8 @@ var _ = Describe("Watcher", func() {
 				secondActual := makeRemovingActualLRP("other-process-guid", "other-instance-guid", 1, cc_messages.AppLRPDomain, models.ActualLRP_Evacuating)
 
 				events := []EventHolder{
-					{models.NewActualLRPInstanceRemovedEvent(firstActual)},
-					{models.NewActualLRPInstanceRemovedEvent(secondActual)},
+					{models.NewActualLRPInstanceRemovedEvent(firstActual, "trace-id")},
+					{models.NewActualLRPInstanceRemovedEvent(secondActual, "trace-id")},
 				}
 
 				eventSource.NextStub = func() (models.Event, error) {
@@ -226,8 +227,8 @@ var _ = Describe("Watcher", func() {
 				secondActual := makeRemovingActualLRP("other-process-guid", "other-instance-guid", 1, cc_messages.AppLRPDomain, models.ActualLRP_Evacuating)
 
 				events := []EventHolder{
-					{models.NewActualLRPInstanceRemovedEvent(firstActual)},
-					{models.NewActualLRPInstanceRemovedEvent(secondActual)},
+					{models.NewActualLRPInstanceRemovedEvent(firstActual, "trace-id")},
+					{models.NewActualLRPInstanceRemovedEvent(secondActual, "trace-id")},
 				}
 
 				eventSource.NextStub = func() (models.Event, error) {
@@ -253,6 +254,198 @@ var _ = Describe("Watcher", func() {
 				}))
 
 				Expect(logger).To(Say("app-evacuating"))
+			})
+		})
+	})
+
+	Describe("When an Actual LRP has been changed", func() {
+		var lrpBefore *models.ActualLRP
+		var lrpAfter *models.ActualLRP
+
+		BeforeEach(func() {
+			lrpBefore = &models.ActualLRP{
+				ActualLRPKey: models.ActualLRPKey{
+					ProcessGuid: "before-process-guid",
+					Index:       5,
+					Domain:      cc_messages.AppLRPDomain,
+				},
+				ActualLRPInstanceKey: models.ActualLRPInstanceKey{
+					InstanceGuid: "before-instance-guid",
+					CellId:       "before-cell-id",
+				},
+			}
+
+			lrpAfter = &models.ActualLRP{
+				ActualLRPKey: models.ActualLRPKey{
+					ProcessGuid: "after-process-guid",
+					Index:       7,
+					Domain:      cc_messages.AppLRPDomain,
+				},
+				ActualLRPInstanceKey: models.ActualLRPInstanceKey{
+					InstanceGuid: "after-instance-guid",
+					CellId:       "after-cell-id",
+				},
+			}
+		})
+
+		JustBeforeEach(func() {
+			changedEvent := models.NewActualLRPInstanceChangedEvent(lrpBefore, lrpAfter, "trace-id")
+			nextEvent.Store(EventHolder{changedEvent})
+		})
+
+		Context("when it does not have readiness info before or after", func() {
+			It("does not call AppReadinessChanged", func() {
+				Consistently(ccClient.AppReadinessChangedCallCount).Should(Equal(0))
+			})
+		})
+
+		Context("when the readiness state is not set before and is set after", func() {
+			Context("when the after state is not ready", func() {
+				BeforeEach(func() {
+					lrpAfter.SetRoutable(false)
+				})
+
+				It("does calls AppReadinessChanged", func() {
+					Eventually(ccClient.AppReadinessChangedCallCount).Should(Equal(1))
+					processGuid, request, _ := ccClient.AppReadinessChangedArgsForCall(0)
+					Expect(processGuid).To(Equal("after-process-guid"))
+					Expect(request.Instance).To(Equal("after-instance-guid"))
+					Expect(request.Index).To(Equal(7))
+					Expect(request.CellID).To(Equal("after-cell-id"))
+					Expect(request.Ready).To(Equal(false))
+				})
+			})
+
+			Context("when the after state is ready", func() {
+				BeforeEach(func() {
+					lrpAfter.SetRoutable(true)
+				})
+
+				It("does call AppReadinessChanged", func() {
+					Eventually(ccClient.AppReadinessChangedCallCount).Should(Equal(1))
+					processGuid, request, _ := ccClient.AppReadinessChangedArgsForCall(0)
+					Expect(processGuid).To(Equal("after-process-guid"))
+					Expect(request.Instance).To(Equal("after-instance-guid"))
+					Expect(request.Index).To(Equal(7))
+					Expect(request.CellID).To(Equal("after-cell-id"))
+					Expect(request.Ready).To(Equal(true))
+				})
+			})
+		})
+
+		Context("when the readiness state is set before and is NOT set after", func() {
+			Context("when the before state is ready", func() {
+				BeforeEach(func() {
+					lrpBefore.SetRoutable(true)
+				})
+
+				It("does not call AppReadinessChanged", func() {
+					Consistently(ccClient.AppReadinessChangedCallCount).Should(Equal(0))
+				})
+			})
+
+			Context("when the before state is not ready", func() {
+				BeforeEach(func() {
+					lrpBefore.SetRoutable(false)
+				})
+
+				It("does call AppReadinessChanged", func() {
+					Eventually(ccClient.AppReadinessChangedCallCount).Should(Equal(1))
+					processGuid, request, _ := ccClient.AppReadinessChangedArgsForCall(0)
+					Expect(processGuid).To(Equal("after-process-guid"))
+					Expect(request.Instance).To(Equal("after-instance-guid"))
+					Expect(request.Index).To(Equal(7))
+					Expect(request.CellID).To(Equal("after-cell-id"))
+					Expect(request.Ready).To(Equal(true))
+				})
+			})
+		})
+
+		Context("when the readiness state is ready and does not change", func() {
+			BeforeEach(func() {
+				lrpBefore.SetRoutable(true)
+				lrpAfter.SetRoutable(true)
+			})
+			It("does not call AppReadinessChanged", func() {
+				Consistently(ccClient.AppReadinessChangedCallCount).Should(Equal(0))
+			})
+		})
+
+		Context("when the readiness state is notready and does not change", func() {
+			BeforeEach(func() {
+				lrpBefore.SetRoutable(false)
+				lrpAfter.SetRoutable(false)
+			})
+			It("does not call AppReadinessChanged", func() {
+				Consistently(ccClient.AppReadinessChangedCallCount).Should(Equal(0))
+			})
+		})
+
+		Context("when it goes from not ready to ready", func() {
+			BeforeEach(func() {
+				lrpBefore.SetRoutable(false)
+				lrpAfter.SetRoutable(true)
+			})
+			It("calls AppReady", func() {
+				Eventually(ccClient.AppReadinessChangedCallCount).Should(Equal(1))
+				processGuid, request, _ := ccClient.AppReadinessChangedArgsForCall(0)
+				Expect(processGuid).To(Equal("after-process-guid"))
+				Expect(request.Instance).To(Equal("after-instance-guid"))
+				Expect(request.Index).To(Equal(7))
+				Expect(request.CellID).To(Equal("after-cell-id"))
+				Expect(request.Ready).To(Equal(true))
+			})
+
+		})
+		Context("when it goes from ready to not ready", func() {
+			BeforeEach(func() {
+				lrpBefore.SetRoutable(true)
+				lrpAfter.SetRoutable(false)
+			})
+			It("calls AppNotReady", func() {
+				Eventually(ccClient.AppReadinessChangedCallCount).Should(Equal(1))
+				processGuid, request, _ := ccClient.AppReadinessChangedArgsForCall(0)
+				Expect(processGuid).To(Equal("after-process-guid"))
+				Expect(request.Instance).To(Equal("after-instance-guid"))
+				Expect(request.Index).To(Equal(7))
+				Expect(request.CellID).To(Equal("after-cell-id"))
+				Expect(request.Ready).To(Equal(false))
+			})
+		})
+
+		Context("when readiness changes, but the app does not have the app domain", func() {
+			BeforeEach(func() {
+				lrpBefore.SetRoutable(true)
+				lrpAfter.SetRoutable(false)
+				lrpAfter.ActualLRPKey.Domain = "meow.com"
+			})
+			It("does not call AppReadinessChanged", func() {
+				Consistently(ccClient.AppReadinessChangedCallCount).Should(Equal(0))
+			})
+		})
+
+		Context("logging", func() {
+			BeforeEach(func() {
+				lrpBefore.SetRoutable(true)
+				lrpAfter.SetRoutable(false)
+			})
+			It("logs", func() {
+				Eventually(logger).Should(gbytes.Say("app-readiness-changed"))
+				Eventually(logger).Should(gbytes.Say("recording-app-readiness-changed"))
+				Eventually(logger).Should(gbytes.Say(`"index":7`))
+				Eventually(logger).Should(gbytes.Say(`"process-guid":"after-process-guid"`))
+				Eventually(ccClient.AppReadinessChangedCallCount).Should(Equal(1))
+			})
+			Context("when ccClient.AppReadinessChanged returns an error", func() {
+				BeforeEach(func() {
+					ccClient.AppReadinessChangedReturns(errors.New("meow"))
+				})
+				It("logs an error", func() {
+					Eventually(logger).Should(gbytes.Say("recording-app-readiness-changed"))
+					Eventually(ccClient.AppReadinessChangedCallCount).Should(Equal(1))
+					Eventually(logger).Should(gbytes.Say("failed-recording-app-readiness-changed"))
+					Eventually(logger).Should(gbytes.Say("meow"))
+				})
 			})
 		})
 	})

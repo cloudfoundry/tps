@@ -1,4 +1,4 @@
-# code.cloudfoundry.org/bbs v0.0.0-20230406145249-41bd09f9f0ca
+# code.cloudfoundry.org/bbs v0.0.0-20231204223625-b4a8e8d97ad9
 ## explicit
 code.cloudfoundry.org/bbs
 code.cloudfoundry.org/bbs/encryption
@@ -8,6 +8,7 @@ code.cloudfoundry.org/bbs/fake_bbs
 code.cloudfoundry.org/bbs/format
 code.cloudfoundry.org/bbs/models
 code.cloudfoundry.org/bbs/models/test/model_helpers
+code.cloudfoundry.org/bbs/trace
 # code.cloudfoundry.org/cfhttp/v2 v2.0.1-0.20210513172332-4c5ee488a657
 ## explicit
 code.cloudfoundry.org/cfhttp/v2
@@ -49,7 +50,7 @@ code.cloudfoundry.org/locket/cmd/locket/config
 code.cloudfoundry.org/locket/cmd/locket/testrunner
 code.cloudfoundry.org/locket/lock
 code.cloudfoundry.org/locket/models
-# code.cloudfoundry.org/runtimeschema v0.0.0-20230323223330-5366865eed76
+# code.cloudfoundry.org/runtimeschema v0.0.0-20231214123546-c95bb31afd3e
 ## explicit; go 1.20
 code.cloudfoundry.org/runtimeschema/cc_messages
 # code.cloudfoundry.org/tlsconfig v0.0.0-20230320190829-8f91c367795b

@@ -1,7 +1,7 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
-code.cloudfoundry.org/bbs v0.0.0-20230406145249-41bd09f9f0ca h1:SYbT/cML0wx30J368+HaSjyoL96QbXaNJslR+0r3dw0=
-code.cloudfoundry.org/bbs v0.0.0-20230406145249-41bd09f9f0ca/go.mod h1:XKlGVVXFi5EcHHMPzw3xgONK9PeEZuUbIC43XNwxD10=
+code.cloudfoundry.org/bbs v0.0.0-20231204223625-b4a8e8d97ad9 h1:4smYQWmuzWZhmMoX2vRlGJYcVEckJxzHPvtEoXKAS60=
+code.cloudfoundry.org/bbs v0.0.0-20231204223625-b4a8e8d97ad9/go.mod h1:XKlGVVXFi5EcHHMPzw3xgONK9PeEZuUbIC43XNwxD10=
 code.cloudfoundry.org/cfhttp/v2 v2.0.1-0.20210513172332-4c5ee488a657 h1:8rnhkeAe8Bnx+8r3unO++S3syBw8P22qPbw3LLFWEoc=
 code.cloudfoundry.org/cfhttp/v2 v2.0.1-0.20210513172332-4c5ee488a657/go.mod h1:Fwt0o/haXfwgOHMom4AM96pXCVw9EAiIcSsPb8hWK9s=
 code.cloudfoundry.org/clock v1.1.0 h1:XLzC6W3Ah/Y7ht1rmZ6+QfPdt1iGWEAAtIZXgiaj57c=
@@ -24,8 +24,8 @@ code.cloudfoundry.org/localip v0.0.0-20230406154046-f137f65d303d h1:UKggh2CVl4b5
 code.cloudfoundry.org/localip v0.0.0-20230406154046-f137f65d303d/go.mod h1:7CQS2p5BMdlH24kxSUdOUUXYTGHD6N3ikfnerNL77HI=
 code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2 h1:tUpafuylA0aTl6sdQnf20OsO/ipCvdNSZlWOB1cHhz8=
 code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2/go.mod h1:AwHLRkdXtttLXNB8RHgLfErJ2kKafH62AR2OClhy6xI=
-code.cloudfoundry.org/runtimeschema v0.0.0-20230323223330-5366865eed76 h1:eUDbHh3nW7UAIsYdoShW/KccCbNUshYPlP4FcBd4sNM=
-code.cloudfoundry.org/runtimeschema v0.0.0-20230323223330-5366865eed76/go.mod h1:Fk8Yr7+89rZ+FLaG4zNzqqvTrOYyYY7P4QeeiCv+fnk=
+code.cloudfoundry.org/runtimeschema v0.0.0-20231214123546-c95bb31afd3e h1:6hOzMD7567RcIQCnVOMCVjYxsVQU49tNCN35M+Q2iqs=
+code.cloudfoundry.org/runtimeschema v0.0.0-20231214123546-c95bb31afd3e/go.mod h1:Fk8Yr7+89rZ+FLaG4zNzqqvTrOYyYY7P4QeeiCv+fnk=
 code.cloudfoundry.org/tlsconfig v0.0.0-20200131000646-bbe0f8da39b3/go.mod h1:eTbFJpyXRGuFVyg5+oaj9B2eIbIc+0/kZjH8ftbtdew=
 code.cloudfoundry.org/tlsconfig v0.0.0-20230320190829-8f91c367795b h1:FjTuGbVBKeaSyvW7WEATlIFCyb0uCpaiuTSaMQXjUyY=
 code.cloudfoundry.org/tlsconfig v0.0.0-20230320190829-8f91c367795b/go.mod h1:C8SxvGRSutmgzV2FxH8Zwqz2Q8HsaAITQRQFKhlDzPw=

@@ -101,6 +101,40 @@ var _ = Describe("CC Client", func() {
 		})
 	})
 
+	Describe("Successfully calling the Cloud Controller's readiness changed endpoint", func() {
+		var expectedBody = []byte(`{"instance":"instance-id","index":3,"cell_id":"id-of-cell","ready":true}`)
+		var callCount int
+
+		BeforeEach(func() {
+			callCount = 0
+			fakeCC.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("POST", "/internal/v4/apps/"+guid+"/readiness_changed"),
+					ghttp.RespondWith(200, `{}`),
+					func(w http.ResponseWriter, req *http.Request) {
+						callCount += 1
+						body, err := ioutil.ReadAll(req.Body)
+						defer req.Body.Close()
+
+						Expect(err).NotTo(HaveOccurred())
+						Expect(body).To(Equal(expectedBody))
+					},
+				),
+			)
+		})
+
+		It("sends the request payload to the CC without modification", func() {
+			err := ccClient.AppReadinessChanged(guid, cc_messages.AppReadinessChangedRequest{
+				Index:    3,
+				Instance: "instance-id",
+				CellID:   "id-of-cell",
+				Ready:    true,
+			}, logger)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(callCount).To(Equal(1))
+		})
+	})
+
 	Describe("Error conditions", func() {
 		Context("when the request couldn't be completed", func() {
 			BeforeEach(func() {
@@ -118,6 +152,14 @@ var _ = Describe("CC Client", func() {
 
 			It("percolates errors calling app rescheduling", func() {
 				err := ccClient.AppRescheduling(guid, cc_messages.AppReschedulingRequest{
+					Index: 1,
+				}, logger)
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(BeAssignableToTypeOf(&url.Error{}))
+			})
+
+			It("percolates errors calling app readiness changed", func() {
+				err := ccClient.AppReadinessChanged(guid, cc_messages.AppReadinessChangedRequest{
 					Index: 1,
 				}, logger)
 				Expect(err).To(HaveOccurred())
@@ -157,6 +199,26 @@ var _ = Describe("CC Client", func() {
 
 			It("returns an error with the actual status code", func() {
 				err := ccClient.AppRescheduling(guid, cc_messages.AppReschedulingRequest{
+					Index: 1,
+				}, logger)
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(BeAssignableToTypeOf(&cc_client.BadResponseError{}))
+				Expect(err.(*cc_client.BadResponseError).StatusCode).To(Equal(500))
+			})
+		})
+
+		Context("when the readiness changed response code is not StatusOK (200)", func() {
+			BeforeEach(func() {
+				fakeCC.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/internal/v4/apps/"+guid+"/readiness_changed"),
+						ghttp.RespondWith(500, `{}`),
+					),
+				)
+			})
+
+			It("returns an error with the actual status code", func() {
+				err := ccClient.AppReadinessChanged(guid, cc_messages.AppReadinessChangedRequest{
 					Index: 1,
 				}, logger)
 				Expect(err).To(HaveOccurred())
