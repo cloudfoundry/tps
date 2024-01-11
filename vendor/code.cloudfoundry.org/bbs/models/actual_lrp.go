@@ -144,6 +144,17 @@ func (actual ActualLRP) ShouldRestartCrash(now time.Time, calc RestartCalculator
 	return calc.ShouldRestart(now.UnixNano(), actual.Since, actual.CrashCount)
 }
 
+func (actual *ActualLRP) SetRoutable(routable bool) {
+	actual.OptionalRoutable = &ActualLRP_Routable{
+		Routable: routable,
+	}
+}
+
+func (actual *ActualLRP) RoutableExists() bool {
+	_, ok := actual.GetOptionalRoutable().(*ActualLRP_Routable)
+	return ok
+}
+
 func (before ActualLRP) AllowsTransitionTo(lrpKey *ActualLRPKey, instanceKey *ActualLRPInstanceKey, newState string) bool {
 	if !before.ActualLRPKey.Equal(lrpKey) {
 		return false
@@ -260,10 +271,11 @@ func (actualLRPInfo *ActualLRPInfo) ToActualLRP(lrpKey ActualLRPKey, lrpInstance
 	if actualLRPInfo == nil {
 		return nil
 	}
-	return &ActualLRP{
+	lrp := ActualLRP{
 		ActualLRPKey:         lrpKey,
 		ActualLRPInstanceKey: lrpInstanceKey,
 		ActualLRPNetInfo:     actualLRPInfo.ActualLRPNetInfo,
+		AvailabilityZone:     actualLRPInfo.AvailabilityZone,
 		CrashCount:           actualLRPInfo.CrashCount,
 		CrashReason:          actualLRPInfo.CrashReason,
 		State:                actualLRPInfo.State,
@@ -272,14 +284,21 @@ func (actualLRPInfo *ActualLRPInfo) ToActualLRP(lrpKey ActualLRPKey, lrpInstance
 		ModificationTag:      actualLRPInfo.ModificationTag,
 		Presence:             actualLRPInfo.Presence,
 	}
+
+	if actualLRPInfo.RoutableExists() {
+		lrp.SetRoutable(actualLRPInfo.GetRoutable())
+	}
+
+	return &lrp
 }
 
 func (actual *ActualLRP) ToActualLRPInfo() *ActualLRPInfo {
 	if actual == nil {
 		return nil
 	}
-	return &ActualLRPInfo{
+	info := ActualLRPInfo{
 		ActualLRPNetInfo: actual.ActualLRPNetInfo,
+		AvailabilityZone: actual.AvailabilityZone,
 		CrashCount:       actual.CrashCount,
 		CrashReason:      actual.CrashReason,
 		State:            actual.State,
@@ -288,6 +307,11 @@ func (actual *ActualLRP) ToActualLRPInfo() *ActualLRPInfo {
 		ModificationTag:  actual.ModificationTag,
 		Presence:         actual.Presence,
 	}
+
+	if actual.RoutableExists() {
+		info.SetRoutable(actual.GetRoutable())
+	}
+	return &info
 }
 
 // DEPRECATED

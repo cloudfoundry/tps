@@ -23,6 +23,19 @@ type FakeCcClient struct {
 	appCrashedReturnsOnCall map[int]struct {
 		result1 error
 	}
+	AppReadinessChangedStub        func(string, cc_messages.AppReadinessChangedRequest, lager.Logger) error
+	appReadinessChangedMutex       sync.RWMutex
+	appReadinessChangedArgsForCall []struct {
+		arg1 string
+		arg2 cc_messages.AppReadinessChangedRequest
+		arg3 lager.Logger
+	}
+	appReadinessChangedReturns struct {
+		result1 error
+	}
+	appReadinessChangedReturnsOnCall map[int]struct {
+		result1 error
+	}
 	AppReschedulingStub        func(string, cc_messages.AppReschedulingRequest, lager.Logger) error
 	appReschedulingMutex       sync.RWMutex
 	appReschedulingArgsForCall []struct {
@@ -103,6 +116,69 @@ func (fake *FakeCcClient) AppCrashedReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *FakeCcClient) AppReadinessChanged(arg1 string, arg2 cc_messages.AppReadinessChangedRequest, arg3 lager.Logger) error {
+	fake.appReadinessChangedMutex.Lock()
+	ret, specificReturn := fake.appReadinessChangedReturnsOnCall[len(fake.appReadinessChangedArgsForCall)]
+	fake.appReadinessChangedArgsForCall = append(fake.appReadinessChangedArgsForCall, struct {
+		arg1 string
+		arg2 cc_messages.AppReadinessChangedRequest
+		arg3 lager.Logger
+	}{arg1, arg2, arg3})
+	stub := fake.AppReadinessChangedStub
+	fakeReturns := fake.appReadinessChangedReturns
+	fake.recordInvocation("AppReadinessChanged", []interface{}{arg1, arg2, arg3})
+	fake.appReadinessChangedMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeCcClient) AppReadinessChangedCallCount() int {
+	fake.appReadinessChangedMutex.RLock()
+	defer fake.appReadinessChangedMutex.RUnlock()
+	return len(fake.appReadinessChangedArgsForCall)
+}
+
+func (fake *FakeCcClient) AppReadinessChangedCalls(stub func(string, cc_messages.AppReadinessChangedRequest, lager.Logger) error) {
+	fake.appReadinessChangedMutex.Lock()
+	defer fake.appReadinessChangedMutex.Unlock()
+	fake.AppReadinessChangedStub = stub
+}
+
+func (fake *FakeCcClient) AppReadinessChangedArgsForCall(i int) (string, cc_messages.AppReadinessChangedRequest, lager.Logger) {
+	fake.appReadinessChangedMutex.RLock()
+	defer fake.appReadinessChangedMutex.RUnlock()
+	argsForCall := fake.appReadinessChangedArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeCcClient) AppReadinessChangedReturns(result1 error) {
+	fake.appReadinessChangedMutex.Lock()
+	defer fake.appReadinessChangedMutex.Unlock()
+	fake.AppReadinessChangedStub = nil
+	fake.appReadinessChangedReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeCcClient) AppReadinessChangedReturnsOnCall(i int, result1 error) {
+	fake.appReadinessChangedMutex.Lock()
+	defer fake.appReadinessChangedMutex.Unlock()
+	fake.AppReadinessChangedStub = nil
+	if fake.appReadinessChangedReturnsOnCall == nil {
+		fake.appReadinessChangedReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.appReadinessChangedReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeCcClient) AppRescheduling(arg1 string, arg2 cc_messages.AppReschedulingRequest, arg3 lager.Logger) error {
 	fake.appReschedulingMutex.Lock()
 	ret, specificReturn := fake.appReschedulingReturnsOnCall[len(fake.appReschedulingArgsForCall)]
@@ -171,6 +247,8 @@ func (fake *FakeCcClient) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.appCrashedMutex.RLock()
 	defer fake.appCrashedMutex.RUnlock()
+	fake.appReadinessChangedMutex.RLock()
+	defer fake.appReadinessChangedMutex.RUnlock()
 	fake.appReschedulingMutex.RLock()
 	defer fake.appReschedulingMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

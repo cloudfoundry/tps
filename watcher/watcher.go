@@ -171,6 +171,72 @@ func (watcher *Watcher) handleEvent(logger lager.Logger, event models.Event) {
 			})
 		}
 	}
+
+	if changedEvent, ok := event.(*models.ActualLRPInstanceChangedEvent); ok {
+		key := changedEvent.ActualLRPKey
+
+		before := changedEvent.Before
+		after := changedEvent.After
+		if key.Domain == cc_messages.AppLRPDomain {
+			changed, newValue := calculateRoutableChange(before.RoutableExists(), after.RoutableExists(), before.GetRoutable(), after.GetRoutable())
+			if changed {
+
+				logger.Info("app-readiness-changed", lager.Data{
+					"process-guid": key.ProcessGuid,
+					"index":        key.Index,
+				})
+
+				AppReadinessChanged := cc_messages.AppReadinessChangedRequest{
+					Instance: changedEvent.ActualLRPInstanceKey.InstanceGuid,
+					Index:    int(key.Index),
+					CellID:   changedEvent.ActualLRPInstanceKey.CellId,
+					Ready:    newValue,
+				}
+
+				watcher.pool.Submit(func() {
+					logger := logger.WithData(lager.Data{
+						"process-guid": key.ProcessGuid,
+						"index":        key.Index,
+					})
+					logger.Info("recording-app-readiness-changed")
+					err := watcher.ccClient.AppReadinessChanged(key.ProcessGuid, AppReadinessChanged, logger)
+					if err != nil {
+						logger.Error("failed-recording-app-readiness-changed", err)
+					}
+				})
+			}
+		}
+	}
+}
+
+func calculateRoutableChange(beforeSet, afterSet, beforeValue, afterValue bool) (hasChanged, newValue bool) {
+	// If routable is not set for either the before or after do not emit an
+	// event.
+	if !beforeSet && !afterSet {
+		return false, false
+	}
+
+	// If routable is not set before, but is set after, emit an event
+	// regardless of the after value.
+	if !beforeSet && afterSet {
+		return true, afterValue
+	}
+
+	// If routable was set before, but not after only emit event if it was not
+	// ready before.
+	if beforeSet && !afterSet {
+		return !beforeValue, true
+	}
+
+	// If routable is set in both the before and after and they don't match,
+	// then emit an event.
+	if beforeValue != afterValue {
+		return true, afterValue
+	}
+
+	// If routable is set in both the before and after, and the value has not
+	// changed, do not emit an event.
+	return false, false
 }
 
 func subscribeToEvents(logger lager.Logger, bbsClient bbs.Client, subscriptionChan chan<- events.EventSource) {

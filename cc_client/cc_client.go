@@ -2,7 +2,6 @@ package cc_client
 
 import (
 	"bytes"
-	"code.cloudfoundry.org/lager/v3"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -13,19 +12,23 @@ import (
 	"net/http"
 	"time"
 
+	"code.cloudfoundry.org/lager/v3"
+
 	"code.cloudfoundry.org/runtimeschema/cc_messages"
 )
 
 const (
-	appCrashedPath      = "/internal/v4/apps/%s/crashed"
-	appReschedulingPath = "/internal/v4/apps/%s/rescheduling"
-	ccRequestTimeout    = 5 * time.Second
+	appCrashedPath          = "/internal/v4/apps/%s/crashed"
+	appReschedulingPath     = "/internal/v4/apps/%s/rescheduling"
+	appReadinessChangedPath = "/internal/v4/apps/%s/readiness_changed"
+	ccRequestTimeout        = 5 * time.Second
 )
 
 //go:generate counterfeiter -o fakes/fake_cc_client.go . CcClient
 type CcClient interface {
 	AppCrashed(guid string, appCrashed cc_messages.AppCrashedRequest, logger lager.Logger) error
 	AppRescheduling(guid string, appRescheduling cc_messages.AppReschedulingRequest, logger lager.Logger) error
+	AppReadinessChanged(guid string, AppReadinessChanged cc_messages.AppReadinessChangedRequest, logger lager.Logger) error
 }
 
 type ccClient struct {
@@ -156,5 +159,38 @@ func (cc *ccClient) AppRescheduling(guid string, appRescheduling cc_messages.App
 	}
 
 	logger.Debug("delivered-app-rescheduling-response")
+	return nil
+}
+
+func (cc *ccClient) AppReadinessChanged(guid string, appReadinessChanged cc_messages.AppReadinessChangedRequest, logger lager.Logger) error {
+	logger = logger.Session("cc-client")
+	logger.Debug("delivering-app-readiness-changed-response", lager.Data{"app_readiness_changed": appReadinessChanged})
+
+	payload, err := json.Marshal(appReadinessChanged)
+	if err != nil {
+		return err
+	}
+
+	url := fmt.Sprintf(cc.ccURI+appReadinessChangedPath, guid)
+	request, err := http.NewRequest("POST", url, bytes.NewReader(payload))
+	if err != nil {
+		return err
+	}
+
+	request.Header.Set("content-type", "application/json")
+
+	response, err := cc.httpClient.Do(request)
+	if err != nil {
+		logger.Error("deliver-app-readiness-changed-response-failed", err)
+		return err
+	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return &BadResponseError{response.StatusCode}
+	}
+
+	logger.Debug("delivered-app-readiness-changed-response")
 	return nil
 }

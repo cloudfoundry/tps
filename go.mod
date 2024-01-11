@@ -3,13 +3,13 @@ module code.cloudfoundry.org/tps
 go 1.20
 
 require (
-	code.cloudfoundry.org/bbs v0.0.0-20230406145249-41bd09f9f0ca
+	code.cloudfoundry.org/bbs v0.0.0-20231204223625-b4a8e8d97ad9
 	code.cloudfoundry.org/clock v1.1.0
 	code.cloudfoundry.org/debugserver v0.0.0-20230329140605-8c21649a9a42
 	code.cloudfoundry.org/lager/v3 v3.0.3
 	code.cloudfoundry.org/localip v0.0.0-20230406154046-f137f65d303d
 	code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2
-	code.cloudfoundry.org/runtimeschema v0.0.0-20230323223330-5366865eed76
+	code.cloudfoundry.org/runtimeschema v0.0.0-20231214123546-c95bb31afd3e
 	code.cloudfoundry.org/workpool v0.0.0-20230406174608-2e26d5d93731
 	github.com/cloudfoundry/dropsonde v1.1.0
 	github.com/lib/pq v1.10.9
