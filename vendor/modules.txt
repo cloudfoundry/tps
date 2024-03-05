@@ -84,7 +84,7 @@ github.com/cloudfoundry/dropsonde/runtime_stats
 # github.com/cloudfoundry/sonde-go v0.0.0-20220627221915-ff36de9c3435
 ## explicit; go 1.17
 github.com/cloudfoundry/sonde-go/events
-# github.com/go-logr/logr v1.3.0
+# github.com/go-logr/logr v1.4.1
 ## explicit; go 1.18
 github.com/go-logr/logr
 github.com/go-logr/logr/funcr
@@ -132,7 +132,7 @@ github.com/mailru/easyjson/jwriter
 # github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 ## explicit
 github.com/nu7hatch/gouuid
-# github.com/onsi/ginkgo/v2 v2.15.0
+# github.com/onsi/ginkgo/v2 v2.16.0
 ## explicit; go 1.20
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
@@ -200,7 +200,7 @@ go.step.sm/crypto/keyutil
 go.step.sm/crypto/pemutil
 go.step.sm/crypto/randutil
 go.step.sm/crypto/x25519
-# golang.org/x/crypto v0.17.0
+# golang.org/x/crypto v0.18.0
 ## explicit; go 1.18
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
@@ -214,7 +214,7 @@ golang.org/x/crypto/salsa20/salsa
 golang.org/x/crypto/scrypt
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/net v0.19.0
+# golang.org/x/net v0.20.0
 ## explicit; go 1.18
 golang.org/x/net/context
 golang.org/x/net/html
@@ -226,7 +226,7 @@ golang.org/x/net/http2/hpack
 golang.org/x/net/idna
 golang.org/x/net/internal/timeseries
 golang.org/x/net/trace
-# golang.org/x/sys v0.15.0
+# golang.org/x/sys v0.16.0
 ## explicit; go 1.18
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
@@ -252,8 +252,9 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# golang.org/x/tools v0.16.1
+# golang.org/x/tools v0.17.0
 ## explicit; go 1.18
+golang.org/x/tools/cover
 golang.org/x/tools/go/ast/inspector
 # google.golang.org/genproto/googleapis/rpc v0.0.0-20230525234030-28d5490b6b19
 ## explicit; go 1.19
