@@ -13,7 +13,7 @@ require (
 	code.cloudfoundry.org/workpool v0.0.0-20230406174608-2e26d5d93731
 	github.com/cloudfoundry/dropsonde v1.1.0
 	github.com/lib/pq v1.10.9
-	github.com/onsi/ginkgo/v2 v2.17.2
+	github.com/onsi/ginkgo/v2 v2.17.3
 	github.com/onsi/gomega v1.33.1
 	github.com/tedsuo/ifrit v0.0.0-20230330192023-5cba443a66c4
 )
