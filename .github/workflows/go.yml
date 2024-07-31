@@ -32,6 +32,12 @@ jobs:
     - name: Test
       run: |
           go install github.com/onsi/ginkgo/v2/ginkgo@v2
-          go install code.cloudfoundry.org/locket/cmd/locket@latest
+          git clone https://github.com/cloudfoundry/diego-release.git
+          pushd diego-release
+          git submodule update --init --recursive
+          popd
+          pushd diego-release/src/code.cloudfoundry.org
+          go build -buildvcs=false -o /go/bin/locket ./locket/cmd/locket
+          popd
           ginkgo version
           ginkgo -r --keep-going -p -trace --randomize-all --race .
