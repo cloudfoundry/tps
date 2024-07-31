@@ -39,7 +39,7 @@ jobs:
           git submodule update --init --recursive
           popd
           pushd ../diego-release/src/code.cloudfoundry.org
-          go build -buildvcs=false -o $GOPATH/bin/locket ./locket/cmd/locket
+          go build -buildvcs=false -o /home/runner/go/bin/locket ./locket/cmd/locket
           popd
           ginkgo version
           ginkgo -r --keep-going -p -trace --randomize-all --race .
