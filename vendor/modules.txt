@@ -12,7 +12,7 @@ code.cloudfoundry.org/bbs/trace
 # code.cloudfoundry.org/cfhttp/v2 v2.0.1-0.20210513172332-4c5ee488a657
 ## explicit
 code.cloudfoundry.org/cfhttp/v2
-# code.cloudfoundry.org/clock v1.3.0
+# code.cloudfoundry.org/clock v1.4.0
 ## explicit; go 1.20
 code.cloudfoundry.org/clock
 # code.cloudfoundry.org/debugserver v0.2.0
@@ -209,7 +209,7 @@ golang.org/x/crypto/salsa20/salsa
 golang.org/x/crypto/scrypt
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/exp v0.0.0-20240808152545-0cdaa3abc0fa
+# golang.org/x/exp v0.0.0-20240822175202-778ce7bba035
 ## explicit; go 1.20
 golang.org/x/exp/constraints
 golang.org/x/exp/slices
