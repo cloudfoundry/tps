@@ -39,7 +39,7 @@ code.cloudfoundry.org/lager/v3/internal/truncate
 code.cloudfoundry.org/lager/v3/lagerctx
 code.cloudfoundry.org/lager/v3/lagerflags
 code.cloudfoundry.org/lager/v3/lagertest
-# code.cloudfoundry.org/localip v0.1.0
+# code.cloudfoundry.org/localip v0.2.0
 ## explicit; go 1.20
 code.cloudfoundry.org/localip
 # code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2
@@ -209,7 +209,7 @@ golang.org/x/crypto/salsa20/salsa
 golang.org/x/crypto/scrypt
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/exp v0.0.0-20240808152545-0cdaa3abc0fa
+# golang.org/x/exp v0.0.0-20240822175202-778ce7bba035
 ## explicit; go 1.20
 golang.org/x/exp/constraints
 golang.org/x/exp/slices
