@@ -32,7 +32,7 @@ code.cloudfoundry.org/go-diodes
 code.cloudfoundry.org/go-loggregator/v8
 code.cloudfoundry.org/go-loggregator/v8/rfc5424
 code.cloudfoundry.org/go-loggregator/v8/rpc/loggregator_v2
-# code.cloudfoundry.org/lager/v3 v3.2.0
+# code.cloudfoundry.org/lager/v3 v3.3.0
 ## explicit; go 1.20
 code.cloudfoundry.org/lager/v3
 code.cloudfoundry.org/lager/v3/internal/truncate
