@@ -15,8 +15,8 @@ code.cloudfoundry.org/cfhttp/v2
 # code.cloudfoundry.org/clock v1.6.0
 ## explicit; go 1.22
 code.cloudfoundry.org/clock
-# code.cloudfoundry.org/debugserver v0.5.0
-## explicit; go 1.19
+# code.cloudfoundry.org/debugserver v0.7.0
+## explicit; go 1.22
 code.cloudfoundry.org/debugserver
 # code.cloudfoundry.org/diego-logging-client v0.0.0-20220314190632-277a9c460661
 ## explicit; go 1.16
