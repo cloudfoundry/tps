@@ -8,7 +8,7 @@ require (
 	code.cloudfoundry.org/clock v1.13.0
 	code.cloudfoundry.org/debugserver v0.15.0
 	code.cloudfoundry.org/lager/v3 v3.6.0
-	code.cloudfoundry.org/localip v0.11.0
+	code.cloudfoundry.org/localip v0.12.0
 	code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2
 	code.cloudfoundry.org/runtimeschema v0.0.0-20231214123546-c95bb31afd3e
 	code.cloudfoundry.org/workpool v0.0.0-20230406174608-2e26d5d93731
@@ -34,7 +34,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/pprof v0.0.0-20240910150728-a0b0bb1d4134 // indirect
+	github.com/google/pprof v0.0.0-20240929191954-255acd752d31 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
