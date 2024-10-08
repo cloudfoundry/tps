@@ -5,7 +5,7 @@ toolchain go1.22.5
 
 require (
 	code.cloudfoundry.org/bbs v0.0.0-20231204223625-b4a8e8d97ad9
-	code.cloudfoundry.org/clock v1.14.0
+	code.cloudfoundry.org/clock v1.15.0
 	code.cloudfoundry.org/debugserver v0.16.0
 	code.cloudfoundry.org/lager/v3 v3.8.0
 	code.cloudfoundry.org/localip v0.12.0
@@ -34,7 +34,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/pprof v0.0.0-20240929191954-255acd752d31 // indirect
+	github.com/google/pprof v0.0.0-20241001023024-f4c0cfd0cf1d // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
@@ -44,11 +44,11 @@ require (
 	github.com/tedsuo/rata v1.0.0 // indirect
 	github.com/vito/go-sse v1.0.0 // indirect
 	go.step.sm/crypto v0.16.2 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
-	golang.org/x/net v0.29.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
-	golang.org/x/tools v0.25.0 // indirect
+	golang.org/x/crypto v0.28.0 // indirect
+	golang.org/x/net v0.30.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/tools v0.26.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415180920-8c6c420018be // indirect
 	google.golang.org/grpc v1.63.2 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
