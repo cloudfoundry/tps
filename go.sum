@@ -612,8 +612,8 @@ code.cloudfoundry.org/go-loggregator/v8 v8.0.5 h1:p1rrGxTwUqLjlUVtbjTAvKOSGNmPuB
 code.cloudfoundry.org/go-loggregator/v8 v8.0.5/go.mod h1:mLlJ1ZyG6gVvBEtYypvbztRvFeCtBsTxE9tt+85tS6Y=
 code.cloudfoundry.org/lager/v3 v3.11.0 h1:YjRSl1USPIz1FFZPVvwFYgXUUodSIWDdXaLVvME3jZg=
 code.cloudfoundry.org/lager/v3 v3.11.0/go.mod h1:8Ot/5fRETEzdf9U3N1kCWp00oZteNwew5Cl2Ck3t2ho=
-code.cloudfoundry.org/localip v0.15.0 h1:ez5wapKkB1ALBUe94EBXeSnQx5etiudoVKCAiF7hq4c=
-code.cloudfoundry.org/localip v0.15.0/go.mod h1:1WLQUbefJ9LAgzMieK/A21Cv82/VZwLGis1FIupaX6Q=
+code.cloudfoundry.org/localip v0.17.0 h1:dE7zhRjyRtkNn8wtB8M9mQL2drn2eDTPu5lKb7f/6f4=
+code.cloudfoundry.org/localip v0.17.0/go.mod h1:I9WlUbrjT/7tQUf+rKgQzxOFBFXx2McdosxuygyZ1d8=
 code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2 h1:tUpafuylA0aTl6sdQnf20OsO/ipCvdNSZlWOB1cHhz8=
 code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2/go.mod h1:AwHLRkdXtttLXNB8RHgLfErJ2kKafH62AR2OClhy6xI=
 code.cloudfoundry.org/runtimeschema v0.0.0-20231214123546-c95bb31afd3e h1:6hOzMD7567RcIQCnVOMCVjYxsVQU49tNCN35M+Q2iqs=
@@ -817,8 +817,8 @@ github.com/google/pprof v0.0.0-20210407192527-94a9f03dee38/go.mod h1:kpwsk12EmLe
 github.com/google/pprof v0.0.0-20210601050228-01bbb1931b22/go.mod h1:kpwsk12EmLew5upagYY7GY0pfYCcupk39gWOCRROcvE=
 github.com/google/pprof v0.0.0-20210609004039-a478d1d731e9/go.mod h1:kpwsk12EmLew5upagYY7GY0pfYCcupk39gWOCRROcvE=
 github.com/google/pprof v0.0.0-20210720184732-4bb14d4b1be1/go.mod h1:kpwsk12EmLew5upagYY7GY0pfYCcupk39gWOCRROcvE=
-github.com/google/pprof v0.0.0-20241021161924-4cf4322d492d h1:dcUSYLuKITgwgLZJZpB+CKecsC8mXHhErghMX9ohbf4=
-github.com/google/pprof v0.0.0-20241021161924-4cf4322d492d/go.mod h1:vavhavw2zAxS5dIdcRluK6cSGGPlZynqzFM8NdvU144=
+github.com/google/pprof v0.0.0-20241023014458-598669927662 h1:SKMkD83p7FwUqKmBsPdLHF5dNyxq3jOWwu9w9UyH5vA=
+github.com/google/pprof v0.0.0-20241023014458-598669927662/go.mod h1:vavhavw2zAxS5dIdcRluK6cSGGPlZynqzFM8NdvU144=
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
