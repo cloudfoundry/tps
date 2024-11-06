@@ -5,7 +5,7 @@ toolchain go1.22.5
 
 require (
 	code.cloudfoundry.org/bbs v0.0.0-20231204223625-b4a8e8d97ad9
-	code.cloudfoundry.org/clock v1.19.0
+	code.cloudfoundry.org/clock v1.20.0
 	code.cloudfoundry.org/debugserver v0.23.0
 	code.cloudfoundry.org/lager/v3 v3.13.0
 	code.cloudfoundry.org/localip v0.18.0
