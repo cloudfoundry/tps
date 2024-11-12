@@ -5,7 +5,7 @@ toolchain go1.22.5
 
 require (
 	code.cloudfoundry.org/bbs v0.0.0-20231204223625-b4a8e8d97ad9
-	code.cloudfoundry.org/clock v1.20.0
+	code.cloudfoundry.org/clock v1.21.0
 	code.cloudfoundry.org/debugserver v0.23.0
 	code.cloudfoundry.org/lager/v3 v3.14.0
 	code.cloudfoundry.org/localip v0.18.0
@@ -44,11 +44,11 @@ require (
 	github.com/tedsuo/rata v1.0.0 // indirect
 	github.com/vito/go-sse v1.0.0 // indirect
 	go.step.sm/crypto v0.16.2 // indirect
-	golang.org/x/crypto v0.28.0 // indirect
-	golang.org/x/net v0.30.0 // indirect
-	golang.org/x/sys v0.26.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
-	golang.org/x/tools v0.26.0 // indirect
+	golang.org/x/crypto v0.29.0 // indirect
+	golang.org/x/net v0.31.0 // indirect
+	golang.org/x/sys v0.27.0 // indirect
+	golang.org/x/text v0.20.0 // indirect
+	golang.org/x/tools v0.27.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415180920-8c6c420018be // indirect
 	google.golang.org/grpc v1.63.2 // indirect
 	google.golang.org/protobuf v1.35.1 // indirect
