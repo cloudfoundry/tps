@@ -8,7 +8,7 @@ require (
 	code.cloudfoundry.org/clock v1.21.0
 	code.cloudfoundry.org/debugserver v0.23.0
 	code.cloudfoundry.org/lager/v3 v3.14.0
-	code.cloudfoundry.org/localip v0.18.0
+	code.cloudfoundry.org/localip v0.19.0
 	code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2
 	code.cloudfoundry.org/runtimeschema v0.0.0-20231214123546-c95bb31afd3e
 	code.cloudfoundry.org/workpool v0.0.0-20230406174608-2e26d5d93731
