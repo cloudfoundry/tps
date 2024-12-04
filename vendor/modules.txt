@@ -12,7 +12,7 @@ code.cloudfoundry.org/bbs/trace
 # code.cloudfoundry.org/cfhttp/v2 v2.0.1-0.20210513172332-4c5ee488a657
 ## explicit
 code.cloudfoundry.org/cfhttp/v2
-# code.cloudfoundry.org/clock v1.22.0
+# code.cloudfoundry.org/clock v1.23.0
 ## explicit; go 1.22.0
 code.cloudfoundry.org/clock
 # code.cloudfoundry.org/debugserver v0.27.0
