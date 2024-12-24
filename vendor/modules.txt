@@ -15,7 +15,7 @@ code.cloudfoundry.org/cfhttp/v2
 # code.cloudfoundry.org/clock v1.25.0
 ## explicit; go 1.22.0
 code.cloudfoundry.org/clock
-# code.cloudfoundry.org/debugserver v0.29.0
+# code.cloudfoundry.org/debugserver v0.30.0
 ## explicit; go 1.22.0
 code.cloudfoundry.org/debugserver
 # code.cloudfoundry.org/diego-logging-client v0.0.0-20220314190632-277a9c460661
@@ -210,7 +210,7 @@ golang.org/x/crypto/salsa20/salsa
 golang.org/x/crypto/scrypt
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/net v0.32.0
+# golang.org/x/net v0.33.0
 ## explicit; go 1.18
 golang.org/x/net/context
 golang.org/x/net/html
