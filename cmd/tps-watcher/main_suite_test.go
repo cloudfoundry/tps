@@ -2,7 +2,6 @@ package main_test
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"code.cloudfoundry.org/lager/v3/lagertest"
 	"code.cloudfoundry.org/tps/cmd/tpsrunner"
@@ -55,7 +54,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	err := json.Unmarshal(payload, &binaries)
 	Expect(err).NotTo(HaveOccurred())
 
-	watcherPath = string(binaries["watcher"])
+	watcherPath = binaries["watcher"]
 
 	logger = lagertest.NewTestLogger("test")
 })
@@ -66,7 +65,7 @@ var _ = BeforeEach(func() {
 
 	watcherConfig = tpsconfig.DefaultWatcherConfig()
 	watcherConfig.BBSAddress = fakeBBS.URL()
-	watcherConfig.CCBaseUrl = fmt.Sprintf(fakeCC.URL())
+	watcherConfig.CCBaseUrl = fakeCC.URL()
 	watcherConfig.LagerConfig.LogLevel = "debug"
 	watcherConfig.CCClientCert = "../../fixtures/watcher_cc_client.crt"
 	watcherConfig.CCClientKey = "../../fixtures/watcher_cc_client.key"
@@ -76,7 +75,7 @@ var _ = BeforeEach(func() {
 })
 
 var _ = JustBeforeEach(func() {
-	runner = tpsrunner.NewWatcher(string(watcherPath), watcherConfig)
+	runner = tpsrunner.NewWatcher(watcherPath, watcherConfig)
 	if disableStartCheck {
 		runner.StartCheck = ""
 	}
