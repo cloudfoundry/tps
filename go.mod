@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	code.cloudfoundry.org/bbs v0.0.0-20231204223625-b4a8e8d97ad9
-	code.cloudfoundry.org/clock v1.35.0
+	code.cloudfoundry.org/clock v1.36.0
 	code.cloudfoundry.org/debugserver v0.46.0
 	code.cloudfoundry.org/lager/v3 v3.34.0
 	code.cloudfoundry.org/localip v0.37.0
@@ -33,7 +33,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20250403155104-27863c87afa6 // indirect
+	github.com/google/pprof v0.0.0-20250418163039-24c5476c6587 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
