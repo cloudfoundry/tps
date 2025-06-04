@@ -6,7 +6,7 @@ require (
 	code.cloudfoundry.org/bbs v0.0.0-20231204223625-b4a8e8d97ad9
 	code.cloudfoundry.org/clock v1.38.0
 	code.cloudfoundry.org/debugserver v0.50.0
-	code.cloudfoundry.org/lager/v3 v3.37.0
+	code.cloudfoundry.org/lager/v3 v3.38.0
 	code.cloudfoundry.org/localip v0.40.0
 	code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2
 	code.cloudfoundry.org/runtimeschema v0.0.0-20231214123546-c95bb31afd3e
@@ -28,12 +28,12 @@ require (
 	filippo.io/edwards25519 v1.0.0-rc.1 // indirect
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
 	github.com/cloudfoundry/sonde-go v0.0.0-20220627221915-ff36de9c3435 // indirect
-	github.com/go-logr/logr v1.4.2 // indirect
+	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20250501235452-c0086092b71a // indirect
+	github.com/google/pprof v0.0.0-20250602020802-c6617b811d0e // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
