@@ -14,7 +14,7 @@ require (
 	github.com/cloudfoundry/dropsonde v1.1.0
 	github.com/lib/pq v1.10.9
 	github.com/onsi/ginkgo/v2 v2.23.4
-	github.com/onsi/gomega v1.37.0
+	github.com/onsi/gomega v1.38.0
 	github.com/tedsuo/ifrit v0.0.0-20230516164442-7862c310ad26
 )
 
@@ -51,6 +51,6 @@ require (
 	golang.org/x/tools v0.35.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415180920-8c6c420018be // indirect
 	google.golang.org/grpc v1.63.2 // indirect
-	google.golang.org/protobuf v1.36.5 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
