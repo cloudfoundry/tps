@@ -6,14 +6,14 @@ require (
 	code.cloudfoundry.org/bbs v0.0.0-20231204223625-b4a8e8d97ad9
 	code.cloudfoundry.org/clock v1.43.0
 	code.cloudfoundry.org/debugserver v0.62.0
-	code.cloudfoundry.org/lager/v3 v3.43.0
+	code.cloudfoundry.org/lager/v3 v3.44.0
 	code.cloudfoundry.org/localip v0.45.0
 	code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2
 	code.cloudfoundry.org/runtimeschema v0.0.0-20231214123546-c95bb31afd3e
 	code.cloudfoundry.org/workpool v0.0.0-20230406174608-2e26d5d93731
 	github.com/cloudfoundry/dropsonde v1.1.0
 	github.com/lib/pq v1.10.9
-	github.com/onsi/ginkgo/v2 v2.23.4
+	github.com/onsi/ginkgo/v2 v2.24.0
 	github.com/onsi/gomega v1.38.0
 	github.com/tedsuo/ifrit v0.0.0-20230516164442-7862c310ad26
 )
@@ -26,6 +26,7 @@ require (
 	code.cloudfoundry.org/go-loggregator/v8 v8.0.5 // indirect
 	code.cloudfoundry.org/tlsconfig v0.0.0-20230320190829-8f91c367795b // indirect
 	filippo.io/edwards25519 v1.0.0-rc.1 // indirect
+	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
 	github.com/cloudfoundry/sonde-go v0.0.0-20220627221915-ff36de9c3435 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
