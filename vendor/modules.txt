@@ -12,7 +12,7 @@ code.cloudfoundry.org/bbs/trace
 # code.cloudfoundry.org/cfhttp/v2 v2.0.1-0.20210513172332-4c5ee488a657
 ## explicit
 code.cloudfoundry.org/cfhttp/v2
-# code.cloudfoundry.org/clock v1.45.0
+# code.cloudfoundry.org/clock v1.46.0
 ## explicit; go 1.24.0
 code.cloudfoundry.org/clock
 # code.cloudfoundry.org/debugserver v0.64.0
@@ -111,7 +111,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20250820193118-f64d9cf942d6
+# github.com/google/pprof v0.0.0-20250830080959-101d87ff5bc3
 ## explicit; go 1.24.0
 github.com/google/pprof/profile
 # github.com/josharian/intern v1.0.0
@@ -131,7 +131,7 @@ github.com/mailru/easyjson/jwriter
 # github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 ## explicit
 github.com/nu7hatch/gouuid
-# github.com/onsi/ginkgo/v2 v2.25.1
+# github.com/onsi/ginkgo/v2 v2.25.2
 ## explicit; go 1.23.0
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
