@@ -7,7 +7,7 @@ require (
 	code.cloudfoundry.org/clock v1.46.0
 	code.cloudfoundry.org/debugserver v0.65.0
 	code.cloudfoundry.org/lager/v3 v3.46.0
-	code.cloudfoundry.org/localip v0.48.0
+	code.cloudfoundry.org/localip v0.49.0
 	code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2
 	code.cloudfoundry.org/runtimeschema v0.0.0-20231214123546-c95bb31afd3e
 	code.cloudfoundry.org/workpool v0.0.0-20230406174608-2e26d5d93731
@@ -34,7 +34,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20250830080959-101d87ff5bc3 // indirect
+	github.com/google/pprof v0.0.0-20250903194437-c28834ac2320 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
@@ -48,8 +48,8 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.41.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/sys v0.35.0 // indirect
-	golang.org/x/text v0.28.0 // indirect
+	golang.org/x/sys v0.36.0 // indirect
+	golang.org/x/text v0.29.0 // indirect
 	golang.org/x/tools v0.36.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415180920-8c6c420018be // indirect
 	google.golang.org/grpc v1.63.2 // indirect
