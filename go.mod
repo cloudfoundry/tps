@@ -6,7 +6,7 @@ require (
 	code.cloudfoundry.org/bbs v0.0.0-20231204223625-b4a8e8d97ad9
 	code.cloudfoundry.org/clock v1.52.0
 	code.cloudfoundry.org/debugserver v0.71.0
-	code.cloudfoundry.org/lager/v3 v3.51.0
+	code.cloudfoundry.org/lager/v3 v3.52.0
 	code.cloudfoundry.org/localip v0.54.0
 	code.cloudfoundry.org/locket v0.0.0-20230406154009-5e8522d975d2
 	code.cloudfoundry.org/runtimeschema v0.0.0-20231214123546-c95bb31afd3e
