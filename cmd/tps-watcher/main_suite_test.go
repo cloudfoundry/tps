@@ -1,10 +1,10 @@
 package main_test
 
 import (
-	"encoding/json"
-
+	"code.cloudfoundry.org/diego-logging-client/testhelpers"
 	"code.cloudfoundry.org/lager/v3/lagertest"
 	"code.cloudfoundry.org/tps/cmd/tpsrunner"
+	"encoding/json"
 	_ "github.com/lib/pq"
 	"github.com/tedsuo/ifrit"
 	ginkgomon "github.com/tedsuo/ifrit/ginkgomon_v2"
@@ -31,6 +31,8 @@ var (
 	fakeCC  *ghttp.Server
 	fakeBBS *ghttp.Server
 	logger  *lagertest.TestLogger
+
+	testIngressServer *testhelpers.TestIngressServer
 )
 
 func TestTPS(t *testing.T) {
@@ -72,6 +74,11 @@ var _ = BeforeEach(func() {
 	watcherConfig.CCCACert = "../../fixtures/watcher_cc_ca.crt"
 
 	disableStartCheck = false
+
+	var err error
+	testIngressServer, err = testhelpers.NewTestIngressServer(watcherConfig.CCClientCert, watcherConfig.CCClientKey, watcherConfig.CCCACert)
+	Expect(err).NotTo(HaveOccurred())
+	testIngressServer.Start()
 })
 
 var _ = JustBeforeEach(func() {
@@ -86,6 +93,7 @@ var _ = JustBeforeEach(func() {
 var _ = AfterEach(func() {
 	fakeCC.Close()
 	fakeBBS.Close()
+	testIngressServer.Stop()
 })
 
 var _ = SynchronizedAfterSuite(func() {

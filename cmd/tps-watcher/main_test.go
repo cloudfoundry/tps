@@ -1,14 +1,6 @@
 package main_test
 
 import (
-	"database/sql"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"time"
-
 	"code.cloudfoundry.org/bbs/events"
 	"code.cloudfoundry.org/bbs/models"
 	"code.cloudfoundry.org/clock"
@@ -19,12 +11,19 @@ import (
 	"code.cloudfoundry.org/locket/lock"
 	locketmodels "code.cloudfoundry.org/locket/models"
 	"code.cloudfoundry.org/runtimeschema/cc_messages"
+	"database/sql"
+	"encoding/json"
+	"fmt"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
 	"github.com/tedsuo/ifrit"
 	ginkgomon "github.com/tedsuo/ifrit/ginkgomon_v2"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"time"
 )
 
 const watcherLockName = "tps_watcher_lock"
@@ -59,6 +58,10 @@ var _ = Describe("TPS", func() {
 			cfg.DatabaseConnectionString = connectionString + "/" + dbName
 			cfg.DatabaseDriver = "postgres"
 			cfg.ListenAddress = locketAddress
+			cfg.LoggregatorConfig.APIPort, _ = testIngressServer.Port()
+			cfg.LoggregatorConfig.CACertPath = watcherConfig.CCCACert
+			cfg.LoggregatorConfig.CertPath = watcherConfig.CCClientCert
+			cfg.LoggregatorConfig.KeyPath = watcherConfig.CCClientKey
 		})
 		locketProcess = ginkgomon.Invoke(locketRunner)
 

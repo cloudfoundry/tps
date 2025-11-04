@@ -3,7 +3,6 @@ package testrunner
 import (
 	"crypto/tls"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"time"
@@ -23,7 +22,7 @@ var (
 )
 
 func init() {
-	certDepot, err := ioutil.TempDir("", "cert-depot")
+	certDepot, err := os.MkdirTemp("", "cert-depot")
 	if err != nil {
 		panic(err)
 	}
@@ -56,7 +55,7 @@ func NewLocketRunner(locketBinPath string, fs ...func(cfg *config.LocketConfig))
 		f(cfg)
 	}
 
-	locketConfig, err := ioutil.TempFile("", "locket-config")
+	locketConfig, err := os.CreateTemp("", "locket-config")
 	Expect(err).NotTo(HaveOccurred())
 
 	locketConfigFilePath := locketConfig.Name()
@@ -72,7 +71,8 @@ func NewLocketRunner(locketBinPath string, fs ...func(cfg *config.LocketConfig))
 		StartCheckTimeout: 10 * time.Second,
 		Command:           exec.Command(locketBinPath, "-config="+locketConfigFilePath),
 		Cleanup: func() {
-			os.RemoveAll(locketConfigFilePath)
+			err := os.RemoveAll(locketConfigFilePath)
+			Expect(err).NotTo(HaveOccurred())
 		},
 	})
 }

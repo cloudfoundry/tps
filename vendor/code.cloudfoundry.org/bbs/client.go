@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"mime"
 	"net"
 	"net/http"
@@ -140,16 +140,19 @@ type ExternalActualLRPClient interface {
 	// Returns all ActualLRPs matching the given ActualLRPFilter
 	ActualLRPs(lager.Logger, string, models.ActualLRPFilter) ([]*models.ActualLRP, error)
 
-	// DEPRECATED
 	// Returns all ActualLRPGroups matching the given ActualLRPFilter
+	//lint:ignore SA1019 - deprecated function returning deprecated data
+	// Deprecated: use ActualLRPs instead
 	ActualLRPGroups(lager.Logger, string, models.ActualLRPFilter) ([]*models.ActualLRPGroup, error)
 
-	// DEPRECATED
 	// Returns all ActualLRPGroups that have the given process guid
+	//lint:ignore SA1019 - deprecated function returning deprecated data
+	// Deprecated: use ActualLRPs instead
 	ActualLRPGroupsByProcessGuid(logger lager.Logger, traceID string, processGuid string) ([]*models.ActualLRPGroup, error)
 
-	// DEPRECATED
 	// Returns the ActualLRPGroup with the given process guid and instance index
+	//lint:ignore SA1019 - deprecated function returning deprecated data
+	// Deprecated: use ActualLRPs instead
 	ActualLRPGroupByProcessGuidAndIndex(logger lager.Logger, traceID string, processGuid string, index int) (*models.ActualLRPGroup, error)
 
 	// Shuts down the ActualLRP matching the given ActualLRPKey, but does not modify the desired state
@@ -169,6 +172,9 @@ type ExternalDesiredLRPClient interface {
 	// Returns all DesiredLRPSchedulingInfos that match the given DesiredLRPFilter
 	DesiredLRPSchedulingInfos(lager.Logger, string, models.DesiredLRPFilter) ([]*models.DesiredLRPSchedulingInfo, error)
 
+	//Returns the DesiredLRPSchedulingInfo that matches the given process guid
+	DesiredLRPSchedulingInfoByProcessGuid(logger lager.Logger, traceID string, processGuid string) (*models.DesiredLRPSchedulingInfo, error)
+
 	// Returns all DesiredLRPRoutingInfos that match the given DesiredLRPFilter
 	DesiredLRPRoutingInfos(lager.Logger, string, models.DesiredLRPFilter) ([]*models.DesiredLRP, error)
 
@@ -186,13 +192,13 @@ type ExternalDesiredLRPClient interface {
 The ExternalEventClient is used to subscribe to groups of Events.
 */
 type ExternalEventClient interface {
-	// DEPRECATED
+	// Deprecated: use SubscribeToInstanceEvents instead
 	SubscribeToEvents(logger lager.Logger) (events.EventSource, error)
 
 	SubscribeToInstanceEvents(logger lager.Logger) (events.EventSource, error)
 	SubscribeToTaskEvents(logger lager.Logger) (events.EventSource, error)
 
-	// DEPRECATED
+	// Deprecated: use SubscribeToInstanceEventsByCellID instead
 	SubscribeToEventsByCellID(logger lager.Logger, cellId string) (events.EventSource, error)
 
 	SubscribeToInstanceEventsByCellID(logger lager.Logger, cellId string) (events.EventSource, error)
@@ -368,7 +374,7 @@ func (c *client) ActualLRPs(logger lager.Logger, traceID string, filter models.A
 	return response.ActualLrps, response.Error.ToError()
 }
 
-// DEPRECATED
+// Deprecated: use ActualLRPs instead
 func (c *client) ActualLRPGroups(logger lager.Logger, traceID string, filter models.ActualLRPFilter) ([]*models.ActualLRPGroup, error) {
 	request := models.ActualLRPGroupsRequest{
 		Domain: filter.Domain,
@@ -383,7 +389,7 @@ func (c *client) ActualLRPGroups(logger lager.Logger, traceID string, filter mod
 	return response.ActualLrpGroups, response.Error.ToError()
 }
 
-// DEPRECATED
+// Deprecated: use ActaulLRPs instead
 func (c *client) ActualLRPGroupsByProcessGuid(logger lager.Logger, traceID string, processGuid string) ([]*models.ActualLRPGroup, error) {
 	request := models.ActualLRPGroupsByProcessGuidRequest{
 		ProcessGuid: processGuid,
@@ -397,7 +403,7 @@ func (c *client) ActualLRPGroupsByProcessGuid(logger lager.Logger, traceID strin
 	return response.ActualLrpGroups, response.Error.ToError()
 }
 
-// DEPRECATED
+// Deprecated: use ActaulLRPs instead
 func (c *client) ActualLRPGroupByProcessGuidAndIndex(logger lager.Logger, traceID string, processGuid string, index int) (*models.ActualLRPGroup, error) {
 	request := models.ActualLRPGroupByProcessGuidAndIndexRequest{
 		ProcessGuid: processGuid,
@@ -587,10 +593,7 @@ func (c *client) RemoveEvacuatingActualLRP(logger lager.Logger, traceID string, 
 }
 
 func (c *client) DesiredLRPs(logger lager.Logger, traceID string, filter models.DesiredLRPFilter) ([]*models.DesiredLRP, error) {
-	request := models.DesiredLRPsRequest{
-		Domain:       filter.Domain,
-		ProcessGuids: filter.ProcessGuids,
-	}
+	request := models.DesiredLRPsRequest(filter)
 	response := models.DesiredLRPsResponse{}
 	err := c.doRequest(logger, traceID, DesiredLRPsRoute_r3, nil, nil, &request, &response)
 	if err != nil {
@@ -614,10 +617,7 @@ func (c *client) DesiredLRPByProcessGuid(logger lager.Logger, traceID string, pr
 }
 
 func (c *client) DesiredLRPSchedulingInfos(logger lager.Logger, traceID string, filter models.DesiredLRPFilter) ([]*models.DesiredLRPSchedulingInfo, error) {
-	request := models.DesiredLRPsRequest{
-		Domain:       filter.Domain,
-		ProcessGuids: filter.ProcessGuids,
-	}
+	request := models.DesiredLRPsRequest(filter)
 	response := models.DesiredLRPSchedulingInfosResponse{}
 	err := c.doRequest(logger, traceID, DesiredLRPSchedulingInfosRoute_r0, nil, nil, &request, &response)
 	if err != nil {
@@ -627,10 +627,21 @@ func (c *client) DesiredLRPSchedulingInfos(logger lager.Logger, traceID string, 
 	return response.DesiredLrpSchedulingInfos, response.Error.ToError()
 }
 
-func (c *client) DesiredLRPRoutingInfos(logger lager.Logger, traceID string, filter models.DesiredLRPFilter) ([]*models.DesiredLRP, error) {
-	request := models.DesiredLRPsRequest{
-		ProcessGuids: filter.ProcessGuids,
+func (c *client) DesiredLRPSchedulingInfoByProcessGuid(logger lager.Logger, traceID string, processGuid string) (*models.DesiredLRPSchedulingInfo, error) {
+	request := models.DesiredLRPByProcessGuidRequest{
+		ProcessGuid: processGuid,
 	}
+	response := models.DesiredLRPSchedulingInfoByProcessGuidResponse{}
+	err := c.doRequest(logger, traceID, DesiredLRPSchedulingInfoByProcessGuid_r0, nil, nil, &request, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.DesiredLrpSchedulingInfo, response.Error.ToError()
+}
+
+func (c *client) DesiredLRPRoutingInfos(logger lager.Logger, traceID string, filter models.DesiredLRPFilter) ([]*models.DesiredLRP, error) {
+	request := models.DesiredLRPsRequest(filter)
 	response := models.DesiredLRPsResponse{}
 	err := c.doRequest(logger, traceID, DesiredLRPRoutingInfosRoute_r0, nil, nil, &request, &response)
 	if err != nil {
@@ -790,6 +801,7 @@ func (c *client) DeleteTask(logger lager.Logger, traceID string, taskGuid string
 	return c.doTaskLifecycleRequest(logger, traceID, route, &request)
 }
 
+// Deprecated: use CancelTask instead
 func (c *client) FailTask(logger lager.Logger, traceID string, taskGuid string, failureReason string) error {
 	request := models.FailTaskRequest{
 		TaskGuid:      taskGuid,
@@ -853,7 +865,7 @@ func (c *client) subscribeToEvents(route string, cellId string) (events.EventSou
 	return events.NewEventSource(eventSource), nil
 }
 
-// DEPRECATED
+// Deprecated: use SubscribeToInstanceEvents instead
 func (c *client) SubscribeToEvents(logger lager.Logger) (events.EventSource, error) {
 	return c.subscribeToEvents(LRPGroupEventStreamRoute_r1, "")
 }
@@ -866,7 +878,7 @@ func (c *client) SubscribeToTaskEvents(logger lager.Logger) (events.EventSource,
 	return c.subscribeToEvents(TaskEventStreamRoute_r1, "")
 }
 
-// DEPRECATED
+// Deprecated: use SubscribeToInstanceEventsByCellID instead
 func (c *client) SubscribeToEventsByCellID(logger lager.Logger, cellId string) (events.EventSource, error) {
 	return c.subscribeToEvents(LRPGroupEventStreamRoute_r1, cellId)
 }
@@ -982,7 +994,7 @@ func handleProtoResponse(response *http.Response, responseObject proto.Message) 
 		return models.NewError(models.Error_InvalidRequest, "responseObject cannot be nil")
 	}
 
-	buf, err := ioutil.ReadAll(response.Body)
+	buf, err := io.ReadAll(response.Body)
 	if err != nil {
 		return models.NewError(models.Error_InvalidResponse, fmt.Sprint("failed to read body: ", err.Error()))
 	}

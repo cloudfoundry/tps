@@ -52,12 +52,19 @@ func (request ActualLRPsRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(internalRequest)
 }
 
-// DEPRECATED
+func (request *ActualLRPsByProcessGuidsRequest) Validate() error {
+	if len(request.ProcessGuids) == 0 {
+		return NewError(Error_InvalidRequest, "process_guids must not be empty")
+	}
+	return nil
+}
+
+// Deprecated: use the ActualLRPInstances API instead
 func (request *ActualLRPGroupsRequest) Validate() error {
 	return nil
 }
 
-// DEPRECATED
+// Deprecated: use the ActualLRPInstances API instead
 func (request *ActualLRPGroupsByProcessGuidRequest) Validate() error {
 	var validationError ValidationError
 
@@ -72,7 +79,7 @@ func (request *ActualLRPGroupsByProcessGuidRequest) Validate() error {
 	return nil
 }
 
-// DEPRECATED
+// Deprecated: use the ActualLRPInstances API instead
 func (request *ActualLRPGroupByProcessGuidAndIndexRequest) Validate() error {
 	var validationError ValidationError
 
