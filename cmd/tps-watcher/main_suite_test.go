@@ -76,10 +76,10 @@ var _ = BeforeEach(func() {
 	disableStartCheck = false
 
 	var err error
-	metronCAFile = "../../fixtures/metron_client.crt"
-	metronServerCertFile = "../../fixtures/metron_client.key"
-	metronServerKeyFile = "../../fixtures/metron_ca.crt"
-	testIngressServer, err = testhelpers.NewTestIngressServer(metronServerCertFile, metronServerKeyFile, metronCAFile)
+	metronCAFile = "../../fixtures/metron_ca.crt"
+	metronServerCertFile = "../../fixtures/metron_client.crt"
+	metronServerKeyFile = "../../fixtures/metron_client.key"
+	testIngressServer, _ = testhelpers.NewTestIngressServer(metronServerCertFile, metronServerKeyFile, metronCAFile)
 	Expect(err).NotTo(HaveOccurred())
 	_ = testIngressServer.Start()
 })
