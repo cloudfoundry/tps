@@ -59,9 +59,9 @@ var _ = Describe("TPS", func() {
 			cfg.DatabaseDriver = "postgres"
 			cfg.ListenAddress = locketAddress
 			cfg.LoggregatorConfig.APIPort, _ = testIngressServer.Port()
-			cfg.LoggregatorConfig.CACertPath = watcherConfig.CCCACert
-			cfg.LoggregatorConfig.CertPath = watcherConfig.CCClientCert
-			cfg.LoggregatorConfig.KeyPath = watcherConfig.CCClientKey
+			cfg.LoggregatorConfig.CACertPath = metronCAFile
+			cfg.LoggregatorConfig.CertPath = metronServerCertFile
+			cfg.LoggregatorConfig.KeyPath = metronServerKeyFile
 		})
 		locketProcess = ginkgomon.Invoke(locketRunner)
 

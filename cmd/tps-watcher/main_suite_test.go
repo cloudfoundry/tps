@@ -8,7 +8,6 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/tedsuo/ifrit"
 	ginkgomon "github.com/tedsuo/ifrit/ginkgomon_v2"
-
 	"testing"
 	"time"
 
@@ -32,7 +31,8 @@ var (
 	fakeBBS *ghttp.Server
 	logger  *lagertest.TestLogger
 
-	testIngressServer *testhelpers.TestIngressServer
+	testIngressServer                                       *testhelpers.TestIngressServer
+	metronCAFile, metronServerCertFile, metronServerKeyFile string
 )
 
 func TestTPS(t *testing.T) {
@@ -76,9 +76,12 @@ var _ = BeforeEach(func() {
 	disableStartCheck = false
 
 	var err error
-	testIngressServer, err = testhelpers.NewTestIngressServer(watcherConfig.CCClientCert, watcherConfig.CCClientKey, watcherConfig.CCCACert)
+	metronCAFile = "../../fixtures/metron_client.crt"
+	metronServerCertFile = "../../fixtures/metron_client.key"
+	metronServerKeyFile = "../../fixtures/metron_ca.crt"
+	testIngressServer, err = testhelpers.NewTestIngressServer(metronServerCertFile, metronServerKeyFile, metronCAFile)
 	Expect(err).NotTo(HaveOccurred())
-	testIngressServer.Start()
+	_ = testIngressServer.Start()
 })
 
 var _ = JustBeforeEach(func() {
