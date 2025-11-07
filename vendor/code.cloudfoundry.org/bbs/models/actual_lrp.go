@@ -27,7 +27,7 @@ var ActualLRPStates = []string{
 	ActualLRPStateCrashed,
 }
 
-// DEPRECATED
+// Deprecated: use the ActualLRPInstances API instead
 type ActualLRPChange struct {
 	Before *ActualLRPGroup
 	After  *ActualLRPGroup
@@ -38,6 +38,10 @@ type ActualLRPFilter struct {
 	CellID      string
 	ProcessGuid string
 	Index       *int32
+}
+
+type ActualLRPsByProcessGuidsFilter struct {
+	ProcessGuids []string
 }
 
 func NewActualLRPKey(processGuid string, index int32, domain string) ActualLRPKey {
@@ -100,6 +104,7 @@ func NewPortMappingWithTLSProxy(hostPort, containerPort, tlsHost, tlsContainer u
 func (key ActualLRPInstanceKey) Empty() bool {
 	return key.InstanceGuid == "" && key.CellId == ""
 }
+
 func (a *ActualLRP) Copy() *ActualLRP {
 	newActualLRP := *a
 	return &newActualLRP
@@ -202,21 +207,21 @@ func (d ActualLRP_Presence) MarshalJSON() ([]byte, error) {
 	return json.Marshal(d.String())
 }
 
-// DEPRECATED
+// Deprecated: use the ActualLRPInstances API instead
 func NewRunningActualLRPGroup(actualLRP *ActualLRP) *ActualLRPGroup {
 	return &ActualLRPGroup{
 		Instance: actualLRP,
 	}
 }
 
-// DEPRECATED
+// Deprecated: use the ActualLRPInstances API instead
 func NewEvacuatingActualLRPGroup(actualLRP *ActualLRP) *ActualLRPGroup {
 	return &ActualLRPGroup{
 		Evacuating: actualLRP,
 	}
 }
 
-// DEPRECATED
+// Deprecated: use the ActualLRPInstances API instead
 func (group ActualLRPGroup) Resolve() (*ActualLRP, bool, error) {
 	switch {
 	case group.Instance == nil && group.Evacuating == nil:
@@ -314,7 +319,7 @@ func (actual *ActualLRP) ToActualLRPInfo() *ActualLRPInfo {
 	return &info
 }
 
-// DEPRECATED
+// Deprecated: use the ActualLRPInstances API instead
 func (actual *ActualLRP) ToActualLRPGroup() *ActualLRPGroup {
 	if actual == nil {
 		return nil
@@ -476,11 +481,11 @@ func hasHigherPriority(lrp1, lrp2 *ActualLRP) bool {
 	return false
 }
 
-// DEPRECATED
 // ResolveActualLRPGroups convert the given set of lrp instances into
 // ActualLRPGroup.  This conversion is lossy.  A suspect LRP is given
 // precendence over an Ordinary instance if it is Running.  Otherwise, the
 // Ordinary instance is returned in the Instance field of the ActualLRPGroup.
+// Deprecated: use the ActualLRPInstances API instead
 func ResolveActualLRPGroups(lrps []*ActualLRP) []*ActualLRPGroup {
 	mapOfGroups := map[ActualLRPKey]*ActualLRPGroup{}
 	result := []*ActualLRPGroup{}
@@ -503,11 +508,11 @@ func ResolveActualLRPGroups(lrps []*ActualLRP) []*ActualLRPGroup {
 	return result
 }
 
-// DEPRECATED
 // ResolveToActualLRPGroup calls ResolveActualLRPGroups and return the first
 // LRP group.  It panics if there are more than one group.  If there no LRP
 // groups were returned by ResolveActualLRPGroups, then an empty ActualLRPGroup
 // is returned.
+// Deprecated: use the ActualLRPInstances API instead
 func ResolveActualLRPGroup(lrps []*ActualLRP) *ActualLRPGroup {
 	actualLRPGroups := ResolveActualLRPGroups(lrps)
 	switch len(actualLRPGroups) {

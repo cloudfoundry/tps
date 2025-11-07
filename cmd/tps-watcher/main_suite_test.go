@@ -1,14 +1,13 @@
 package main_test
 
 import (
-	"encoding/json"
-
+	"code.cloudfoundry.org/diego-logging-client/testhelpers"
 	"code.cloudfoundry.org/lager/v3/lagertest"
 	"code.cloudfoundry.org/tps/cmd/tpsrunner"
+	"encoding/json"
 	_ "github.com/lib/pq"
 	"github.com/tedsuo/ifrit"
 	ginkgomon "github.com/tedsuo/ifrit/ginkgomon_v2"
-
 	"testing"
 	"time"
 
@@ -31,6 +30,9 @@ var (
 	fakeCC  *ghttp.Server
 	fakeBBS *ghttp.Server
 	logger  *lagertest.TestLogger
+
+	testIngressServer                                       *testhelpers.TestIngressServer
+	metronCAFile, metronServerCertFile, metronServerKeyFile string
 )
 
 func TestTPS(t *testing.T) {
@@ -72,6 +74,14 @@ var _ = BeforeEach(func() {
 	watcherConfig.CCCACert = "../../fixtures/watcher_cc_ca.crt"
 
 	disableStartCheck = false
+
+	var err error
+	metronCAFile = "../../fixtures/metron_ca.crt"
+	metronServerCertFile = "../../fixtures/metron_client.crt"
+	metronServerKeyFile = "../../fixtures/metron_client.key"
+	testIngressServer, _ = testhelpers.NewTestIngressServer(metronServerCertFile, metronServerKeyFile, metronCAFile)
+	Expect(err).NotTo(HaveOccurred())
+	_ = testIngressServer.Start()
 })
 
 var _ = JustBeforeEach(func() {
@@ -86,6 +96,7 @@ var _ = JustBeforeEach(func() {
 var _ = AfterEach(func() {
 	fakeCC.Close()
 	fakeBBS.Close()
+	testIngressServer.Stop()
 })
 
 var _ = SynchronizedAfterSuite(func() {

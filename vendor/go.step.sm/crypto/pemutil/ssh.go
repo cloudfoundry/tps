@@ -10,7 +10,6 @@ import (
 	"crypto/cipher"
 	"crypto/ecdsa"
 	"crypto/ed25519"
-	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
 	"encoding/binary"
@@ -143,7 +142,7 @@ func SerializeOpenSSHPrivateKey(key crypto.PrivateKey, opts ...Options) (*pem.Bl
 
 	switch k := key.(type) {
 	case *rsa.PrivateKey:
-		E := new(big.Int).SetInt64(int64(k.PublicKey.E))
+		e := new(big.Int).SetInt64(int64(k.PublicKey.E))
 		// Marshal public key:
 		// E and N are in reversed order in the public and private key.
 		pubKey := struct {
@@ -152,7 +151,7 @@ func SerializeOpenSSHPrivateKey(key crypto.PrivateKey, opts ...Options) (*pem.Bl
 			N       *big.Int
 		}{
 			ssh.KeyAlgoRSA,
-			E, k.PublicKey.N,
+			e, k.PublicKey.N,
 		}
 		w.PubKey = ssh.Marshal(pubKey)
 
@@ -166,7 +165,7 @@ func SerializeOpenSSHPrivateKey(key crypto.PrivateKey, opts ...Options) (*pem.Bl
 			Q       *big.Int
 			Comment string
 		}{
-			k.PublicKey.N, E,
+			k.PublicKey.N, e,
 			k.D, k.Precomputed.Qinv, k.Primes[0], k.Primes[1],
 			ctx.comment,
 		}
@@ -188,7 +187,10 @@ func SerializeOpenSSHPrivateKey(key crypto.PrivateKey, opts ...Options) (*pem.Bl
 			return nil, errors.Errorf("error serializing key: unsupported curve %s", k.Curve.Params().Name)
 		}
 
-		pub := elliptic.Marshal(k.Curve, k.PublicKey.X, k.PublicKey.Y)
+		p, err := k.PublicKey.ECDH()
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed converting *ecdsa.PublicKey to *ecdh.PublicKey")
+		}
 
 		// Marshal public key.
 		pubKey := struct {
@@ -196,7 +198,7 @@ func SerializeOpenSSHPrivateKey(key crypto.PrivateKey, opts ...Options) (*pem.Bl
 			Curve   string
 			Pub     []byte
 		}{
-			keyType, curve, pub,
+			keyType, curve, p.Bytes(),
 		}
 		w.PubKey = ssh.Marshal(pubKey)
 
@@ -207,7 +209,7 @@ func SerializeOpenSSHPrivateKey(key crypto.PrivateKey, opts ...Options) (*pem.Bl
 			D       *big.Int
 			Comment string
 		}{
-			curve, pub, k.D,
+			curve, p.Bytes(), k.D,
 			ctx.comment,
 		}
 		pk1.Keytype = keyType
