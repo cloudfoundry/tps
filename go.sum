@@ -596,8 +596,8 @@ code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1 h1:I8GHH9o33/lZm2lq
 code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1/go.mod h1:XKlGVVXFi5EcHHMPzw3xgONK9PeEZuUbIC43XNwxD10=
 code.cloudfoundry.org/cfhttp/v2 v2.0.1-0.20210513172332-4c5ee488a657 h1:8rnhkeAe8Bnx+8r3unO++S3syBw8P22qPbw3LLFWEoc=
 code.cloudfoundry.org/cfhttp/v2 v2.0.1-0.20210513172332-4c5ee488a657/go.mod h1:Fwt0o/haXfwgOHMom4AM96pXCVw9EAiIcSsPb8hWK9s=
-code.cloudfoundry.org/clock v1.53.0 h1:yi/3Xhx52CnhVyx/QuL9HePkf1r8F0CJyiF0L5MNs8I=
-code.cloudfoundry.org/clock v1.53.0/go.mod h1:vHQaOs9mJVUXHYyGXlLzB8df8wtdW+8CJ/hBN88+geE=
+code.cloudfoundry.org/clock v1.54.0 h1:kTVz/kOC5xa24pDorN3skVgtnIbej1RjOA7SF7GywaA=
+code.cloudfoundry.org/clock v1.54.0/go.mod h1:2CHJsQ3akPesKt+RCmG5OuvbySINyWrApBhggl8oKdg=
 code.cloudfoundry.org/debugserver v0.75.0 h1:a0x9IGO8f2do/lWilkkxFt+vYUJWe/yH7Klvh7b7M/Q=
 code.cloudfoundry.org/debugserver v0.75.0/go.mod h1:jEzd9nBQGTHaNY5aFBcYu1aVIfZnR2fO7plecGrT4k0=
 code.cloudfoundry.org/diego-logging-client v0.78.0 h1:wdbDTo82vp4BPqv1DPvL1+4qd0W9yPXeMcTTo8sNgNY=
