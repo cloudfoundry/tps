@@ -6,7 +6,7 @@ require (
 	code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1
 	code.cloudfoundry.org/clock v1.54.0
 	code.cloudfoundry.org/debugserver v0.75.0
-	code.cloudfoundry.org/diego-logging-client v0.78.0
+	code.cloudfoundry.org/diego-logging-client v0.79.0
 	code.cloudfoundry.org/lager/v3 v3.54.0
 	code.cloudfoundry.org/localip v0.56.0
 	code.cloudfoundry.org/locket v0.0.0-20251028190928-8f3817b47d6f
@@ -22,9 +22,9 @@ require (
 require (
 	code.cloudfoundry.org/cfhttp/v2 v2.0.1-0.20210513172332-4c5ee488a657 // indirect
 	code.cloudfoundry.org/durationjson v0.0.0-20200131001738-04c274cd71ed // indirect
-	code.cloudfoundry.org/go-diodes v0.0.0-20251027221130-fc49a49e17eb // indirect
+	code.cloudfoundry.org/go-diodes v0.0.0-20251110090230-86c716268a29 // indirect
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1 // indirect
-	code.cloudfoundry.org/tlsconfig v0.37.0 // indirect
+	code.cloudfoundry.org/tlsconfig v0.38.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
@@ -45,7 +45,7 @@ require (
 	github.com/square/certstrap v1.3.0 // indirect
 	github.com/tedsuo/rata v1.0.0 // indirect
 	github.com/vito/go-sse v1.0.0 // indirect
-	go.step.sm/crypto v0.72.0 // indirect
+	go.step.sm/crypto v0.73.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.43.0 // indirect
 	golang.org/x/mod v0.29.0 // indirect
@@ -54,7 +54,7 @@ require (
 	golang.org/x/sys v0.38.0 // indirect
 	golang.org/x/text v0.30.0 // indirect
 	golang.org/x/tools v0.38.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251103181224-f26f9409b101 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251110190251-83f479183930 // indirect
 	google.golang.org/grpc v1.76.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 )
