@@ -8,7 +8,7 @@ require (
 	code.cloudfoundry.org/debugserver v0.74.0
 	code.cloudfoundry.org/diego-logging-client v0.78.0
 	code.cloudfoundry.org/lager/v3 v3.53.0
-	code.cloudfoundry.org/localip v0.55.0
+	code.cloudfoundry.org/localip v0.56.0
 	code.cloudfoundry.org/locket v0.0.0-20251028190928-8f3817b47d6f
 	code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf
 	code.cloudfoundry.org/workpool v0.0.0-20250911194158-1489753f182e
@@ -50,8 +50,8 @@ require (
 	golang.org/x/crypto v0.43.0 // indirect
 	golang.org/x/mod v0.29.0 // indirect
 	golang.org/x/net v0.46.0 // indirect
-	golang.org/x/sync v0.17.0 // indirect
-	golang.org/x/sys v0.37.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
 	golang.org/x/text v0.30.0 // indirect
 	golang.org/x/tools v0.38.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251103181224-f26f9409b101 // indirect
