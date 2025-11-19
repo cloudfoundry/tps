@@ -610,8 +610,8 @@ code.cloudfoundry.org/go-loggregator/v9 v9.2.1 h1:S6Lgg5UJbhh2bt2TGQxs6R00CF8PrU
 code.cloudfoundry.org/go-loggregator/v9 v9.2.1/go.mod h1:FTFFruqGeOhVCDFvyLgl8EV8YW63NNwRzLhxJcporu8=
 code.cloudfoundry.org/lager/v3 v3.55.0 h1:viHGEjAl6drHqOppRXU+ZpZZUjikO5o/tI4mY//WpQg=
 code.cloudfoundry.org/lager/v3 v3.55.0/go.mod h1:1mXk1+RPluzvyusvJkrZE3KtKzmDGXoRDnVX33zthZw=
-code.cloudfoundry.org/localip v0.56.0 h1:JWQHEUaHZfgqS3NYTiJqzDnA5BgnW2qdnfio+k1Pxog=
-code.cloudfoundry.org/localip v0.56.0/go.mod h1:w1cTNf4DMHwiUnVxpDCYB1nAWPTI/AUXvx3KKS1jpjk=
+code.cloudfoundry.org/localip v0.57.0 h1:s1Rdrwfd6nf2wtXTBFliMW0y76FkHQsIrAOh00H+tOI=
+code.cloudfoundry.org/localip v0.57.0/go.mod h1:QPaYtrqC2Rv1gOxQa9Y3zKwvzn85VJM1I4VBhcPw6AU=
 code.cloudfoundry.org/locket v0.0.0-20251028190928-8f3817b47d6f h1:QQJJHVATi00MC4pvBnv0sHWdF9ulDj48uL/4FYIwlNY=
 code.cloudfoundry.org/locket v0.0.0-20251028190928-8f3817b47d6f/go.mod h1:AwHLRkdXtttLXNB8RHgLfErJ2kKafH62AR2OClhy6xI=
 code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf h1:sTpfHaU+tgDeRO/fRnyr91gvf1FaJk3ZNiJHiHq4nko=
