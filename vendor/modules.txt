@@ -18,14 +18,14 @@ code.cloudfoundry.org/clock
 # code.cloudfoundry.org/debugserver v0.76.0
 ## explicit; go 1.24.0
 code.cloudfoundry.org/debugserver
-# code.cloudfoundry.org/diego-logging-client v0.79.0
+# code.cloudfoundry.org/diego-logging-client v0.81.0
 ## explicit; go 1.24.0
 code.cloudfoundry.org/diego-logging-client
 code.cloudfoundry.org/diego-logging-client/testhelpers
 # code.cloudfoundry.org/durationjson v0.0.0-20200131001738-04c274cd71ed
 ## explicit
 code.cloudfoundry.org/durationjson
-# code.cloudfoundry.org/go-diodes v0.0.0-20251110090230-86c716268a29
+# code.cloudfoundry.org/go-diodes v0.0.0-20251124091730-becfb70ab838
 ## explicit; go 1.24.0
 code.cloudfoundry.org/go-diodes
 # code.cloudfoundry.org/go-loggregator/v9 v9.2.1
@@ -53,7 +53,7 @@ code.cloudfoundry.org/locket/models
 # code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf
 ## explicit; go 1.20
 code.cloudfoundry.org/runtimeschema/cc_messages
-# code.cloudfoundry.org/tlsconfig v0.38.0
+# code.cloudfoundry.org/tlsconfig v0.40.0
 ## explicit; go 1.24.0
 code.cloudfoundry.org/tlsconfig
 # code.cloudfoundry.org/workpool v0.0.0-20250911194158-1489753f182e
@@ -196,7 +196,7 @@ github.com/tedsuo/rata
 # github.com/vito/go-sse v1.0.0
 ## explicit; go 1.12
 github.com/vito/go-sse/sse
-# go.step.sm/crypto v0.73.0
+# go.step.sm/crypto v0.74.0
 ## explicit; go 1.24.0
 go.step.sm/crypto/fingerprint
 go.step.sm/crypto/internal/bcrypt_pbkdf
@@ -291,10 +291,10 @@ golang.org/x/tools/internal/stdlib
 golang.org/x/tools/internal/typeparams
 golang.org/x/tools/internal/typesinternal
 golang.org/x/tools/internal/versions
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20251110190251-83f479183930
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20251124214823-79d6a2a48846
 ## explicit; go 1.24.0
 google.golang.org/genproto/googleapis/rpc/status
-# google.golang.org/grpc v1.76.0
+# google.golang.org/grpc v1.77.0
 ## explicit; go 1.24.0
 google.golang.org/grpc
 google.golang.org/grpc/attributes
@@ -305,7 +305,6 @@ google.golang.org/grpc/balancer/endpointsharding
 google.golang.org/grpc/balancer/grpclb/state
 google.golang.org/grpc/balancer/pickfirst
 google.golang.org/grpc/balancer/pickfirst/internal
-google.golang.org/grpc/balancer/pickfirst/pickfirstleaf
 google.golang.org/grpc/balancer/roundrobin
 google.golang.org/grpc/binarylog/grpc_binarylog_v1
 google.golang.org/grpc/channelz
@@ -314,6 +313,7 @@ google.golang.org/grpc/connectivity
 google.golang.org/grpc/credentials
 google.golang.org/grpc/credentials/insecure
 google.golang.org/grpc/encoding
+google.golang.org/grpc/encoding/internal
 google.golang.org/grpc/encoding/proto
 google.golang.org/grpc/experimental/stats
 google.golang.org/grpc/grpclog
