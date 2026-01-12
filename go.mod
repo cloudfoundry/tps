@@ -5,7 +5,7 @@ go 1.24.9
 require (
 	code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1
 	code.cloudfoundry.org/clock v1.56.0
-	code.cloudfoundry.org/debugserver v0.79.0
+	code.cloudfoundry.org/debugserver v0.80.0
 	code.cloudfoundry.org/diego-logging-client v0.85.0
 	code.cloudfoundry.org/lager/v3 v3.56.0
 	code.cloudfoundry.org/localip v0.59.0
