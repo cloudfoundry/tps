@@ -6,7 +6,7 @@ require (
 	code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1
 	code.cloudfoundry.org/clock v1.56.0
 	code.cloudfoundry.org/debugserver v0.80.0
-	code.cloudfoundry.org/diego-logging-client v0.85.0
+	code.cloudfoundry.org/diego-logging-client v0.86.0
 	code.cloudfoundry.org/lager/v3 v3.56.0
 	code.cloudfoundry.org/localip v0.59.0
 	code.cloudfoundry.org/locket v0.0.0-20251028190928-8f3817b47d6f
