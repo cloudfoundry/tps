@@ -18,14 +18,14 @@ code.cloudfoundry.org/clock
 # code.cloudfoundry.org/debugserver v0.81.0
 ## explicit; go 1.24.9
 code.cloudfoundry.org/debugserver
-# code.cloudfoundry.org/diego-logging-client v0.87.0
+# code.cloudfoundry.org/diego-logging-client v0.88.0
 ## explicit; go 1.24.9
 code.cloudfoundry.org/diego-logging-client
 code.cloudfoundry.org/diego-logging-client/testhelpers
 # code.cloudfoundry.org/durationjson v0.0.0-20200131001738-04c274cd71ed
 ## explicit
 code.cloudfoundry.org/durationjson
-# code.cloudfoundry.org/go-diodes v0.0.0-20260112063157-4b000d565325
+# code.cloudfoundry.org/go-diodes v0.0.0-20260119094648-9c5f37160881
 ## explicit; go 1.24.0
 code.cloudfoundry.org/go-diodes
 # code.cloudfoundry.org/go-loggregator/v9 v9.2.1
@@ -53,7 +53,7 @@ code.cloudfoundry.org/locket/models
 # code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf
 ## explicit; go 1.20
 code.cloudfoundry.org/runtimeschema/cc_messages
-# code.cloudfoundry.org/tlsconfig v0.42.0
+# code.cloudfoundry.org/tlsconfig v0.43.0
 ## explicit; go 1.24.0
 code.cloudfoundry.org/tlsconfig
 # code.cloudfoundry.org/workpool v0.0.0-20250911194158-1489753f182e
@@ -291,7 +291,7 @@ golang.org/x/tools/internal/stdlib
 golang.org/x/tools/internal/typeparams
 golang.org/x/tools/internal/typesinternal
 golang.org/x/tools/internal/versions
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20260112192933-99fd39fd28a9
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20260114163908-3f89685c29c3
 ## explicit; go 1.24.0
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.78.0
