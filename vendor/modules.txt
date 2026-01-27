@@ -18,7 +18,7 @@ code.cloudfoundry.org/clock
 # code.cloudfoundry.org/debugserver v0.82.0
 ## explicit; go 1.24.9
 code.cloudfoundry.org/debugserver
-# code.cloudfoundry.org/diego-logging-client v0.88.0
+# code.cloudfoundry.org/diego-logging-client v0.89.0
 ## explicit; go 1.24.9
 code.cloudfoundry.org/diego-logging-client
 code.cloudfoundry.org/diego-logging-client/testhelpers
@@ -291,7 +291,7 @@ golang.org/x/tools/internal/stdlib
 golang.org/x/tools/internal/typeparams
 golang.org/x/tools/internal/typesinternal
 golang.org/x/tools/internal/versions
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20260114163908-3f89685c29c3
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20260126211449-d11affda4bed
 ## explicit; go 1.24.0
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.78.0
