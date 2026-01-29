@@ -13,7 +13,7 @@ require (
 	code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf
 	code.cloudfoundry.org/workpool v0.0.0-20250911194158-1489753f182e
 	github.com/cloudfoundry/dropsonde v1.1.0
-	github.com/lib/pq v1.10.9
+	github.com/lib/pq v1.11.0
 	github.com/onsi/ginkgo/v2 v2.27.5
 	github.com/onsi/gomega v1.39.0
 	github.com/tedsuo/ifrit v0.0.0-20230516164442-7862c310ad26
