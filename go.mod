@@ -1,10 +1,10 @@
 module code.cloudfoundry.org/tps
 
-go 1.25
+go 1.25.0
 
 require (
 	code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1
-	code.cloudfoundry.org/clock v1.61.0
+	code.cloudfoundry.org/clock v1.62.0
 	code.cloudfoundry.org/debugserver v0.87.0
 	code.cloudfoundry.org/diego-logging-client v0.94.0
 	code.cloudfoundry.org/lager/v3 v3.62.0
