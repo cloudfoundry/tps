@@ -1,6 +1,6 @@
 module code.cloudfoundry.org/tps
 
-go 1.25
+go 1.25.0
 
 require (
 	code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1
@@ -8,7 +8,7 @@ require (
 	code.cloudfoundry.org/debugserver v0.87.0
 	code.cloudfoundry.org/diego-logging-client v0.94.0
 	code.cloudfoundry.org/lager/v3 v3.62.0
-	code.cloudfoundry.org/localip v0.64.0
+	code.cloudfoundry.org/localip v0.65.0
 	code.cloudfoundry.org/locket v0.0.0-20251028190928-8f3817b47d6f
 	code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf
 	code.cloudfoundry.org/workpool v0.0.0-20250911194158-1489753f182e
@@ -50,8 +50,8 @@ require (
 	golang.org/x/crypto v0.48.0 // indirect
 	golang.org/x/mod v0.33.0 // indirect
 	golang.org/x/net v0.51.0 // indirect
-	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/tools v0.42.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171 // indirect
