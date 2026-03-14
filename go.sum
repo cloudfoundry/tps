@@ -600,8 +600,8 @@ code.cloudfoundry.org/clock v1.63.0 h1:tBK7Mj9V7i2yu1D51z6/s2lqVsb3zVuCQY+0KgNDy
 code.cloudfoundry.org/clock v1.63.0/go.mod h1:W3x+LKnVUYowJivVSudvWRaDFe4n68cvoIL+yv7WAng=
 code.cloudfoundry.org/debugserver v0.88.0 h1:AU6jvUIj9OWzs1KHQ0hXl6fiTsAh/Dvznlh5QxL61Kg=
 code.cloudfoundry.org/debugserver v0.88.0/go.mod h1:iM+ZPcUvqYvKVjO72L7AGrpcAIeJwYFPO5aBg7NhzgE=
-code.cloudfoundry.org/diego-logging-client v0.94.0 h1:qUkQNB5K2jxr21R8mEDNtM61r/1/bYPYREtgStYVibw=
-code.cloudfoundry.org/diego-logging-client v0.94.0/go.mod h1:VK+O4647WJWPoUALJKsaM7yfx9OjZlZVbsvVGnhACgk=
+code.cloudfoundry.org/diego-logging-client v0.96.0 h1:l5y5m7H2yPLANeFIJsOtn7bllF2oxY/n8A9bzawjXho=
+code.cloudfoundry.org/diego-logging-client v0.96.0/go.mod h1:grnTRkWelcr8a6E8mENAgw7sTMuDsCqS7+Ov5COumg0=
 code.cloudfoundry.org/durationjson v0.0.0-20200131001738-04c274cd71ed h1:hSvlHcyx91CyefH4h8og5Xrz2gK0KSRbqPcvRXXwho8=
 code.cloudfoundry.org/durationjson v0.0.0-20200131001738-04c274cd71ed/go.mod h1:uR0bLsCAMy6IeJVZDs/pD+jKZ2+hBt2hKnX4DzLQs5A=
 code.cloudfoundry.org/go-diodes v0.0.0-20260209061029-a81ffbc46978 h1:uZ6UIz7zl39FMy5GybKzI83zD35c4fvkU8sQEZDH/x8=
@@ -1682,8 +1682,8 @@ google.golang.org/grpc v1.52.3/go.mod h1:pu6fVzoFb+NBYNAvQL08ic+lvB2IojljRYuun5v
 google.golang.org/grpc v1.53.0/go.mod h1:OnIrk0ipVdj4N5d9IUoFUx72/VlD7+jUsHwZgwSMQpw=
 google.golang.org/grpc v1.54.0/go.mod h1:PUSEXI6iWghWaB6lXM4knEgpJNu2qUcKfDtNci3EC2g=
 google.golang.org/grpc v1.55.0/go.mod h1:iYEXKGkEBhg1PjZQvoYEVPTDkHo1/bjTnfwTeGONTY8=
-google.golang.org/grpc v1.79.1 h1:zGhSi45ODB9/p3VAawt9a+O/MULLl9dpizzNNpq7flY=
-google.golang.org/grpc v1.79.1/go.mod h1:KmT0Kjez+0dde/v2j9vzwoAScgEPx/Bw1CYChhHLrHQ=
+google.golang.org/grpc v1.79.2 h1:fRMD94s2tITpyJGtBBn7MkMseNpOZU8ZxgC3MMBaXRU=
+google.golang.org/grpc v1.79.2/go.mod h1:KmT0Kjez+0dde/v2j9vzwoAScgEPx/Bw1CYChhHLrHQ=
 google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0/go.mod h1:6Kw0yEErY5E/yWrBtf03jp27GLLJujG4z/JK95pnjjw=
 google.golang.org/grpc/examples v0.0.0-20230512210959-5dcfb37c0b43/go.mod h1:irORyHPQXotoshbRTZVFvPDcfTfFHL23efQeop+H45M=
 google.golang.org/protobuf v0.0.0-20200109180630-ec00e32a8dfd/go.mod h1:DFci5gLYBciE7Vtevhsrf46CRTquxDuWsQurQQe4oz8=
