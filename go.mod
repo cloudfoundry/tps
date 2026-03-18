@@ -5,7 +5,7 @@ go 1.25
 require (
 	code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1
 	code.cloudfoundry.org/clock v1.63.0
-	code.cloudfoundry.org/debugserver v0.88.0
+	code.cloudfoundry.org/debugserver v0.89.0
 	code.cloudfoundry.org/diego-logging-client v0.96.0
 	code.cloudfoundry.org/lager/v3 v3.63.0
 	code.cloudfoundry.org/localip v0.65.0
@@ -47,13 +47,13 @@ require (
 	github.com/vito/go-sse v1.0.0 // indirect
 	go.step.sm/crypto v0.76.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.48.0 // indirect
-	golang.org/x/mod v0.33.0 // indirect
-	golang.org/x/net v0.51.0 // indirect
+	golang.org/x/crypto v0.49.0 // indirect
+	golang.org/x/mod v0.34.0 // indirect
+	golang.org/x/net v0.52.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.42.0 // indirect
-	golang.org/x/text v0.34.0 // indirect
-	golang.org/x/tools v0.42.0 // indirect
+	golang.org/x/text v0.35.0 // indirect
+	golang.org/x/tools v0.43.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171 // indirect
 	google.golang.org/grpc v1.79.2 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
