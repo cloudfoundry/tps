@@ -5,7 +5,7 @@ go 1.25
 require (
 	code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1
 	code.cloudfoundry.org/clock v1.66.0
-	code.cloudfoundry.org/debugserver v0.92.0
+	code.cloudfoundry.org/debugserver v0.93.0
 	code.cloudfoundry.org/diego-logging-client v0.101.0
 	code.cloudfoundry.org/lager/v3 v3.66.0
 	code.cloudfoundry.org/localip v0.68.0
@@ -16,7 +16,7 @@ require (
 	github.com/lib/pq v1.12.3
 	github.com/onsi/ginkgo/v2 v2.28.1
 	github.com/onsi/gomega v1.39.1
-	github.com/tedsuo/ifrit v0.0.0-20230516164442-7862c310ad26
+	github.com/tedsuo/ifrit v0.0.0-20260418191334-846868129986
 )
 
 require (
