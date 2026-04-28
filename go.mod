@@ -1,10 +1,10 @@
 module code.cloudfoundry.org/tps
 
-go 1.25
+go 1.25.0
 
 require (
 	code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1
-	code.cloudfoundry.org/clock v1.67.0
+	code.cloudfoundry.org/clock v1.68.0
 	code.cloudfoundry.org/debugserver v0.93.0
 	code.cloudfoundry.org/diego-logging-client v0.102.0
 	code.cloudfoundry.org/lager/v3 v3.66.0
@@ -14,7 +14,7 @@ require (
 	code.cloudfoundry.org/workpool v0.0.0-20250911194158-1489753f182e
 	github.com/cloudfoundry/dropsonde v1.1.0
 	github.com/lib/pq v1.12.3
-	github.com/onsi/ginkgo/v2 v2.28.1
+	github.com/onsi/ginkgo/v2 v2.28.2
 	github.com/onsi/gomega v1.39.1
 	github.com/tedsuo/ifrit v0.0.0-20260418191334-846868129986
 )
