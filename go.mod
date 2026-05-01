@@ -6,7 +6,7 @@ require (
 	code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1
 	code.cloudfoundry.org/clock v1.68.0
 	code.cloudfoundry.org/debugserver v0.94.0
-	code.cloudfoundry.org/diego-logging-client v0.102.0
+	code.cloudfoundry.org/diego-logging-client v0.103.0
 	code.cloudfoundry.org/lager/v3 v3.66.0
 	code.cloudfoundry.org/localip v0.69.0
 	code.cloudfoundry.org/locket v0.0.0-20251028190928-8f3817b47d6f
@@ -22,7 +22,7 @@ require (
 require (
 	code.cloudfoundry.org/cfhttp/v2 v2.0.1-0.20210513172332-4c5ee488a657 // indirect
 	code.cloudfoundry.org/durationjson v0.0.0-20200131001738-04c274cd71ed // indirect
-	code.cloudfoundry.org/go-diodes v0.0.0-20260209061029-a81ffbc46978 // indirect
+	code.cloudfoundry.org/go-diodes v0.0.0-20260427153419-57aa1b10ab4c // indirect
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1 // indirect
 	code.cloudfoundry.org/tlsconfig v0.51.0 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
@@ -54,7 +54,7 @@ require (
 	golang.org/x/sys v0.43.0 // indirect
 	golang.org/x/text v0.36.0 // indirect
 	golang.org/x/tools v0.44.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260420184626-e10c466a9529 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260427160629-7cedc36a6bc4 // indirect
 	google.golang.org/grpc v1.80.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
