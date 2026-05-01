@@ -600,12 +600,12 @@ code.cloudfoundry.org/clock v1.68.0 h1:2F2GrEaocbwuRqq/Blj6CLmd3Ml55Q7N3ZWy6N+Qi
 code.cloudfoundry.org/clock v1.68.0/go.mod h1:KLfFF9RlqChL0Af0YIohxG5ly9SNz3HfN+vTM7RTnRg=
 code.cloudfoundry.org/debugserver v0.94.0 h1:a87ZSLQfZspiXuAbDKQbtRX1t2etE4Z0uWgFglSAR4A=
 code.cloudfoundry.org/debugserver v0.94.0/go.mod h1:2KsFae0Pg3HJQ2248uQ1+6vcejL8OH26U/NDFBWxte0=
-code.cloudfoundry.org/diego-logging-client v0.102.0 h1:Pe19CYLleNSQ9q8X0R3ediFj/Ouw5reBuPwgV0OZ22g=
-code.cloudfoundry.org/diego-logging-client v0.102.0/go.mod h1:7pw04/dvCnulpZpLZ6Wo0sU0jSwZq6i8UGkUrLTHdnk=
+code.cloudfoundry.org/diego-logging-client v0.103.0 h1:6/HmvBeK0wDYu/D6I8CRjzNJNYqoxna4Jt3nvtW2jPo=
+code.cloudfoundry.org/diego-logging-client v0.103.0/go.mod h1:606TA09qNbxdQRs0sGHLu1rTQWqaHvxbfmCmodR92LU=
 code.cloudfoundry.org/durationjson v0.0.0-20200131001738-04c274cd71ed h1:hSvlHcyx91CyefH4h8og5Xrz2gK0KSRbqPcvRXXwho8=
 code.cloudfoundry.org/durationjson v0.0.0-20200131001738-04c274cd71ed/go.mod h1:uR0bLsCAMy6IeJVZDs/pD+jKZ2+hBt2hKnX4DzLQs5A=
-code.cloudfoundry.org/go-diodes v0.0.0-20260209061029-a81ffbc46978 h1:uZ6UIz7zl39FMy5GybKzI83zD35c4fvkU8sQEZDH/x8=
-code.cloudfoundry.org/go-diodes v0.0.0-20260209061029-a81ffbc46978/go.mod h1:ZZMgJNANhsfqeXF//d5qDK0dNnQ4jTBsib4WR0xbWJQ=
+code.cloudfoundry.org/go-diodes v0.0.0-20260427153419-57aa1b10ab4c h1:Gig0o7f+Gi4+z+dMxfy09zjMzl4DYB7udnQdfPF3pRk=
+code.cloudfoundry.org/go-diodes v0.0.0-20260427153419-57aa1b10ab4c/go.mod h1:kZ5GX5LVg0YV8rJ9QFj5K6BS9e1iPIQP32FFcOLdnP0=
 code.cloudfoundry.org/go-loggregator/v9 v9.2.1 h1:S6Lgg5UJbhh2bt2TGQxs6R00CF8PrUA3GFPYDxy56Fk=
 code.cloudfoundry.org/go-loggregator/v9 v9.2.1/go.mod h1:FTFFruqGeOhVCDFvyLgl8EV8YW63NNwRzLhxJcporu8=
 code.cloudfoundry.org/lager/v3 v3.66.0 h1:OM9Zy+KCTUpanOfIlL4ac87po7VlBZEq+Mdf32VBi/g=
@@ -1637,8 +1637,8 @@ google.golang.org/genproto v0.0.0-20230323212658-478b75c54725/go.mod h1:UUQDJDOl
 google.golang.org/genproto v0.0.0-20230330154414-c0448cd141ea/go.mod h1:UUQDJDOlWu4KYeJZffbWgBkS1YFobzKbLVfK69pe0Ak=
 google.golang.org/genproto v0.0.0-20230331144136-dcfb400f0633/go.mod h1:UUQDJDOlWu4KYeJZffbWgBkS1YFobzKbLVfK69pe0Ak=
 google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1/go.mod h1:nKE/iIaLqn2bQwXBg8f1g2Ylh6r5MN5CmZvuzZCgsCU=
-google.golang.org/genproto/googleapis/rpc v0.0.0-20260420184626-e10c466a9529 h1:XF8+t6QQiS0o9ArVan/HW8Q7cycNPGsJf6GA2nXxYAg=
-google.golang.org/genproto/googleapis/rpc v0.0.0-20260420184626-e10c466a9529/go.mod h1:4Hqkh8ycfw05ld/3BWL7rJOSfebL2Q+DVDeRgYgxUU8=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20260427160629-7cedc36a6bc4 h1:tEkOQcXgF6dH1G+MVKZrfpYvozGrzb91k6ha7jireSM=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20260427160629-7cedc36a6bc4/go.mod h1:4Hqkh8ycfw05ld/3BWL7rJOSfebL2Q+DVDeRgYgxUU8=
 google.golang.org/grpc v1.19.0/go.mod h1:mqu4LbDTu4XGKhr4mRzUsmM4RtVoemTSY81AxZiDr8c=
 google.golang.org/grpc v1.20.1/go.mod h1:10oTOabMzJvdu6/UiuZezV6QK5dSlG84ov/aaiqXj38=
 google.golang.org/grpc v1.21.1/go.mod h1:oYelfM1adQP15Ek0mdvEgi9Df8B9CZIaU1084ijfRaM=
