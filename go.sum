@@ -608,8 +608,8 @@ code.cloudfoundry.org/go-diodes v0.0.0-20260427153419-57aa1b10ab4c h1:Gig0o7f+Gi
 code.cloudfoundry.org/go-diodes v0.0.0-20260427153419-57aa1b10ab4c/go.mod h1:kZ5GX5LVg0YV8rJ9QFj5K6BS9e1iPIQP32FFcOLdnP0=
 code.cloudfoundry.org/go-loggregator/v9 v9.2.1 h1:S6Lgg5UJbhh2bt2TGQxs6R00CF8PrUA3GFPYDxy56Fk=
 code.cloudfoundry.org/go-loggregator/v9 v9.2.1/go.mod h1:FTFFruqGeOhVCDFvyLgl8EV8YW63NNwRzLhxJcporu8=
-code.cloudfoundry.org/lager/v3 v3.66.0 h1:OM9Zy+KCTUpanOfIlL4ac87po7VlBZEq+Mdf32VBi/g=
-code.cloudfoundry.org/lager/v3 v3.66.0/go.mod h1:d+HET0t/G9vf8+sxAzhauv313xbfv8molPzY4uNb7vo=
+code.cloudfoundry.org/lager/v3 v3.68.0 h1:b33D5fOtsIxbkZ38sDBF+caplshMLE9FgyTOkZWK0LY=
+code.cloudfoundry.org/lager/v3 v3.68.0/go.mod h1:BZ2gnIin10+CWClXj0ixcE9BHlaydZehY643zvKAO5c=
 code.cloudfoundry.org/localip v0.69.0 h1:OTW/Rjz2DXVb1cWRGFKbMGvRWrnN3AF+A2jR1VD80V8=
 code.cloudfoundry.org/localip v0.69.0/go.mod h1:VFNgcxLS+b1nSPRzmEV/hCKY8Z3onmLP7ZLQ8LroAEA=
 code.cloudfoundry.org/locket v0.0.0-20251028190928-8f3817b47d6f h1:QQJJHVATi00MC4pvBnv0sHWdF9ulDj48uL/4FYIwlNY=
@@ -628,8 +628,8 @@ git.sr.ht/~sbinet/gg v0.3.1/go.mod h1:KGYtlADtqsqANL9ueOFkWymvzUvLMQllU5Ixo+8v3p
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c/go.mod h1:X0CRv0ky0k6m906ixxpzmDRLvX58TFUKS2eePweuyxk=
-github.com/Masterminds/semver/v3 v3.4.0 h1:Zog+i5UMtVoCU8oKka5P7i9q9HgrJeGzI9SA1Xbatp0=
-github.com/Masterminds/semver/v3 v3.4.0/go.mod h1:4V+yj/TJE1HU9XfppCwVMZq3I84lprf4nC11bSS5beM=
+github.com/Masterminds/semver/v3 v3.5.0 h1:kQceYJfbupGfZOKZQg0kou0DgAKhzDg2NZPAwZ/2OOE=
+github.com/Masterminds/semver/v3 v3.5.0/go.mod h1:4V+yj/TJE1HU9XfppCwVMZq3I84lprf4nC11bSS5beM=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/ajstarks/deck v0.0.0-20200831202436-30c9fc6549a9/go.mod h1:JynElWSGnm/4RlzPXRlREEwqTHAN3T56Bv2ITsFT3gY=
 github.com/ajstarks/deck/generate v0.0.0-20210309230005-c3f852c02e19/go.mod h1:T13YZdzov6OU0A1+RfKZiZN9ca6VeKdBdyDV+BY97Tk=

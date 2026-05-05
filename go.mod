@@ -1,13 +1,13 @@
 module code.cloudfoundry.org/tps
 
-go 1.25
+go 1.25.0
 
 require (
 	code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1
 	code.cloudfoundry.org/clock v1.68.0
 	code.cloudfoundry.org/debugserver v0.94.0
 	code.cloudfoundry.org/diego-logging-client v0.103.0
-	code.cloudfoundry.org/lager/v3 v3.66.0
+	code.cloudfoundry.org/lager/v3 v3.68.0
 	code.cloudfoundry.org/localip v0.69.0
 	code.cloudfoundry.org/locket v0.0.0-20251028190928-8f3817b47d6f
 	code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf
@@ -26,7 +26,7 @@ require (
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1 // indirect
 	code.cloudfoundry.org/tlsconfig v0.51.0 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
-	github.com/Masterminds/semver/v3 v3.4.0 // indirect
+	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
 	github.com/cloudfoundry/sonde-go v0.0.0-20220627221915-ff36de9c3435 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
