@@ -1,6 +1,6 @@
 module code.cloudfoundry.org/tps
 
-go 1.25
+go 1.25.0
 
 require (
 	code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1
@@ -15,7 +15,7 @@ require (
 	github.com/cloudfoundry/dropsonde v1.1.0
 	github.com/lib/pq v1.12.3
 	github.com/onsi/ginkgo/v2 v2.28.3
-	github.com/onsi/gomega v1.40.0
+	github.com/onsi/gomega v1.41.0
 	github.com/tedsuo/ifrit v0.0.0-20260418191334-846868129986
 )
 
