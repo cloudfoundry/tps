@@ -17,6 +17,7 @@ type LocketConfig struct {
 	DBConnectionTimeout           durationjson.Duration `json:"db_connection_timeout,omitempty"`
 	DBReadTimeout                 durationjson.Duration `json:"db_read_timeout,omitempty"`
 	DBWriteTimeout                durationjson.Duration `json:"db_write_timeout,omitempty"`
+	DBOperationTimeout            durationjson.Duration `json:"db_operation_timeout,omitempty"`
 	MaxOpenDatabaseConnections    int                   `json:"max_open_database_connections,omitempty"`
 	MaxDatabaseConnectionLifetime durationjson.Duration `json:"max_database_connection_lifetime,omitempty"`
 	DatabaseDriver                string                `json:"database_driver,omitempty"`
@@ -26,6 +27,10 @@ type LocketConfig struct {
 	SQLEnableIdentityVerification bool                  `json:"sql_enable_identity_verification,omitempty"`
 	LoggregatorConfig             loggingclient.Config  `json:"loggregator"`
 	ReportInterval                durationjson.Duration `json:"report_interval,omitempty"`
+	HealthCheckTimeout            durationjson.Duration `json:"health_check_timeout,omitempty"`
+	HealthCheckFailureThreshold   int                   `json:"health_check_failure_threshold,omitempty"`
+	HealthCheckInterval           durationjson.Duration `json:"health_check_interval,omitempty"`
+	EnableDBHealthCheck           bool                  `json:"enable_db_health_check,omitempty"`
 	debugserver.DebugServerConfig
 	lagerflags.LagerConfig
 }
