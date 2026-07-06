@@ -36,7 +36,9 @@ jobs:
           git clone https://github.com/cloudfoundry/locket.git
           popd
           pushd ../locket
+          ls -al
           go build -o /home/runner/go/bin/locket
           popd
+          ls -al /home/runner/go/bin
           ginkgo version
           ginkgo -r --keep-going -p -trace --randomize-all --race .
