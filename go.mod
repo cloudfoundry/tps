@@ -1,9 +1,10 @@
 module code.cloudfoundry.org/tps
 
-go 1.26.0
+go 1.26.2
 
 require (
-	code.cloudfoundry.org/bbs v0.0.0-20251029140956-4e01df8b0ac1
+	code.cloudfoundry.org/bbs v1.11.0
+	code.cloudfoundry.org/bbs/models v1.7.0
 	code.cloudfoundry.org/clock v1.76.0
 	code.cloudfoundry.org/debugserver v0.103.0
 	code.cloudfoundry.org/diego-logging-client v0.113.0
@@ -20,7 +21,9 @@ require (
 )
 
 require (
-	code.cloudfoundry.org/cfhttp/v2 v2.0.1-0.20210513172332-4c5ee488a657 // indirect
+	code.cloudfoundry.org/bbs/encryption v1.9.0 // indirect
+	code.cloudfoundry.org/bbs/format v1.9.0 // indirect
+	code.cloudfoundry.org/cfhttp/v2 v2.83.0 // indirect
 	code.cloudfoundry.org/durationjson v0.78.0 // indirect
 	code.cloudfoundry.org/go-diodes v0.0.0-20260629064500-85da08bf73ac // indirect
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1 // indirect
@@ -41,7 +44,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/square/certstrap v1.3.0 // indirect
 	github.com/tedsuo/rata v1.0.0 // indirect
-	github.com/vito/go-sse v1.0.0 // indirect
+	github.com/vito/go-sse v1.1.3 // indirect
 	go.step.sm/crypto v0.84.1 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.53.0 // indirect

@@ -73,6 +73,21 @@ type FakeClient struct {
 		result1 []*models.ActualLRP
 		result2 error
 	}
+	ActualLRPsByProcessGuidsStub        func(lager.Logger, string, []string) ([]*models.ActualLRP, error)
+	actualLRPsByProcessGuidsMutex       sync.RWMutex
+	actualLRPsByProcessGuidsArgsForCall []struct {
+		arg1 lager.Logger
+		arg2 string
+		arg3 []string
+	}
+	actualLRPsByProcessGuidsReturns struct {
+		result1 []*models.ActualLRP
+		result2 error
+	}
+	actualLRPsByProcessGuidsReturnsOnCall map[int]struct {
+		result1 []*models.ActualLRP
+		result2 error
+	}
 	CancelTaskStub        func(lager.Logger, string, string) error
 	cancelTaskMutex       sync.RWMutex
 	cancelTaskArgsForCall []struct {
@@ -714,6 +729,77 @@ func (fake *FakeClient) ActualLRPsReturnsOnCall(i int, result1 []*models.ActualL
 		})
 	}
 	fake.actualLRPsReturnsOnCall[i] = struct {
+		result1 []*models.ActualLRP
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClient) ActualLRPsByProcessGuids(arg1 lager.Logger, arg2 string, arg3 []string) ([]*models.ActualLRP, error) {
+	var arg3Copy []string
+	if arg3 != nil {
+		arg3Copy = make([]string, len(arg3))
+		copy(arg3Copy, arg3)
+	}
+	fake.actualLRPsByProcessGuidsMutex.Lock()
+	ret, specificReturn := fake.actualLRPsByProcessGuidsReturnsOnCall[len(fake.actualLRPsByProcessGuidsArgsForCall)]
+	fake.actualLRPsByProcessGuidsArgsForCall = append(fake.actualLRPsByProcessGuidsArgsForCall, struct {
+		arg1 lager.Logger
+		arg2 string
+		arg3 []string
+	}{arg1, arg2, arg3Copy})
+	stub := fake.ActualLRPsByProcessGuidsStub
+	fakeReturns := fake.actualLRPsByProcessGuidsReturns
+	fake.recordInvocation("ActualLRPsByProcessGuids", []interface{}{arg1, arg2, arg3Copy})
+	fake.actualLRPsByProcessGuidsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeClient) ActualLRPsByProcessGuidsCallCount() int {
+	fake.actualLRPsByProcessGuidsMutex.RLock()
+	defer fake.actualLRPsByProcessGuidsMutex.RUnlock()
+	return len(fake.actualLRPsByProcessGuidsArgsForCall)
+}
+
+func (fake *FakeClient) ActualLRPsByProcessGuidsCalls(stub func(lager.Logger, string, []string) ([]*models.ActualLRP, error)) {
+	fake.actualLRPsByProcessGuidsMutex.Lock()
+	defer fake.actualLRPsByProcessGuidsMutex.Unlock()
+	fake.ActualLRPsByProcessGuidsStub = stub
+}
+
+func (fake *FakeClient) ActualLRPsByProcessGuidsArgsForCall(i int) (lager.Logger, string, []string) {
+	fake.actualLRPsByProcessGuidsMutex.RLock()
+	defer fake.actualLRPsByProcessGuidsMutex.RUnlock()
+	argsForCall := fake.actualLRPsByProcessGuidsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeClient) ActualLRPsByProcessGuidsReturns(result1 []*models.ActualLRP, result2 error) {
+	fake.actualLRPsByProcessGuidsMutex.Lock()
+	defer fake.actualLRPsByProcessGuidsMutex.Unlock()
+	fake.ActualLRPsByProcessGuidsStub = nil
+	fake.actualLRPsByProcessGuidsReturns = struct {
+		result1 []*models.ActualLRP
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClient) ActualLRPsByProcessGuidsReturnsOnCall(i int, result1 []*models.ActualLRP, result2 error) {
+	fake.actualLRPsByProcessGuidsMutex.Lock()
+	defer fake.actualLRPsByProcessGuidsMutex.Unlock()
+	fake.ActualLRPsByProcessGuidsStub = nil
+	if fake.actualLRPsByProcessGuidsReturnsOnCall == nil {
+		fake.actualLRPsByProcessGuidsReturnsOnCall = make(map[int]struct {
+			result1 []*models.ActualLRP
+			result2 error
+		})
+	}
+	fake.actualLRPsByProcessGuidsReturnsOnCall[i] = struct {
 		result1 []*models.ActualLRP
 		result2 error
 	}{result1, result2}
@@ -2466,68 +2552,6 @@ func (fake *FakeClient) UpsertDomainReturnsOnCall(i int, result1 error) {
 func (fake *FakeClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.actualLRPGroupByProcessGuidAndIndexMutex.RLock()
-	defer fake.actualLRPGroupByProcessGuidAndIndexMutex.RUnlock()
-	fake.actualLRPGroupsMutex.RLock()
-	defer fake.actualLRPGroupsMutex.RUnlock()
-	fake.actualLRPGroupsByProcessGuidMutex.RLock()
-	defer fake.actualLRPGroupsByProcessGuidMutex.RUnlock()
-	fake.actualLRPsMutex.RLock()
-	defer fake.actualLRPsMutex.RUnlock()
-	fake.cancelTaskMutex.RLock()
-	defer fake.cancelTaskMutex.RUnlock()
-	fake.cellsMutex.RLock()
-	defer fake.cellsMutex.RUnlock()
-	fake.deleteTaskMutex.RLock()
-	defer fake.deleteTaskMutex.RUnlock()
-	fake.desireLRPMutex.RLock()
-	defer fake.desireLRPMutex.RUnlock()
-	fake.desireTaskMutex.RLock()
-	defer fake.desireTaskMutex.RUnlock()
-	fake.desiredLRPByProcessGuidMutex.RLock()
-	defer fake.desiredLRPByProcessGuidMutex.RUnlock()
-	fake.desiredLRPRoutingInfosMutex.RLock()
-	defer fake.desiredLRPRoutingInfosMutex.RUnlock()
-	fake.desiredLRPSchedulingInfoByProcessGuidMutex.RLock()
-	defer fake.desiredLRPSchedulingInfoByProcessGuidMutex.RUnlock()
-	fake.desiredLRPSchedulingInfosMutex.RLock()
-	defer fake.desiredLRPSchedulingInfosMutex.RUnlock()
-	fake.desiredLRPsMutex.RLock()
-	defer fake.desiredLRPsMutex.RUnlock()
-	fake.domainsMutex.RLock()
-	defer fake.domainsMutex.RUnlock()
-	fake.pingMutex.RLock()
-	defer fake.pingMutex.RUnlock()
-	fake.removeDesiredLRPMutex.RLock()
-	defer fake.removeDesiredLRPMutex.RUnlock()
-	fake.resolvingTaskMutex.RLock()
-	defer fake.resolvingTaskMutex.RUnlock()
-	fake.retireActualLRPMutex.RLock()
-	defer fake.retireActualLRPMutex.RUnlock()
-	fake.subscribeToEventsMutex.RLock()
-	defer fake.subscribeToEventsMutex.RUnlock()
-	fake.subscribeToEventsByCellIDMutex.RLock()
-	defer fake.subscribeToEventsByCellIDMutex.RUnlock()
-	fake.subscribeToInstanceEventsMutex.RLock()
-	defer fake.subscribeToInstanceEventsMutex.RUnlock()
-	fake.subscribeToInstanceEventsByCellIDMutex.RLock()
-	defer fake.subscribeToInstanceEventsByCellIDMutex.RUnlock()
-	fake.subscribeToTaskEventsMutex.RLock()
-	defer fake.subscribeToTaskEventsMutex.RUnlock()
-	fake.taskByGuidMutex.RLock()
-	defer fake.taskByGuidMutex.RUnlock()
-	fake.tasksMutex.RLock()
-	defer fake.tasksMutex.RUnlock()
-	fake.tasksByCellIDMutex.RLock()
-	defer fake.tasksByCellIDMutex.RUnlock()
-	fake.tasksByDomainMutex.RLock()
-	defer fake.tasksByDomainMutex.RUnlock()
-	fake.tasksWithFilterMutex.RLock()
-	defer fake.tasksWithFilterMutex.RUnlock()
-	fake.updateDesiredLRPMutex.RLock()
-	defer fake.updateDesiredLRPMutex.RUnlock()
-	fake.upsertDomainMutex.RLock()
-	defer fake.upsertDomainMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
