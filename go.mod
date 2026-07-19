@@ -7,7 +7,7 @@ require (
 	code.cloudfoundry.org/bbs/models v1.8.0
 	code.cloudfoundry.org/clock v1.79.0
 	code.cloudfoundry.org/debugserver v0.106.0
-	code.cloudfoundry.org/diego-logging-client v0.115.0
+	code.cloudfoundry.org/diego-logging-client v0.116.0
 	code.cloudfoundry.org/lager/v3 v3.78.0
 	code.cloudfoundry.org/localip v0.80.0
 	code.cloudfoundry.org/locket v1.4.0
@@ -54,7 +54,7 @@ require (
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/text v0.40.0 // indirect
 	golang.org/x/tools v0.48.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260706201446-f0a921348800 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260713224248-f5fc221cf8c4 // indirect
 	google.golang.org/grpc v1.82.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
