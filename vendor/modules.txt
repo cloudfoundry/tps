@@ -28,7 +28,7 @@ code.cloudfoundry.org/debugserver
 ## explicit; go 1.25.8
 code.cloudfoundry.org/diego-logging-client
 code.cloudfoundry.org/diego-logging-client/testhelpers
-# code.cloudfoundry.org/durationjson v0.78.0
+# code.cloudfoundry.org/durationjson v0.80.0
 ## explicit; go 1.25.0
 code.cloudfoundry.org/durationjson
 # code.cloudfoundry.org/go-diodes v0.0.0-20260706112827-32a910f327a2
@@ -48,7 +48,7 @@ code.cloudfoundry.org/lager/v3/lagertest
 # code.cloudfoundry.org/localip v0.80.0
 ## explicit; go 1.25.0
 code.cloudfoundry.org/localip
-# code.cloudfoundry.org/locket v1.4.0
+# code.cloudfoundry.org/locket v1.5.0
 ## explicit; go 1.26.0
 code.cloudfoundry.org/locket
 code.cloudfoundry.org/locket/cmd/locket/certauthority
