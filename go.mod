@@ -7,7 +7,7 @@ require (
 	code.cloudfoundry.org/bbs/models v1.8.0
 	code.cloudfoundry.org/clock v1.79.0
 	code.cloudfoundry.org/debugserver v0.106.0
-	code.cloudfoundry.org/diego-logging-client v0.116.0
+	code.cloudfoundry.org/diego-logging-client v0.117.0
 	code.cloudfoundry.org/lager/v3 v3.78.0
 	code.cloudfoundry.org/localip v0.80.0
 	code.cloudfoundry.org/locket v1.4.0
@@ -25,14 +25,14 @@ require (
 	code.cloudfoundry.org/bbs/format v1.9.0 // indirect
 	code.cloudfoundry.org/cfhttp/v2 v2.83.0 // indirect
 	code.cloudfoundry.org/durationjson v0.78.0 // indirect
-	code.cloudfoundry.org/go-diodes v0.0.0-20260706112827-32a910f327a2 // indirect
+	code.cloudfoundry.org/go-diodes v0.0.0-20260720065427-59f65622c841 // indirect
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1 // indirect
-	code.cloudfoundry.org/tlsconfig v0.61.0 // indirect
+	code.cloudfoundry.org/tlsconfig v0.62.0 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
 	github.com/cloudfoundry/sonde-go v0.0.0-20220627221915-ff36de9c3435 // indirect
-	github.com/go-logr/logr v1.4.3 // indirect
+	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
@@ -54,7 +54,7 @@ require (
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/text v0.40.0 // indirect
 	golang.org/x/tools v0.48.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260713224248-f5fc221cf8c4 // indirect
-	google.golang.org/grpc v1.82.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260720211330-0afa2a65878a // indirect
+	google.golang.org/grpc v1.82.1 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
