@@ -38,7 +38,7 @@ code.cloudfoundry.org/go-diodes
 ## explicit; go 1.21
 code.cloudfoundry.org/go-loggregator/v9
 code.cloudfoundry.org/go-loggregator/v9/rpc/loggregator_v2
-# code.cloudfoundry.org/lager/v3 v3.78.0
+# code.cloudfoundry.org/lager/v3 v3.79.0
 ## explicit; go 1.25.0
 code.cloudfoundry.org/lager/v3
 code.cloudfoundry.org/lager/v3/internal/truncate
@@ -93,7 +93,7 @@ github.com/cloudfoundry/dropsonde/runtime_stats
 # github.com/cloudfoundry/sonde-go v0.0.0-20220627221915-ff36de9c3435
 ## explicit; go 1.17
 github.com/cloudfoundry/sonde-go/events
-# github.com/go-logr/logr v1.4.3
+# github.com/go-logr/logr v1.4.4
 ## explicit; go 1.18
 github.com/go-logr/logr
 github.com/go-logr/logr/funcr
