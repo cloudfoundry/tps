@@ -10,7 +10,7 @@ require (
 	code.cloudfoundry.org/diego-logging-client v0.116.0
 	code.cloudfoundry.org/lager/v3 v3.78.0
 	code.cloudfoundry.org/localip v0.80.0
-	code.cloudfoundry.org/locket v1.4.0
+	code.cloudfoundry.org/locket v1.5.0
 	code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf
 	code.cloudfoundry.org/workpool v0.0.0-20250911194158-1489753f182e
 	github.com/cloudfoundry/dropsonde v1.1.0
@@ -24,7 +24,7 @@ require (
 	code.cloudfoundry.org/bbs/encryption v1.9.0 // indirect
 	code.cloudfoundry.org/bbs/format v1.9.0 // indirect
 	code.cloudfoundry.org/cfhttp/v2 v2.83.0 // indirect
-	code.cloudfoundry.org/durationjson v0.78.0 // indirect
+	code.cloudfoundry.org/durationjson v0.80.0 // indirect
 	code.cloudfoundry.org/go-diodes v0.0.0-20260706112827-32a910f327a2 // indirect
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1 // indirect
 	code.cloudfoundry.org/tlsconfig v0.61.0 // indirect
