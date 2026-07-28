@@ -18,7 +18,7 @@ code.cloudfoundry.org/bbs/models/test/model_helpers
 # code.cloudfoundry.org/cfhttp/v2 v2.83.0
 ## explicit; go 1.25.0
 code.cloudfoundry.org/cfhttp/v2
-# code.cloudfoundry.org/clock v1.80.0
+# code.cloudfoundry.org/clock v1.81.0
 ## explicit; go 1.25.0
 code.cloudfoundry.org/clock
 # code.cloudfoundry.org/debugserver v0.107.0
@@ -214,7 +214,7 @@ go.step.sm/crypto/keyutil
 go.step.sm/crypto/pemutil
 go.step.sm/crypto/randutil
 go.step.sm/crypto/x25519
-# go.yaml.in/yaml/v3 v3.0.4
+# go.yaml.in/yaml/v3 v3.0.5
 ## explicit; go 1.16
 go.yaml.in/yaml/v3
 # golang.org/x/crypto v0.54.0

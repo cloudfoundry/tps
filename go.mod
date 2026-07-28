@@ -5,7 +5,7 @@ go 1.26.2
 require (
 	code.cloudfoundry.org/bbs v1.11.0
 	code.cloudfoundry.org/bbs/models v1.8.0
-	code.cloudfoundry.org/clock v1.80.0
+	code.cloudfoundry.org/clock v1.81.0
 	code.cloudfoundry.org/debugserver v0.107.0
 	code.cloudfoundry.org/diego-logging-client v0.117.0
 	code.cloudfoundry.org/lager/v3 v3.79.0
@@ -46,7 +46,7 @@ require (
 	github.com/tedsuo/rata v1.0.0 // indirect
 	github.com/vito/go-sse v1.1.3 // indirect
 	go.step.sm/crypto v0.84.1 // indirect
-	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.54.0 // indirect
 	golang.org/x/mod v0.38.0 // indirect
 	golang.org/x/net v0.57.0 // indirect
