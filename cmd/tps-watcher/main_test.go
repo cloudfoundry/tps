@@ -224,7 +224,7 @@ var _ = Describe("TPS", func() {
 					})
 
 					It("grabs the lock and becomes active", func() {
-						Eventually(runner.Buffer, 5*time.Second).Should(gbytes.Say("tps-watcher.started"))
+						Eventually(runner.Buffer, 10*time.Second).Should(gbytes.Say("tps-watcher.started"))
 					})
 				})
 			})

@@ -127,7 +127,7 @@ func initializeLocketLockMaintainer(logger lager.Logger, watcherConfig config.Wa
 		lockIdentifier,
 		locket.DefaultSessionTTLInSeconds,
 		clock.NewClock(),
-		locket.SQLRetryInterval,
+		locket.RetryInterval,
 	)
 }
 
