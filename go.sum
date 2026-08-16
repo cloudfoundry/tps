@@ -604,8 +604,8 @@ code.cloudfoundry.org/cfhttp/v2 v2.83.0 h1:XP43/VVeA8+3He1Qp4yqXwAwZkgBM2tx3VIX9
 code.cloudfoundry.org/cfhttp/v2 v2.83.0/go.mod h1:OAYoWcMpQzzkMrqGNrL4Lj1u07jelqdtNT56CRu/X8I=
 code.cloudfoundry.org/clock v1.83.0 h1:mfvo8W/0rbabUP14xffa/IaGjNVPbROta8kZoG9nuB0=
 code.cloudfoundry.org/clock v1.83.0/go.mod h1:7ZvHLD4H0HfcO8WJsGb/CCOTT9bky1ruYUwCP5glzRA=
-code.cloudfoundry.org/debugserver v0.108.0 h1:YJRoy6MCr7dGlFrMurxe1+YoY76mUwLIjpn+I+TDWps=
-code.cloudfoundry.org/debugserver v0.108.0/go.mod h1:w8+XJ2Y+bVphfktviGg22xTphgtMI2N4l6XHq0VBqgw=
+code.cloudfoundry.org/debugserver v0.110.0 h1:1i2oLlKvjGjEv/SUBLjSTE4INK11fWqSK2rbU4BPMXs=
+code.cloudfoundry.org/debugserver v0.110.0/go.mod h1:nq5tffMlBWHMpSZJ9U2hJYIuCU/jMYYV2CdqQBbIJyc=
 code.cloudfoundry.org/diego-logging-client v0.120.0 h1:OYMi75pV5lNWi3wYd1ZPxGWanBaZnpSOF5x3ov3bvpo=
 code.cloudfoundry.org/diego-logging-client v0.120.0/go.mod h1:J5U2p7ydtwP/TLYhH9t2DXgwCb0OrYX7jZ4kyTbaylQ=
 code.cloudfoundry.org/durationjson v0.82.0 h1:Mk6NQUxM7voITbJzy9vqooCP+R6slZ/P3TTpGqO3krQ=
@@ -614,8 +614,8 @@ code.cloudfoundry.org/go-diodes v0.0.0-20260720065427-59f65622c841 h1:zvumGkVYJg
 code.cloudfoundry.org/go-diodes v0.0.0-20260720065427-59f65622c841/go.mod h1:czNfbIZFq2IWuL5+OYO/zlEzOL3rbWPfOVIuymG9la4=
 code.cloudfoundry.org/go-loggregator/v9 v9.2.1 h1:S6Lgg5UJbhh2bt2TGQxs6R00CF8PrUA3GFPYDxy56Fk=
 code.cloudfoundry.org/go-loggregator/v9 v9.2.1/go.mod h1:FTFFruqGeOhVCDFvyLgl8EV8YW63NNwRzLhxJcporu8=
-code.cloudfoundry.org/lager/v3 v3.80.0 h1:TYFCcCQ2lG+kEN+3NJiUvXRhWTsW5Ju14xmV429YaT0=
-code.cloudfoundry.org/lager/v3 v3.80.0/go.mod h1:08ujODr8WeHIekdvjPTMDGTXpbc5lpbPpFbkOTJw6v8=
+code.cloudfoundry.org/lager/v3 v3.81.0 h1:eQthuw4X7SdKaFmuVTynPaNP+8i8GusPFw13RLBEzgQ=
+code.cloudfoundry.org/lager/v3 v3.81.0/go.mod h1:oRVMTOslQSjA9WquSbUEIa/qExMpSEPhFc0EwOSVgRg=
 code.cloudfoundry.org/localip v0.84.0 h1:eVEqnkhQ/5rf3zmcyDeoSmOJYc/EGddQMnpup+l42e0=
 code.cloudfoundry.org/localip v0.84.0/go.mod h1:ujHdkJs63PwzNjd0xjI0N40TN98PfxNeARRAh96T+Sg=
 code.cloudfoundry.org/locket v1.6.0 h1:OePm4cPqIwFucCpL4+5vrpjHUe9d0FVSMJZsaOlVWLQ=
