@@ -3,7 +3,7 @@ module code.cloudfoundry.org/tps
 go 1.26.2
 
 require (
-	code.cloudfoundry.org/bbs v1.11.0
+	code.cloudfoundry.org/bbs v1.12.0
 	code.cloudfoundry.org/bbs/models v1.8.0
 	code.cloudfoundry.org/clock v1.83.0
 	code.cloudfoundry.org/debugserver v0.110.0
