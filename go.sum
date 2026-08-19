@@ -608,8 +608,8 @@ code.cloudfoundry.org/debugserver v0.110.0 h1:1i2oLlKvjGjEv/SUBLjSTE4INK11fWqSK2
 code.cloudfoundry.org/debugserver v0.110.0/go.mod h1:nq5tffMlBWHMpSZJ9U2hJYIuCU/jMYYV2CdqQBbIJyc=
 code.cloudfoundry.org/diego-logging-client v0.120.0 h1:OYMi75pV5lNWi3wYd1ZPxGWanBaZnpSOF5x3ov3bvpo=
 code.cloudfoundry.org/diego-logging-client v0.120.0/go.mod h1:J5U2p7ydtwP/TLYhH9t2DXgwCb0OrYX7jZ4kyTbaylQ=
-code.cloudfoundry.org/durationjson v0.82.0 h1:Mk6NQUxM7voITbJzy9vqooCP+R6slZ/P3TTpGqO3krQ=
-code.cloudfoundry.org/durationjson v0.82.0/go.mod h1:2ta2CwA+djptmVLDiMk0euVr2szlz35e68mfkvhJMdw=
+code.cloudfoundry.org/durationjson v0.84.0 h1:Q5/fXF44tofrxf8hXbihuNyQ0P/qmwAnyJ8u0ySk+H4=
+code.cloudfoundry.org/durationjson v0.84.0/go.mod h1:9xq+k5i7SrYl+YOdUpt7odQcTtGyvAP5a/bwz4MxTJg=
 code.cloudfoundry.org/go-diodes v0.0.0-20260720065427-59f65622c841 h1:zvumGkVYJgjVJZo/BCcc2HSMVO2BLvrX0wCg+KLvT20=
 code.cloudfoundry.org/go-diodes v0.0.0-20260720065427-59f65622c841/go.mod h1:czNfbIZFq2IWuL5+OYO/zlEzOL3rbWPfOVIuymG9la4=
 code.cloudfoundry.org/go-loggregator/v9 v9.2.1 h1:S6Lgg5UJbhh2bt2TGQxs6R00CF8PrUA3GFPYDxy56Fk=
@@ -618,8 +618,8 @@ code.cloudfoundry.org/lager/v3 v3.82.0 h1:/iTYAOg02MbOaq/Sh4jdka5IUtUYVN1YYR8GHb
 code.cloudfoundry.org/lager/v3 v3.82.0/go.mod h1:MfEnRvMtBJxBIDRHZKv9s6ssvB5HFnprVLSiwWZlx+s=
 code.cloudfoundry.org/localip v0.84.0 h1:eVEqnkhQ/5rf3zmcyDeoSmOJYc/EGddQMnpup+l42e0=
 code.cloudfoundry.org/localip v0.84.0/go.mod h1:ujHdkJs63PwzNjd0xjI0N40TN98PfxNeARRAh96T+Sg=
-code.cloudfoundry.org/locket v1.6.0 h1:OePm4cPqIwFucCpL4+5vrpjHUe9d0FVSMJZsaOlVWLQ=
-code.cloudfoundry.org/locket v1.6.0/go.mod h1:S+W4pISWq9FWbu3LaopvM+rzYHUyHFKLtiuVyRMG+2M=
+code.cloudfoundry.org/locket v1.7.0 h1:mw3aqETmPOYmYujUXdmRoOC98FrFtp8y7DlDqKezt2w=
+code.cloudfoundry.org/locket v1.7.0/go.mod h1:Ry3jV9bOnUY7cj58CMjAJnqLt428reVD0dJiX38eOK8=
 code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf h1:sTpfHaU+tgDeRO/fRnyr91gvf1FaJk3ZNiJHiHq4nko=
 code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf/go.mod h1:Cbw66uMLAXkeK8ZpcTUIJ9nhXNxaN742q1xS/ONrWiQ=
 code.cloudfoundry.org/tlsconfig v0.64.0 h1:RfqVhbAyLiF9o5OZpIv7s5wIGY94Orao/EUiiHg4Br4=
