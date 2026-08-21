@@ -9,7 +9,7 @@ require (
 	code.cloudfoundry.org/debugserver v0.110.0
 	code.cloudfoundry.org/diego-logging-client v0.120.0
 	code.cloudfoundry.org/lager/v3 v3.82.0
-	code.cloudfoundry.org/localip v0.84.0
+	code.cloudfoundry.org/localip v0.85.0
 	code.cloudfoundry.org/locket v1.7.0
 	code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf
 	code.cloudfoundry.org/workpool v0.0.0-20250911194158-1489753f182e
@@ -47,13 +47,13 @@ require (
 	github.com/vito/go-sse v1.1.3 // indirect
 	go.step.sm/crypto v0.87.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/crypto v0.54.0 // indirect
-	golang.org/x/mod v0.39.0 // indirect
-	golang.org/x/net v0.57.0 // indirect
+	golang.org/x/crypto v0.55.0 // indirect
+	golang.org/x/mod v0.40.0 // indirect
+	golang.org/x/net v0.58.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/text v0.40.0 // indirect
-	golang.org/x/tools v0.48.0 // indirect
+	golang.org/x/text v0.41.0 // indirect
+	golang.org/x/tools v0.49.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260810153831-ec0a7760b754 // indirect
 	google.golang.org/grpc v1.83.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
