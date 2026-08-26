@@ -12,8 +12,8 @@ code.cloudfoundry.org/clock v1.83.0 h1:mfvo8W/0rbabUP14xffa/IaGjNVPbROta8kZoG9nu
 code.cloudfoundry.org/clock v1.83.0/go.mod h1:7ZvHLD4H0HfcO8WJsGb/CCOTT9bky1ruYUwCP5glzRA=
 code.cloudfoundry.org/debugserver v0.111.0 h1:G3iQdarMY9xBIvZ9tz6S3neOR4b9ftdLPk7R90LuHtY=
 code.cloudfoundry.org/debugserver v0.111.0/go.mod h1:Va7ouJLVYkEr7oS+ZEK/L5le/MGwwYP25S8lwILRMyM=
-code.cloudfoundry.org/diego-logging-client v0.120.0 h1:OYMi75pV5lNWi3wYd1ZPxGWanBaZnpSOF5x3ov3bvpo=
-code.cloudfoundry.org/diego-logging-client v0.120.0/go.mod h1:J5U2p7ydtwP/TLYhH9t2DXgwCb0OrYX7jZ4kyTbaylQ=
+code.cloudfoundry.org/diego-logging-client v0.121.0 h1:7oH4Xkh5Tbov4xXdXiECykC48rPhjQz/oVEJbrC173s=
+code.cloudfoundry.org/diego-logging-client v0.121.0/go.mod h1:aaIDxnHn7Du5PgGwU06O1HvEoizHTRjjHZ2fZkVJpxg=
 code.cloudfoundry.org/durationjson v0.84.0 h1:Q5/fXF44tofrxf8hXbihuNyQ0P/qmwAnyJ8u0ySk+H4=
 code.cloudfoundry.org/durationjson v0.84.0/go.mod h1:9xq+k5i7SrYl+YOdUpt7odQcTtGyvAP5a/bwz4MxTJg=
 code.cloudfoundry.org/go-diodes v0.0.0-20260720065427-59f65622c841 h1:zvumGkVYJgjVJZo/BCcc2HSMVO2BLvrX0wCg+KLvT20=
@@ -191,8 +191,8 @@ golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8T
 golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 gonum.org/v1/gonum v0.17.0 h1:VbpOemQlsSMrYmn7T2OUvQ4dqxQXU+ouZFQsZOx50z4=
 gonum.org/v1/gonum v0.17.0/go.mod h1:El3tOrEuMpv2UdMrbNlKEh9vd86bmQ6vqIcDwxEOc1E=
-google.golang.org/genproto/googleapis/rpc v0.0.0-20260810153831-ec0a7760b754 h1:k5CJw9e5ONCcA/u0webKt092npXuY+KeGh3Q8NAVf0g=
-google.golang.org/genproto/googleapis/rpc v0.0.0-20260810153831-ec0a7760b754/go.mod h1:4Hqkh8ycfw05ld/3BWL7rJOSfebL2Q+DVDeRgYgxUU8=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20260817212433-ac3dfec99bb1 h1:utmqiUzZAEINbLmRyAt1QjVkMyLQ+lvIwCpLaB1rZfw=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20260817212433-ac3dfec99bb1/go.mod h1:4Hqkh8ycfw05ld/3BWL7rJOSfebL2Q+DVDeRgYgxUU8=
 google.golang.org/grpc v1.83.0 h1:JeNZEKJFbQxArAMl+hiytHauacDNqJUllNfmIMmpqnQ=
 google.golang.org/grpc v1.83.0/go.mod h1:kDyl6SKsiHKt0uylY5gtn5cEjkrIOhQOGDgIc4JGwzQ=
 google.golang.org/protobuf v1.36.12 h1:pJOKDDOyeXErUroCihFAd5LQuwXBSpVnKGrj5o/fwxc=
