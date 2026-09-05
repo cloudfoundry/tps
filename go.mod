@@ -10,7 +10,7 @@ require (
 	code.cloudfoundry.org/diego-logging-client v0.122.0
 	code.cloudfoundry.org/lager/v3 v3.85.0
 	code.cloudfoundry.org/localip v0.86.0
-	code.cloudfoundry.org/locket v1.10.0
+	code.cloudfoundry.org/locket v1.11.0
 	code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf
 	code.cloudfoundry.org/workpool v0.0.0-20250911194158-1489753f182e
 	github.com/cloudfoundry/dropsonde v1.1.0
@@ -24,8 +24,8 @@ require (
 	code.cloudfoundry.org/bbs/encryption v1.9.0 // indirect
 	code.cloudfoundry.org/bbs/format v1.9.0 // indirect
 	code.cloudfoundry.org/cfhttp/v2 v2.83.0 // indirect
-	code.cloudfoundry.org/durationjson v0.86.0 // indirect
-	code.cloudfoundry.org/go-diodes v0.0.0-20260818081020-5f89c9327272 // indirect
+	code.cloudfoundry.org/durationjson v0.87.0 // indirect
+	code.cloudfoundry.org/go-diodes v0.0.0-20260831145205-e8366a756183 // indirect
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1 // indirect
 	code.cloudfoundry.org/tlsconfig v0.65.0 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
@@ -54,8 +54,8 @@ require (
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/text v0.41.0 // indirect
 	golang.org/x/tools v0.49.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260819154853-08b0e4226688 // indirect
-	google.golang.org/grpc v1.83.1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260831171406-18b4a7587f8a // indirect
+	google.golang.org/grpc v1.83.2 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
