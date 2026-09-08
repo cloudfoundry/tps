@@ -4,7 +4,7 @@ go 1.26.2
 
 require (
 	code.cloudfoundry.org/bbs v1.12.0
-	code.cloudfoundry.org/bbs/models v1.8.0
+	code.cloudfoundry.org/bbs/models v1.12.0
 	code.cloudfoundry.org/clock v1.85.0
 	code.cloudfoundry.org/debugserver v0.113.0
 	code.cloudfoundry.org/diego-logging-client v0.122.0
@@ -21,8 +21,8 @@ require (
 )
 
 require (
-	code.cloudfoundry.org/bbs/encryption v1.9.0 // indirect
-	code.cloudfoundry.org/bbs/format v1.9.0 // indirect
+	code.cloudfoundry.org/bbs/encryption v1.11.0 // indirect
+	code.cloudfoundry.org/bbs/format v1.10.0 // indirect
 	code.cloudfoundry.org/cfhttp/v2 v2.83.0 // indirect
 	code.cloudfoundry.org/durationjson v0.86.0 // indirect
 	code.cloudfoundry.org/go-diodes v0.0.0-20260818081020-5f89c9327272 // indirect
@@ -36,7 +36,7 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20260830191439-4932ad3515ea // indirect
+	github.com/google/pprof v0.0.0-20260903180319-d6c3cb2f37ec // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
