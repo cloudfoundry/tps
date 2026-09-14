@@ -8,8 +8,8 @@ code.cloudfoundry.org/bbs/models v1.12.0 h1:S4BGMK/ekGzEA25VrZPA84QiLRG7EpJlu1ib
 code.cloudfoundry.org/bbs/models v1.12.0/go.mod h1:XHmd4dVS2QmCKR+sSFmkAyzEdEi+7osowzy+CqZStqc=
 code.cloudfoundry.org/cfhttp/v2 v2.83.0 h1:XP43/VVeA8+3He1Qp4yqXwAwZkgBM2tx3VIX9gYzpzQ=
 code.cloudfoundry.org/cfhttp/v2 v2.83.0/go.mod h1:OAYoWcMpQzzkMrqGNrL4Lj1u07jelqdtNT56CRu/X8I=
-code.cloudfoundry.org/clock v1.85.0 h1:482FGvM6L9cfOlDjVvkeMFZ0xOSaxWgxJj1GPkY+YEQ=
-code.cloudfoundry.org/clock v1.85.0/go.mod h1:6hXp4cwmAAQajTDprxsFAPqs3QN2YoeExgxJMWaf1+8=
+code.cloudfoundry.org/clock v1.87.0 h1:7TzMbR9GnHpz0qhFeUyfXUbIXnuBME22nxVTosOhLL4=
+code.cloudfoundry.org/clock v1.87.0/go.mod h1:toNQtpynOC/zweoB7xecA0No8dM0/RnjE8SJELOa99Y=
 code.cloudfoundry.org/debugserver v0.113.0 h1:VHAZXXMsXEXcAB3jtBfcOz3fMizHMlH65OzV+19SceA=
 code.cloudfoundry.org/debugserver v0.113.0/go.mod h1:1infVlb0zqdtXDQnkjJF1WJkQr/0g2pvAeel+M3Lc9Q=
 code.cloudfoundry.org/diego-logging-client v0.123.0 h1:/e6wqYwT4wJhBoMdOegdi7/JyZmLTbKtUR7Y3B/xR4g=
@@ -72,8 +72,8 @@ github.com/golang/protobuf v1.5.4 h1:i7eJL8qZTpSEXOPTxNKhASYpMn+8e5Q6AdndVa1dWek
 github.com/golang/protobuf v1.5.4/go.mod h1:lnTiLA8Wa4RWRcIUkrtSVa5nRhsEGBg48fD6rSs7xps=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
 github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
-github.com/google/pprof v0.0.0-20260903180319-d6c3cb2f37ec h1:ZhR4jlKRUmzPEPd2RLiJRUi25rUrdKBrhQNVIbqpTNE=
-github.com/google/pprof v0.0.0-20260903180319-d6c3cb2f37ec/go.mod h1:jl5iWTm0/hd5PjEYEOuwAJ57L/CibdZfrqZ5XA5GrCk=
+github.com/google/pprof v0.0.0-20260906184651-6331bc6350fe h1:QAinXoAFJdGQYztXn3VpFey7KCwpedbZ/EkzbplQ0cY=
+github.com/google/pprof v0.0.0-20260906184651-6331bc6350fe/go.mod h1:jl5iWTm0/hd5PjEYEOuwAJ57L/CibdZfrqZ5XA5GrCk=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8HmY=
