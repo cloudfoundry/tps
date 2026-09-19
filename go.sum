@@ -8,8 +8,8 @@ code.cloudfoundry.org/bbs/models v1.13.0 h1:rFnXwBUWT1PqeNI6/S/2RmIDa143apLu5KYz
 code.cloudfoundry.org/bbs/models v1.13.0/go.mod h1:58T80LLEoBX4Z76TbQIDr93xSTx5soZw1JJM7Mht1E4=
 code.cloudfoundry.org/cfhttp/v2 v2.93.0 h1:uCac6TXNxe9Ltu+2C9sjwExwf9nRHyW2cr08HDWWjLc=
 code.cloudfoundry.org/cfhttp/v2 v2.93.0/go.mod h1:1iiiBW4KdzsxsnqfoGZFWPbTdR9KHHb+D77OA5yG26Y=
-code.cloudfoundry.org/clock v1.87.0 h1:7TzMbR9GnHpz0qhFeUyfXUbIXnuBME22nxVTosOhLL4=
-code.cloudfoundry.org/clock v1.87.0/go.mod h1:toNQtpynOC/zweoB7xecA0No8dM0/RnjE8SJELOa99Y=
+code.cloudfoundry.org/clock v1.88.0 h1:rlPCGl0D5fV9vjNl8ww+QS3ffvhRl+zoQdCdv+uHtFg=
+code.cloudfoundry.org/clock v1.88.0/go.mod h1:XUG+XI/odMYn6y9rqSX4+PqSBHrJ3jD7UR5dBNnc7/o=
 code.cloudfoundry.org/debugserver v0.114.0 h1:kYI5KzCqGJYdll2GaEptAUKs3lwL+eK9FEwx96jOiOg=
 code.cloudfoundry.org/debugserver v0.114.0/go.mod h1:afeA4l1ZeqhJTKydg/h+23CtAjGLbRGfuEAaHc8SCWk=
 code.cloudfoundry.org/diego-logging-client v0.124.0 h1:K42q7gbxXQ0ZVYIM7ZqFto6h528pA0v3eWobnpNUNb0=
@@ -112,8 +112,8 @@ github.com/square/certstrap v1.3.0 h1:N9P0ZRA+DjT8pq5fGDj0z3FjafRKnBDypP0QHpMlaA
 github.com/square/certstrap v1.3.0/go.mod h1:wGZo9eE1B7WX2GKBn0htJ+B3OuRl2UsdCFySNooy9hU=
 github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWDWE=
 github.com/stretchr/testify v1.12.1/go.mod h1:MDEgiDPPsNp5cuIrHPPCyornHKgEVbtFUmoNlxoYthg=
-github.com/tedsuo/ifrit v0.0.0-20260813155221-94822c932811 h1:A4cmZWps1laLIFZa5XyyVU03A3pkYCDdN7vDQfB8RvM=
-github.com/tedsuo/ifrit v0.0.0-20260813155221-94822c932811/go.mod h1:U4gRO4lEOLwO3h4CO9BE6c28VB74a5R+HjCwG7o1Mw0=
+github.com/tedsuo/ifrit v0.0.0-20260908181113-dd353a7daa27 h1:gKDGsw+NqSByQPkCbwKfTiTNo+d3tsdjQjKUYVG3jAY=
+github.com/tedsuo/ifrit v0.0.0-20260908181113-dd353a7daa27/go.mod h1:U4gRO4lEOLwO3h4CO9BE6c28VB74a5R+HjCwG7o1Mw0=
 github.com/tedsuo/rata v1.0.0 h1:Sf9aZrYy6ElSTncjnGkyC2yuVvz5YJetBIUKJ4CmeKE=
 github.com/tedsuo/rata v1.0.0/go.mod h1:X47ELzhOoLbfFIY0Cql9P6yo3Cdwf2CMX3FVZxRzJPc=
 github.com/tidwall/gjson v1.18.0 h1:FIDeeyB800efLX89e5a8Y0BNH+LOngJyGrIWxG2FKQY=
