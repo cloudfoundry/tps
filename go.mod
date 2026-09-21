@@ -16,7 +16,7 @@ require (
 	github.com/cloudfoundry/dropsonde v1.1.0
 	github.com/lib/pq v1.12.3
 	github.com/onsi/ginkgo/v2 v2.32.2
-	github.com/onsi/gomega v1.43.0
+	github.com/onsi/gomega v1.43.1
 	github.com/tedsuo/ifrit v0.0.0-20260908181113-dd353a7daa27
 )
 
