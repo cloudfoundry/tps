@@ -3,7 +3,7 @@ module code.cloudfoundry.org/tps
 go 1.26.2
 
 require (
-	code.cloudfoundry.org/bbs v1.16.0
+	code.cloudfoundry.org/bbs v1.17.0
 	code.cloudfoundry.org/bbs/models v1.13.0
 	code.cloudfoundry.org/clock v1.88.0
 	code.cloudfoundry.org/debugserver v0.114.0
@@ -21,9 +21,9 @@ require (
 )
 
 require (
-	code.cloudfoundry.org/bbs/encryption v1.11.0 // indirect
-	code.cloudfoundry.org/bbs/format v1.10.0 // indirect
-	code.cloudfoundry.org/cfhttp/v2 v2.93.0 // indirect
+	code.cloudfoundry.org/bbs/encryption v1.14.0 // indirect
+	code.cloudfoundry.org/bbs/format v1.12.0 // indirect
+	code.cloudfoundry.org/cfhttp/v2 v2.94.0 // indirect
 	code.cloudfoundry.org/durationjson v0.89.0 // indirect
 	code.cloudfoundry.org/go-diodes v0.0.0-20260914115851-7fd03ae06e34 // indirect
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1 // indirect
