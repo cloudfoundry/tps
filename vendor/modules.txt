@@ -18,7 +18,7 @@ code.cloudfoundry.org/bbs/models/test/model_helpers
 # code.cloudfoundry.org/cfhttp/v2 v2.94.0
 ## explicit; go 1.25.0
 code.cloudfoundry.org/cfhttp/v2
-# code.cloudfoundry.org/clock v1.88.0
+# code.cloudfoundry.org/clock v1.89.0
 ## explicit; go 1.26.0
 code.cloudfoundry.org/clock
 # code.cloudfoundry.org/debugserver v0.115.0
@@ -140,7 +140,7 @@ github.com/mailru/easyjson/jwriter
 # github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 ## explicit
 github.com/nu7hatch/gouuid
-# github.com/onsi/ginkgo/v2 v2.32.2
+# github.com/onsi/ginkgo/v2 v2.33.0
 ## explicit; go 1.25.0
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
@@ -164,7 +164,7 @@ github.com/onsi/ginkgo/v2/internal/reporters
 github.com/onsi/ginkgo/v2/internal/testingtproxy
 github.com/onsi/ginkgo/v2/reporters
 github.com/onsi/ginkgo/v2/types
-# github.com/onsi/gomega v1.43.0
+# github.com/onsi/gomega v1.43.1
 ## explicit; go 1.25.0
 github.com/onsi/gomega
 github.com/onsi/gomega/format
