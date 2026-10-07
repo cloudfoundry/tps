@@ -1,4 +1,4 @@
-# code.cloudfoundry.org/bbs v1.18.0
+# code.cloudfoundry.org/bbs v1.22.0
 ## explicit; go 1.26.2
 code.cloudfoundry.org/bbs
 code.cloudfoundry.org/bbs/events
@@ -15,7 +15,7 @@ code.cloudfoundry.org/bbs/format
 ## explicit; go 1.26.2
 code.cloudfoundry.org/bbs/models
 code.cloudfoundry.org/bbs/models/test/model_helpers
-# code.cloudfoundry.org/cfhttp/v2 v2.95.0
+# code.cloudfoundry.org/cfhttp/v2 v2.97.0
 ## explicit; go 1.26.0
 code.cloudfoundry.org/cfhttp/v2
 # code.cloudfoundry.org/clock v1.90.0
@@ -28,7 +28,7 @@ code.cloudfoundry.org/debugserver
 ## explicit; go 1.26.0
 code.cloudfoundry.org/diego-logging-client
 code.cloudfoundry.org/diego-logging-client/testhelpers
-# code.cloudfoundry.org/durationjson v0.91.0
+# code.cloudfoundry.org/durationjson v0.92.0
 ## explicit; go 1.26.0
 code.cloudfoundry.org/durationjson
 # code.cloudfoundry.org/go-diodes v0.0.0-20260928063035-f81ac938b818
