@@ -4,8 +4,8 @@ code.cloudfoundry.org/bbs/encryption v1.18.0 h1:WOzd9avpOTeOlrvwrqmmjJKOqihQx2El
 code.cloudfoundry.org/bbs/encryption v1.18.0/go.mod h1:snzdbUJ/7+W17dJAuzxy1kNAGrNpk5MJ/78t2sPLWyo=
 code.cloudfoundry.org/bbs/format v1.14.0 h1:zYBX4M1R0vtEXjs+sjpAXyyomwIf0kxi+rK5e4vIeA4=
 code.cloudfoundry.org/bbs/format v1.14.0/go.mod h1:GmyV9vov8nJ8hKcqd90J3mSLLLmVjkozlypkRUQ9x6o=
-code.cloudfoundry.org/bbs/models v1.18.0 h1:hzgwBLWxKOCkysGb72Fe9Ex7Z/2Y2qopdWyHgQVTefA=
-code.cloudfoundry.org/bbs/models v1.18.0/go.mod h1:rH3ZSdFl3SgcmRx+P4ojDMjP0QV5aK/LqWMmJ+F5NV8=
+code.cloudfoundry.org/bbs/models v1.19.0 h1:w5hM5U7UkHgywy/+V4+ELuXMKtd4pPxbfqZc+Cpppd8=
+code.cloudfoundry.org/bbs/models v1.19.0/go.mod h1:Ng2+QDEfEnRTBtVlybbb6R710rCK5Qi8kPHyEvssCGE=
 code.cloudfoundry.org/cfhttp/v2 v2.95.0 h1:lIadLnwpEJces15YfIvIxGe/kwLfXIdCSP15OenAMFs=
 code.cloudfoundry.org/cfhttp/v2 v2.95.0/go.mod h1:E7m7LQcaPm4j0b3bWTv5gemXgT60jGwD6SYoPBPy9MU=
 code.cloudfoundry.org/clock v1.90.0 h1:lxRhMb3SvXn+tBvt4bjTZKR7dKOUq0sPJvnmgw6eCIg=
