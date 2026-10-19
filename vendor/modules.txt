@@ -28,7 +28,7 @@ code.cloudfoundry.org/debugserver
 ## explicit; go 1.26.0
 code.cloudfoundry.org/diego-logging-client
 code.cloudfoundry.org/diego-logging-client/testhelpers
-# code.cloudfoundry.org/durationjson v0.92.0
+# code.cloudfoundry.org/durationjson v0.93.0
 ## explicit; go 1.26.0
 code.cloudfoundry.org/durationjson
 # code.cloudfoundry.org/go-diodes v0.0.0-20260928063035-f81ac938b818
@@ -48,7 +48,7 @@ code.cloudfoundry.org/lager/v3/lagertest
 # code.cloudfoundry.org/localip v0.93.0
 ## explicit; go 1.26.0
 code.cloudfoundry.org/localip
-# code.cloudfoundry.org/locket v1.16.0
+# code.cloudfoundry.org/locket v1.17.0
 ## explicit; go 1.26.0
 code.cloudfoundry.org/locket
 code.cloudfoundry.org/locket/cmd/locket/certauthority
@@ -187,8 +187,8 @@ github.com/openzipkin/zipkin-go/model
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
-# github.com/square/certstrap v1.3.0
-## explicit; go 1.18
+# github.com/square/certstrap v1.4.0
+## explicit; go 1.24
 github.com/square/certstrap/pkix
 # github.com/tedsuo/ifrit v0.0.0-20260908181113-dd353a7daa27
 ## explicit; go 1.25.0
