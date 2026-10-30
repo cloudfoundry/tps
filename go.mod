@@ -1,6 +1,6 @@
 module code.cloudfoundry.org/tps
 
-go 1.26.2
+go 1.27
 
 require (
 	code.cloudfoundry.org/bbs v1.25.0
