@@ -6,9 +6,9 @@ require (
 	code.cloudfoundry.org/bbs v1.25.0
 	code.cloudfoundry.org/bbs/models v1.21.0
 	code.cloudfoundry.org/clock v1.93.0
-	code.cloudfoundry.org/debugserver v0.119.0
+	code.cloudfoundry.org/debugserver v0.121.0
 	code.cloudfoundry.org/diego-logging-client v0.129.0
-	code.cloudfoundry.org/lager/v3 v3.91.0
+	code.cloudfoundry.org/lager/v3 v3.92.0
 	code.cloudfoundry.org/localip v0.94.0
 	code.cloudfoundry.org/locket v1.17.0
 	code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf
@@ -36,7 +36,7 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20261016150608-1facf8f91b50 // indirect
+	github.com/google/pprof v0.0.0-20261026192309-dbd0ed30aa88 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
