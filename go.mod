@@ -4,7 +4,7 @@ go 1.27
 
 require (
 	code.cloudfoundry.org/bbs v1.25.0
-	code.cloudfoundry.org/bbs/models v1.21.0
+	code.cloudfoundry.org/bbs/models v1.25.0
 	code.cloudfoundry.org/clock v1.93.0
 	code.cloudfoundry.org/debugserver v0.121.0
 	code.cloudfoundry.org/diego-logging-client v0.129.0
@@ -21,8 +21,8 @@ require (
 )
 
 require (
-	code.cloudfoundry.org/bbs/encryption v1.20.0 // indirect
-	code.cloudfoundry.org/bbs/format v1.16.0 // indirect
+	code.cloudfoundry.org/bbs/encryption v1.25.0 // indirect
+	code.cloudfoundry.org/bbs/format v1.18.0 // indirect
 	code.cloudfoundry.org/cfhttp/v2 v2.97.0 // indirect
 	code.cloudfoundry.org/durationjson v0.93.0 // indirect
 	code.cloudfoundry.org/go-diodes v0.0.0-20260928063035-f81ac938b818 // indirect
