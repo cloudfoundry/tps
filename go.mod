@@ -8,7 +8,7 @@ require (
 	code.cloudfoundry.org/clock v1.93.0
 	code.cloudfoundry.org/debugserver v0.121.0
 	code.cloudfoundry.org/diego-logging-client v0.130.0
-	code.cloudfoundry.org/lager/v3 v3.92.0
+	code.cloudfoundry.org/lager/v3 v3.93.0
 	code.cloudfoundry.org/localip v0.94.0
 	code.cloudfoundry.org/locket v1.19.0
 	code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf
