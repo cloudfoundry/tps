@@ -24,7 +24,7 @@ code.cloudfoundry.org/clock
 # code.cloudfoundry.org/debugserver v0.121.0
 ## explicit; go 1.26.0
 code.cloudfoundry.org/debugserver
-# code.cloudfoundry.org/diego-logging-client v0.130.0
+# code.cloudfoundry.org/diego-logging-client v0.131.0
 ## explicit; go 1.26.0
 code.cloudfoundry.org/diego-logging-client
 code.cloudfoundry.org/diego-logging-client/testhelpers
