@@ -22,8 +22,8 @@ code.cloudfoundry.org/go-loggregator/v9 v9.2.1 h1:S6Lgg5UJbhh2bt2TGQxs6R00CF8PrU
 code.cloudfoundry.org/go-loggregator/v9 v9.2.1/go.mod h1:FTFFruqGeOhVCDFvyLgl8EV8YW63NNwRzLhxJcporu8=
 code.cloudfoundry.org/lager/v3 v3.91.0 h1:9Ydc9QENtQ0tI0hqdIrYVHtM7g0Vou8xG5kPAFxWVNI=
 code.cloudfoundry.org/lager/v3 v3.91.0/go.mod h1:j4v5jKYn/nRqOCkL9XoSRmDnjpZH5fITFrlK6veKIBs=
-code.cloudfoundry.org/localip v0.93.0 h1:Of0KlBxvb6yV24zs+tVQ9rfph+Dc0JU/X0xSy3hRho0=
-code.cloudfoundry.org/localip v0.93.0/go.mod h1:SJ2pkrLjlHoMftThFYPgbECVNfruw5xlRgoLrtAGGoI=
+code.cloudfoundry.org/localip v0.94.0 h1:GJL969OcrbR5tOSGdI52Va4Nu5uL+Ln4wJL+/2SoUpc=
+code.cloudfoundry.org/localip v0.94.0/go.mod h1:hj4wafMzC5yKdkbEclW+A6dtdGlaHBxSP3iJZ+H9k4Q=
 code.cloudfoundry.org/locket v1.17.0 h1:TMHnfWbr0vHApI+ACdZHZEnWEanIp88hYLQxxq4TjUE=
 code.cloudfoundry.org/locket v1.17.0/go.mod h1:1JjhSwbp7tHJ+761GDO9GgXmjtIqKbBqzW3uWlTfz2o=
 code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf h1:sTpfHaU+tgDeRO/fRnyr91gvf1FaJk3ZNiJHiHq4nko=
@@ -66,8 +66,8 @@ github.com/golang/protobuf v1.5.4 h1:i7eJL8qZTpSEXOPTxNKhASYpMn+8e5Q6AdndVa1dWek
 github.com/golang/protobuf v1.5.4/go.mod h1:lnTiLA8Wa4RWRcIUkrtSVa5nRhsEGBg48fD6rSs7xps=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
 github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
-github.com/google/pprof v0.0.0-20261012231050-2af12c3f4d87 h1:P18JvwDzBYAeC8SIfnee/YJzKk1dysuN6rUwmF6CxZY=
-github.com/google/pprof v0.0.0-20261012231050-2af12c3f4d87/go.mod h1:yUo1AMMpsPIDFGuwDK8nLcf8+vvAd5l2O6JDZ6hpwrM=
+github.com/google/pprof v0.0.0-20261016150608-1facf8f91b50 h1:PlNWJRxu5APSV0pWqfIsZ0qt9OOGHSWfZQ4zvx+WgWs=
+github.com/google/pprof v0.0.0-20261016150608-1facf8f91b50/go.mod h1:yUo1AMMpsPIDFGuwDK8nLcf8+vvAd5l2O6JDZ6hpwrM=
 github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8HmY=
 github.com/josharian/intern v1.0.0/go.mod h1:5DoeVV0s6jJacbCEi61lwdGj/aVlrQvzHFFd8Hwg//Y=
 github.com/joshdk/go-junit v1.0.0 h1:S86cUKIdwBHWwA6xCmFlf3RTLfVXYQfvanM5Uh+K6GE=
