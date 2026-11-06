@@ -8,14 +8,14 @@ require (
 	code.cloudfoundry.org/clock v1.94.0
 	code.cloudfoundry.org/debugserver v0.121.0
 	code.cloudfoundry.org/diego-logging-client v0.131.0
-	code.cloudfoundry.org/lager/v3 v3.93.0
+	code.cloudfoundry.org/lager/v3 v3.94.0
 	code.cloudfoundry.org/localip v0.95.0
 	code.cloudfoundry.org/locket v1.19.0
 	code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf
 	code.cloudfoundry.org/workpool v0.0.0-20250911194158-1489753f182e
 	github.com/cloudfoundry/dropsonde v1.1.0
 	github.com/lib/pq v1.12.3
-	github.com/onsi/ginkgo/v2 v2.33.1
+	github.com/onsi/ginkgo/v2 v2.34.0
 	github.com/onsi/gomega v1.44.0
 	github.com/tedsuo/ifrit v0.0.0-20260908181113-dd353a7daa27
 )
@@ -36,7 +36,7 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20261026192309-dbd0ed30aa88 // indirect
+	github.com/google/pprof v0.0.0-20261102214848-0031fcd306b0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
@@ -46,10 +46,10 @@ require (
 	github.com/tedsuo/rata v1.0.0 // indirect
 	github.com/vito/go-sse v1.1.3 // indirect
 	go.step.sm/crypto v0.91.0 // indirect
-	go.yaml.in/yaml/v3 v3.0.5 // indirect
+	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	golang.org/x/crypto v0.58.0 // indirect
 	golang.org/x/mod v0.42.0 // indirect
-	golang.org/x/net v0.61.0 // indirect
+	golang.org/x/net v0.62.0 // indirect
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
