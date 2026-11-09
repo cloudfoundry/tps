@@ -24,8 +24,8 @@ code.cloudfoundry.org/clock
 # code.cloudfoundry.org/debugserver v0.122.0
 ## explicit; go 1.26.0
 code.cloudfoundry.org/debugserver
-# code.cloudfoundry.org/diego-logging-client v0.131.0
-## explicit; go 1.26.0
+# code.cloudfoundry.org/diego-logging-client v0.132.0
+## explicit; go 1.27.3
 code.cloudfoundry.org/diego-logging-client
 code.cloudfoundry.org/diego-logging-client/testhelpers
 # code.cloudfoundry.org/durationjson v0.95.0
@@ -59,8 +59,8 @@ code.cloudfoundry.org/locket/models
 # code.cloudfoundry.org/runtimeschema v0.0.0-20240514235758-31be7684c5bf
 ## explicit; go 1.20
 code.cloudfoundry.org/runtimeschema/cc_messages
-# code.cloudfoundry.org/tlsconfig v0.69.0
-## explicit; go 1.26.0
+# code.cloudfoundry.org/tlsconfig v0.70.0
+## explicit; go 1.27.3
 code.cloudfoundry.org/tlsconfig
 # code.cloudfoundry.org/workpool v0.0.0-20250911194158-1489753f182e
 ## explicit
@@ -304,8 +304,8 @@ golang.org/x/tools/internal/versions
 # google.golang.org/genproto/googleapis/rpc v0.0.0-20261026165753-2ffab32bce7e
 ## explicit; go 1.26.0
 google.golang.org/genproto/googleapis/rpc/status
-# google.golang.org/grpc v1.84.0
-## explicit; go 1.25.0
+# google.golang.org/grpc v1.85.0
+## explicit; go 1.26.0
 google.golang.org/grpc
 google.golang.org/grpc/attributes
 google.golang.org/grpc/backoff
