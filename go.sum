@@ -1,13 +1,13 @@
-code.cloudfoundry.org/bbs v1.30.0 h1:YKd2YE64Hx0incnnD10Z1U3XtQuanbHjsok0oeyjs8w=
-code.cloudfoundry.org/bbs v1.30.0/go.mod h1:T3Ww9evbaamglolWbIaTcbfDrW0Ajoq5CO/ylPsribU=
+code.cloudfoundry.org/bbs v1.34.0 h1:wQJ1R+UzCZ7PhsE3pRFKtlYNsoNq/FgCCmg5Vi67MTM=
+code.cloudfoundry.org/bbs v1.34.0/go.mod h1:EdJ1jhDddnNiCc1ElPiEDfzzr8psLIgAxyq2DGQRI3o=
 code.cloudfoundry.org/bbs/encryption v1.28.0 h1:6xu7lLR+kOz3ePnBXDn08dzloNtY7xwWgwH0zd5mGj0=
 code.cloudfoundry.org/bbs/encryption v1.28.0/go.mod h1:jlv0T8xoAgLCOhQIzx4rSskBCFnHBPWHc9hdcIL156o=
 code.cloudfoundry.org/bbs/format v1.20.0 h1:a4z7V7y7jkJr3Wy1ifCfHfYuE/L9FRCTVuK+boWG7k8=
 code.cloudfoundry.org/bbs/format v1.20.0/go.mod h1:FdFMlw+wq82sevW98yrMSPI/L4IefeSK4YoiZlw7stg=
 code.cloudfoundry.org/bbs/models v1.29.0 h1:djNAJQNd6PmXkSr2/X8Og4YD2+itoIe1puoiHuheurE=
 code.cloudfoundry.org/bbs/models v1.29.0/go.mod h1:WTsL0BD6F3b1QKkPemTM2iOQfKK3/62HWV11Lxu8aGw=
-code.cloudfoundry.org/cfhttp/v2 v2.99.0 h1:A2NuxCLW2MuT8Hsiiky3KE6PDvQZ8rkzPimcIs2/vCU=
-code.cloudfoundry.org/cfhttp/v2 v2.99.0/go.mod h1:xJ7XlnKyNnyR0+PGrIKARe0uBTqQK7T4BHMjVHnnb2k=
+code.cloudfoundry.org/cfhttp/v2 v2.101.0 h1:IC0iU2JoYwaZweNjaICmSyAeP/9wb1pEhfyhBhIfoC4=
+code.cloudfoundry.org/cfhttp/v2 v2.101.0/go.mod h1:r+IywdZGyt+PMmE3oVfAhsOIB+13UpKXP0MilM2c8CI=
 code.cloudfoundry.org/clock v1.96.0 h1:7jHacz+fcodeUtZpB9RmTXxXXNUMxHJbHxNgkFCItVU=
 code.cloudfoundry.org/clock v1.96.0/go.mod h1:YqD1dlN8/OZN9uAsZVFQn9CVC5SsskQDpXdGhjntXEg=
 code.cloudfoundry.org/debugserver v0.122.0 h1:lyTadQ2mIi/pQDVtfTpc1tX3uJ/pBQ2lzLygxApNisw=

@@ -1,5 +1,5 @@
-# code.cloudfoundry.org/bbs v1.30.0
-## explicit; go 1.26.2
+# code.cloudfoundry.org/bbs v1.34.0
+## explicit; go 1.27.3
 code.cloudfoundry.org/bbs
 code.cloudfoundry.org/bbs/events
 code.cloudfoundry.org/bbs/events/eventfakes
@@ -15,7 +15,7 @@ code.cloudfoundry.org/bbs/format
 ## explicit; go 1.26.2
 code.cloudfoundry.org/bbs/models
 code.cloudfoundry.org/bbs/models/test/model_helpers
-# code.cloudfoundry.org/cfhttp/v2 v2.99.0
+# code.cloudfoundry.org/cfhttp/v2 v2.101.0
 ## explicit; go 1.26.0
 code.cloudfoundry.org/cfhttp/v2
 # code.cloudfoundry.org/clock v1.96.0
