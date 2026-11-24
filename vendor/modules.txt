@@ -48,7 +48,7 @@ code.cloudfoundry.org/lager/v3/lagertest
 # code.cloudfoundry.org/localip v0.98.0
 ## explicit; go 1.26.0
 code.cloudfoundry.org/localip
-# code.cloudfoundry.org/locket v1.21.0
+# code.cloudfoundry.org/locket v1.22.0
 ## explicit; go 1.27.3
 code.cloudfoundry.org/locket
 code.cloudfoundry.org/locket/cmd/locket/certauthority
